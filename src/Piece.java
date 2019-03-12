@@ -9,7 +9,7 @@ import java.awt.geom.Ellipse2D;
  * 2   -   Red King
  * 3   -   Black
  * 4   -   Black King
- * <p>
+ *
  * Oval is the drawn piece on game board
  */
 class Piece {
@@ -49,7 +49,8 @@ class Piece {
         return this.king;
     }
 
-    void resetPiece() {
+    void resetPiece(int emptyPieceType) {
+//        this.pieceType = CheckersData.EMPTY; // This WOULD work, but feels like a bad practice
         this.pieceType = 0;
         this.oval = null;
         this.king = false;

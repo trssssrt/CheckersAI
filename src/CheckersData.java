@@ -72,14 +72,14 @@ class CheckersData {
     void makeMove(int fromRow, int fromCol, int toRow, int toCol) {
         boolean isKing = false; //!@#$%^&*() Only used for testing. Triggers print when a piece becomes a king
         Piece temp = gamePieces[toRow][toCol];
-        temp.resetPiece();
+        temp.resetPiece(EMPTY);
         gamePieces[toRow][toCol] = gamePieces[fromRow][fromCol];
         gamePieces[fromRow][fromCol] = temp;
         if (Math.abs(fromRow - toRow) == 2) {
             // The move is a jump.  Remove the jumped piece from the board.
             int jumpRow = (fromRow + toRow) / 2;  // Row of the jumped piece.
             int jumpCol = (fromCol + toCol) / 2;  // Column of the jumped piece.
-            gamePieces[jumpRow][jumpCol].resetPiece();//!@#$%^&*()
+            gamePieces[jumpRow][jumpCol].resetPiece(EMPTY);//!@#$%^&*()
         }
 
         // If piece gets to other side of board make it into a king

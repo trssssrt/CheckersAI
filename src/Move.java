@@ -21,6 +21,7 @@ class Move {
     // Check if move is a jump (assume jump is legal).
     // Non-jump moves only move diagonally 1 tile at a time
     boolean isJump() {
-        return (fromRow - toRow == 2 || fromRow - toRow == -2);
+//        return (fromRow - toRow == 2 || fromRow - toRow == -2);
+        return Math.abs(fromRow - toRow) == 2;
     }
 }

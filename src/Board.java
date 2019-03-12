@@ -14,10 +14,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
 
     private final CheckersData board = new CheckersData();
     private boolean gameInProgress;
-    private static Color backgroundColor;
-
-    /* The next three variables are valid only when the game is in progress. */
-
+    //    private static Color backgroundColor;
     private int currentPlayer; // Holds Piece Type (RED or BLACK)
 
     private int selectedRow, selectedCol;  // -1 if Player has not selected Row & Col
@@ -26,11 +23,12 @@ class Board extends JPanel implements ActionListener, MouseListener {
     private static int numRowsAndColumns = 8;
 
 
+    // Variables dealing with game Paints & Graphics
     private static final Color darkColor = Color.decode("#9D7D5C");
     private static final Color lightColor = Color.decode("#F1EBDE");
-
     private static final Color gameBlack = Color.BLACK.brighter(),
             gameRed = Color.RED.darker(),
+            emptyPieceColor = new Color(0, 0, 0, 0),
             legalMovePieceColor = Color.ORANGE,
             legalMoveColor = Color.MAGENTA,
             selectedPiece = Color.WHITE,
@@ -38,9 +36,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
     private static final float legalMoveBorder = 1.9f,
             selectedLegalMoveBorder = 1.9f,
             selectedPieceBorder = 2f;
-
     private static Graphics[][] gameBoardGraphics = new Graphics[numRowsAndColumns][numRowsAndColumns];
-
     private static final int initialX = 100, initialY = 50;
     private static final int squareSize = 80, pieceSize = 60;
 
@@ -52,7 +48,9 @@ class Board extends JPanel implements ActionListener, MouseListener {
 
     //!@#$%^&*()
     Board(Color backgroundColor) {
+//        this.numRowsAndColumns = numRowsAndColumns;
         setBackground(backgroundColor);
+//        this.backgroundColor = backgroundColor;
         addMouseListener(this);
         resignButton = new JButton("Resign");
         resignButton.addActionListener(this);
@@ -65,6 +63,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
     }
 
     //!@#$%^&*() WILL remove if buttons don't exist
+
     /**
      * Respond to user's click on one of the two buttons.
      */
@@ -77,6 +76,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
     }
 
     //!@#$%^&*()
+
     /**
      * Start a new game
      */
@@ -100,8 +100,9 @@ class Board extends JPanel implements ActionListener, MouseListener {
 
 
     //!@#$%^&*() I may cut this out entirely. I have not modified it from original
+
     /**
-     * Current player resigns.  Game ends.  Opponent wins.
+     * If the current player resigns, then the game ends and opponent wins
      */
     private void doResign() {
         if (!gameInProgress) {
@@ -117,8 +118,8 @@ class Board extends JPanel implements ActionListener, MouseListener {
 
 
     //!@#$%^&*()
+
     /**
-     *
      * @param str Message sent to players at the end of the game
      */
     private void gameOver(String str) {
@@ -283,9 +284,9 @@ class Board extends JPanel implements ActionListener, MouseListener {
                 RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setRenderingHints(rh);
+
         int currentX = initialX;
         int currentY = initialY;
-
         for (int row = 0; row < numRowsAndColumns; row++) {
             for (int col = 0; col < numRowsAndColumns; col++) {
 
@@ -308,7 +309,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
                     g2d.setColor(gameRed);
 
                 } else if (board.gamePieces[row][col].getPieceType() == CheckersData.EMPTY) {
-                    g2d.setColor(new Color(0, 0, 0, 0));
+                    g2d.setColor(emptyPieceColor);
                 }
 
                 // Draw Ellipse around gamePieces
@@ -402,7 +403,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
 
     /**
      * mousePressed
-     *
+     * <p>
      * Responds when the user clicks the game board.
      * Calculate row and column that the user clicks,
      * then send calculated data to handler.
