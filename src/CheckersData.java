@@ -67,7 +67,7 @@ class CheckersData {
      * @param toRow   Row to which the Player moves
      * @param toCol   Column to which the Player moves
      */
-    public void makeMove(int fromRow, int fromCol, int toRow, int toCol) {
+    void makeMove(int fromRow, int fromCol, int toRow, int toCol) {
         boolean isKing = false; //!@#$%^&*() Only used for testing. Triggers print when a piece becomes a king
         Piece temp = gamePieces[toRow][toCol];
         temp.resetPiece(EMPTY);
@@ -117,7 +117,7 @@ class CheckersData {
      *                  /                  |                      \
      *         Southwest           South (illegal Move)            Southeast
      */
-    public Move[] getLegalMoves(int playerID) {
+    Move[] getLegalMoves(int playerID) {
         // Reject if player isn't Red or Black (Should never happen)
         if (playerID != RED && playerID != BLACK) {
             return null;
