@@ -14,20 +14,20 @@ class Board extends JPanel implements ActionListener, MouseListener {
 
     private final CheckersData board = new CheckersData();
     private boolean gameInProgress;
+    private static Color backgroundColor;
 
     /* The next three variables are valid only when the game is in progress. */
 
-    private int currentPlayer;      // Whose turn is it now?  The possible values
-    //    are CheckersData.RED and CheckersData.BLACK.
+    private int currentPlayer; // Holds Piece Type (RED or BLACK)
 
-    private int selectedRow, selectedCol;  // If the current player has selected a piece to
-    //     move, these give the row and column
-    //     containing that piece.  If no piece is
-    //     yet selected, then selectedRow is -1.
+    private int selectedRow, selectedCol;  // -1 if Player has not selected Row & Col
 
-    private static Move[] legalMoves;  // An array containing the legal moves for the
-    //   current player.
+    private static Move[] legalMoves;  // Current Player's legal moves
     private static int numRowsAndColumns = 8;
+
+
+    private static final Color darkColor = Color.decode("#9D7D5C");
+    private static final Color lightColor = Color.decode("#F1EBDE");
 
     private static final Color gameBlack = Color.BLACK.brighter(),
             gameRed = Color.RED.darker(),
@@ -51,8 +51,8 @@ class Board extends JPanel implements ActionListener, MouseListener {
 
 
     //!@#$%^&*()
-    Board() {
-        setBackground(Color.BLACK);
+    Board(Color backgroundColor) {
+        setBackground(backgroundColor);
         addMouseListener(this);
         resignButton = new JButton("Resign");
         resignButton.addActionListener(this);
@@ -64,7 +64,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
         doNewGame();
     }
 
-    //!@#$%^&*()
+    //!@#$%^&*() WILL remove if buttons don't exist
     /**
      * Respond to user's click on one of the two buttons.
      */
@@ -82,29 +82,24 @@ class Board extends JPanel implements ActionListener, MouseListener {
      */
     private void doNewGame() {
         if (gameInProgress) {
-            // This should not be possible, but it doesn't hurt to check.
-            message.setText("Finish the current game first!");
+//            message.setText("Finish the current game first!");
             return;
         }
         board.setUpCheckerBoard(numRowsAndColumns);
-        // My Changes, my changes SHOULD include gamePieces... CHECK THAT
-//        currentPlayer = CheckersData.BLACK;   // BLACK moves first.
-//        legalMoves = board.getLegalMoves(CheckersData.BLACK);  // Get First Player's legal moves.
-        // ORIGINAL
         currentPlayer = CheckersData.RED;   // RED moves first.
         legalMoves = board.getLegalMoves(CheckersData.RED);  // Get RED's legal moves.
 
-
-        selectedRow = -1;   // RED has not yet selected a piece to move.
-        message.setText("Black:  Make your move.");
+        selectedRow = -1;   // No pieces are selected at start of game
+//        message.setText("Black:  Make your move.");
         gameInProgress = true;
-        newGameButton.setEnabled(false);
-        resignButton.setEnabled(true);
+//        newGameButton.setEnabled(false);
+//        resignButton.setEnabled(true);
+        // Update screen
         repaint();
     }
 
 
-    //!@#$%^&*()
+    //!@#$%^&*() I may cut this out entirely. I have not modified it from original
     /**
      * Current player resigns.  Game ends.  Opponent wins.
      */
@@ -123,10 +118,8 @@ class Board extends JPanel implements ActionListener, MouseListener {
 
     //!@#$%^&*()
     /**
-     * The game ends.  The parameter, str, is displayed as a message
-     * to the user.  The states of the buttons are adjusted so the players
-     * can start a new game.  This method is called when the game
-     * ends at any point in this class.
+     *
+     * @param str Message sent to players at the end of the game
      */
     private void gameOver(String str) {
         message.setText(str);
@@ -136,59 +129,49 @@ class Board extends JPanel implements ActionListener, MouseListener {
     }
 
 
-    //!@#$%^&*()
     /**
-     * This is called by mousePressed() when a player clicks on the
-     * square in the specified row and col.  It has already been checked
-     * that a game is, in fact, in progress.
+     * If user selects valid tile, update screen with moves
+     * (This is called by mousePressed())
+     *
+     * @param clickedRow The row the player selects
+     * @param clickedCol The column the player selects
      */
-    private void doClickSquare(int row, int col) {
-
-         /* If the player clicked on one of the pieces that the player
-          can move, mark this row and col as selected and return.  (This
-          might change a previous selection.)  Reset the message, in
-          case it was previously displaying an error message. */
-
+    private void doClickTile(int clickedRow, int clickedCol) {
+        // If player clicks a row and column that are valid, update selectedRow & selectedCol and update screen
         for (Move legalMove : legalMoves) {
-            if (legalMove.fromRow == row && legalMove.fromCol == col) {
-                selectedRow = row;
-                selectedCol = col;
-                if (currentPlayer == CheckersData.RED) {
-                    message.setText("RED:  Make your move.");
-                } else {
-                    message.setText("BLACK:  Make your move.");
-                }
+            if (legalMove.fromRow == clickedRow && legalMove.fromCol == clickedCol) {
+                selectedRow = clickedRow;
+                selectedCol = clickedCol;
+//                if (currentPlayer == CheckersData.RED) {
+//                    message.setText("RED:  Make your move.");
+//                } else {
+//                    message.setText("BLACK:  Make your move.");
+//                }
+                // Update Screen
                 repaint();
                 return;
             }
         }
 
-         /* If no piece has been selected to be moved, the user must first
-          select a piece.  Show an error message and return. */
-
+        // Inform player that they can only select their pieces //!@#$%^&*()
         if (selectedRow < 0) {
-            message.setText("Click the piece you want to move.");
+//            message.setText("Click the piece you want to move.");
             return;
         }
 
-         /* If the user clicked on a square where the selected piece can be
-          legally moved, then make the move and return. */
-
+        // When player chooses where to move, move the piece
         for (Move legalMove : legalMoves) {
             if (legalMove.fromRow == selectedRow && legalMove.fromCol == selectedCol
-                    && legalMove.toRow == row && legalMove.toCol == col) {
+                    && legalMove.toRow == clickedRow && legalMove.toCol == clickedCol) {
                 doMakeMove(legalMove);
                 return;
             }
         }
 
-         /* If we get to this point, there is a piece selected, and the square where
-          the user just clicked is not one where that piece can be legally moved.
-          Show an error message. */
+        // Inform player that they can only select the highlighted
+//        message.setText("Click the square you want to move to.");
 
-        message.setText("Click the square you want to move to.");
-
-    }  // end doClickSquare()
+    }
 
 
     /**
@@ -217,7 +200,8 @@ class Board extends JPanel implements ActionListener, MouseListener {
 //                } else {
 //                    message.setText("BLACK:  You must continue jumping.");
 //                }
-                selectedRow = move.toRow;  // Since only one piece can be moved, select it.
+                // Enforce Jump Rule
+                selectedRow = move.toRow;
                 selectedCol = move.toCol;
                 // Update board
                 repaint();
@@ -234,40 +218,45 @@ class Board extends JPanel implements ActionListener, MouseListener {
             currentPlayer = CheckersData.BLACK;
             legalMoves = board.getLegalMoves(currentPlayer);
             if (legalMoves == null) {
-                gameOver("BLACK has no moves.  RED wins.");
+                gameOver("BLACK has no moves.  RED wins."); //!@#$%^&*()
             } else if (legalMoves[0].isJump()) {
-                message.setText("BLACK:  Make your move.  You must jump.");
+//                message.setText("BLACK:  Make your move.  You must jump.");
             } else {
-                message.setText("BLACK:  Make your move.");
+//                message.setText("BLACK:  Make your move.");
             }
         } else {
             currentPlayer = CheckersData.RED;
             legalMoves = board.getLegalMoves(currentPlayer);
             if (legalMoves == null) {
-                gameOver("RED has no moves.  BLACK wins.");
+                gameOver("RED has no moves.  BLACK wins.");//!@#$%^&*()
             } else if (legalMoves[0].isJump()) {
-                message.setText("RED:  Make your move.  You must jump.");
+//                message.setText("RED:  Make your move.  You must jump.");
             } else {
-                message.setText("RED:  Make your move.");
+//                message.setText("RED:  Make your move.");
             }
         }
 
         // Player has not selected piece: selectedRow = -1
-
         selectedRow = -1;
 
         // Auto select piece if it is the only legal piece to move
-
         if (legalMoves != null) {
-            boolean sameStartSquare = true;
+            boolean isOnlyOneLegalPieceToMove = true;
             //!@#$%^&*() Foreach?
-            for (int i = 1; i < legalMoves.length; i++)
-                if (legalMoves[i].fromRow != legalMoves[0].fromRow
-                        || legalMoves[i].fromCol != legalMoves[0].fromCol) {
-                    sameStartSquare = false;
+            for (Move legalMove : legalMoves) {
+                if (legalMove.fromRow != legalMoves[0].fromRow
+                        || legalMove.fromCol != legalMoves[0].fromCol) {
+                    isOnlyOneLegalPieceToMove = false;
                     break;
                 }
-            if (sameStartSquare) {
+            }
+//            for (int i = 1; i < legalMoves.length; i++)
+//                if (legalMoves[i].fromRow != legalMoves[0].fromRow
+//                        || legalMoves[i].fromCol != legalMoves[0].fromCol) {
+//                    sameStartSquare = false;
+//                    break;
+//                }
+            if (isOnlyOneLegalPieceToMove) {
                 selectedRow = legalMoves[0].fromRow;
                 selectedCol = legalMoves[0].fromCol;
             }
@@ -277,19 +266,18 @@ class Board extends JPanel implements ActionListener, MouseListener {
 
         repaint();
 
-    }  // end doMakeMove();
+    }
 
 
     /**
      * Draw checkerboard pattern, then the checkers pieces.
      * If we have an active game, highlight legal moves for
      * current player
+     * Every time this is called it repaints EVERY part
+     * of the game
      */
     @Override
     public void paintComponent(Graphics g) {
-        Color darkColor = Color.decode("#9D7D5C");
-        Color lightColor = Color.decode("#F1EBDE");
-
         Graphics2D g2d = (Graphics2D) g;
         RenderingHints rh = new RenderingHints(
                 RenderingHints.KEY_ANTIALIASING,
@@ -297,9 +285,10 @@ class Board extends JPanel implements ActionListener, MouseListener {
         g2d.setRenderingHints(rh);
         int currentX = initialX;
         int currentY = initialY;
-        //Every repaint the board and all the pieces on it are repainted from scratch
+
         for (int row = 0; row < numRowsAndColumns; row++) {
             for (int col = 0; col < numRowsAndColumns; col++) {
+
                 //Paints the game board
                 if (row % 2 == col % 2) {
                     g.setColor(darkColor);
@@ -308,17 +297,22 @@ class Board extends JPanel implements ActionListener, MouseListener {
                 }
                 g2d.fill(new Rectangle2D.Double(currentX, currentY, squareSize, squareSize));
                 gameBoardGraphics[row][col] = g;
-                //Checks what piece is to be drawn and sets the colour that is appropriate
-                if (board.gamePieces[row][col].getPieceType() == 1 || board.gamePieces[row][col].getPieceType() == 2) {
+
+                // Check piece type and color it appropriately
+                if (board.gamePieces[row][col].getPieceType() == CheckersData.RED
+                        || board.gamePieces[row][col].getPieceType() == CheckersData.RED_KING) {
                     g2d.setColor(gameBlack);
-                } else if (board.gamePieces[row][col].getPieceType() == 3 || board.gamePieces[row][col].getPieceType() == 4) {
+
+                } else if (board.gamePieces[row][col].getPieceType() == CheckersData.BLACK
+                        || board.gamePieces[row][col].getPieceType() == CheckersData.BLACK_KING) {
                     g2d.setColor(gameRed);
-                } else if (board.gamePieces[row][col].getPieceType() == 0) {
+
+                } else if (board.gamePieces[row][col].getPieceType() == CheckersData.EMPTY) {
                     g2d.setColor(new Color(0, 0, 0, 0));
                 }
 
                 // Draw Ellipse around gamePieces
-                if (board.gamePieces[row][col].getPieceType() != 0) {
+                if (board.gamePieces[row][col].getPieceType() != CheckersData.EMPTY) {
                     Ellipse2D pieceShape = new Ellipse2D.Double(currentX + initialX / 10.0,
                             currentY + initialX / 10.0, pieceSize, pieceSize);
                     board.gamePieces[row][col].setOval(pieceShape);
@@ -357,8 +351,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
                 g2d.setStroke(new BasicStroke(legalMoveBorder));
             }
 
-            //!@#$%^&*()
-            // If a piece is selected add add border to piece's tile and another borde to legal moves
+            // If a piece is selected add add border to piece's tile and another border to legal moves
             if (selectedRow >= 0) {
                 // Draw border around selected piece
                 gameBoardGraphics[selectedRow][selectedCol].setColor(selectedPiece);
@@ -409,7 +402,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
 
     /**
      * mousePressed
-     * <p>
+     *
      * Responds when the user clicks the game board.
      * Calculate row and column that the user clicks,
      * then send calculated data to handler.
@@ -422,7 +415,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
             int col = (evt.getX() - initialX) / squareSize;
             int row = (evt.getY() - initialY) / squareSize;
             if (col >= 0 && col < numRowsAndColumns && row >= 0 && row < numRowsAndColumns) {
-                doClickSquare(row, col);
+                doClickTile(row, col);
             }
         } else {
             message.setText("Click \"New Game\" to start a new game.");

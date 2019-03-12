@@ -17,7 +17,8 @@ class Checkers extends JPanel {
         put("height", 750);
     }};
     private static int numRowsAndColumns = 8;
-    private final Board board = new Board();
+    private static Color backgroundColor = Color.decode("#492A1B");
+    private final Board board = new Board(backgroundColor);
 
     /**
      * Main routine makes it possible to run Checkers as a stand-alone
@@ -38,7 +39,6 @@ class Checkers extends JPanel {
         window.setResizable(false);
         window.setVisible(true);
     }
-
     /**
      * The constructor creates the Board (which in turn creates and manages
      * the buttons and message label), adds all the components, and sets
@@ -50,7 +50,7 @@ class Checkers extends JPanel {
 //        setLayout(null);  // This is the cause of the sizing issues
         setPreferredSize(new Dimension(windowDimensions.get("width"), windowDimensions.get("height")));
 
-        setBackground(new Color(0, 150, 0));  // Dark green background.//!@#$%^&*()
+        setBackground(backgroundColor);  // Dark green background.//!@#$%^&*()
 
         /* Create the components and add them to the panel. */
 
@@ -62,7 +62,7 @@ class Checkers extends JPanel {
 //        add(newGameButton);
 //        add(resignButton);
 //        add(message);
-      
+
       /* Set the position and size of each component by calling
        its setBounds() method. */
 
