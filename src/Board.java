@@ -194,7 +194,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
 
         if (move.isJump()) {
             // Check for double jump (this will continue to get called until there are no more successive jumps)
-            legalMoves = board.getLegalJumpsFrom(currentPlayer, move.toRow, move.toCol);
+            legalMoves = board.getLegalJumpsFromPosition(currentPlayer, move.toRow, move.toCol);
             if (legalMoves != null) {
 //                if (currentPlayer == CheckersData.RED) {
 //                    message.setText("RED:  You must continue jumping.");

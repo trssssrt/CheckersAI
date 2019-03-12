@@ -98,16 +98,7 @@ class CheckersData {
             printBoardPieces();
         }
     }
-
-    /**
-     * Return an array containing all the legal Moves
-     * for the specified player on the current board.  If the player
-     * has no legal moves, null is returned.  The value of player
-     * should be one of the constants RED or BLACK; if not, null
-     * is returned.  If the returned value is non-null, it consists
-     * entirely of jump moves or entirely of regular moves, since
-     * if the player can jump, only jumps are legal moves.
-     */
+    
     /**
      * @param playerID Current Player's ID (RED or BLACK)
      * @return Returns Moves array if there are any legal moves
@@ -118,26 +109,25 @@ class CheckersData {
      * <p>
      * <p>
      * Piece Organization:
-     * Northwest           North (illegal Move)            Northeast
-     *          \                  |                      /
-     *           \                 |                     /
+     *         Northwest           North (illegal Move)            Northeast
+     *                  \                  |                      /
+     *                   \                 |                     /
      * West (illegal Move) -------   Player's Game Piece     ------- East (illegal Move)
-     *           /                 |                     \
-     *          /                  |                      \
-     * Southwest           South (illegal Move)            Southeast
+     *                   /                 |                     \
+     *                  /                  |                      \
+     *         Southwest           South (illegal Move)            Southeast
      */
-    //!@#$%^&*() Refactor
     Move[] getLegalMoves(int playerID) {
         // Reject if player isn't Red or Black (Should never happen)
         if (playerID != RED && playerID != BLACK) {
             return null;
         }
 
-        int playerKing;  // Get Player's King ID
+        int playerKingID;  // Get Player's King ID
         if (playerID == RED) {
-            playerKing = RED_KING;
+            playerKingID = RED_KING;
         } else {
-            playerKing = BLACK_KING;
+            playerKingID = BLACK_KING;
         }
 
         ArrayList<Move> moves = new ArrayList<>();  // Moves will be stored in this list.
@@ -151,7 +141,7 @@ class CheckersData {
             for (int col = 0; col < numRowsAndColumns; col++) {
 
                 // Check if piece is current player's
-                if (gamePieces[row][col].getPieceType() == playerID || gamePieces[row][col].getPieceType() == playerKing) {
+                if (gamePieces[row][col].getPieceType() == playerID || gamePieces[row][col].getPieceType() == playerKingID) {
 
                     // Check if player can jump Northeast
                     if (isLegalJump(playerID, row, col, row + 1, col + 1, row + 2, col + 2)) {
@@ -184,7 +174,7 @@ class CheckersData {
         if (moves.size() == 0) {
             for (int row = 0; row < numRowsAndColumns; row++) {
                 for (int col = 0; col < numRowsAndColumns; col++) {
-                    if (gamePieces[row][col].getPieceType() == playerID || gamePieces[row][col].getPieceType() == playerKing) {
+                    if (gamePieces[row][col].getPieceType() == playerID || gamePieces[row][col].getPieceType() == playerKingID) {
                         // Diagonal to the Northeast
                         if (isLegalMove(playerID, row, col, row + 1, col + 1)) {
                             moves.add(new Move(row, col, row + 1, col + 1));
@@ -211,11 +201,6 @@ class CheckersData {
             return null;
         } else {
             return moves.toArray(new Move[moves.size()]); // Convert Move List to Move Array
-//            Move[] moveArray = new Move[moves.size()];
-//            for (int i = 0; i < moves.size(); i++) {
-//                moveArray[i] = moves.get(i);
-//            }
-//            return moveArray;
         }
 
     }
@@ -231,8 +216,7 @@ class CheckersData {
      * @param currentCol Game piece's current column
      * @return Return array of legal jumps
      */
-    //!@#$%^&*() Refactor
-    Move[] getLegalJumpsFrom(int playerID, int currentRow, int currentCol) {
+    Move[] getLegalJumpsFromPosition(int playerID, int currentRow, int currentCol) {
         // Reject if player isn't Red or Black
         if (playerID != RED && playerID != BLACK) {
             return null;
@@ -274,12 +258,6 @@ class CheckersData {
             return null;
         } else {//!@#$%^&*() Why can't we just return moves? -- Because they are a different type
             return moves.toArray(new Move[moves.size()]);
-//            Move[] moveArray = new Move[moves.size()];
-//            //!@#$%^&*() foreach?
-//            for (int i = 0; i < moves.size(); i++) {
-//                moveArray[i] = moves.get(i);
-//            }
-//            return moveArray;
         }
     }
 
@@ -378,7 +356,7 @@ class CheckersData {
 
     /**
      * Check if move is legal
-     * 
+     *
      * @param player  Player's ID
      * @param fromRow Row from which the Player moves
      * @param fromCol Column from which the Player moves
