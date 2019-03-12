@@ -51,7 +51,7 @@ class Piece {
 
     void resetPiece(int emptyPieceType) {
 //        this.pieceType = CheckersData.EMPTY; // This WOULD work, but feels like a bad practice
-        this.pieceType = 0;
+        this.pieceType = emptyPieceType;
         this.oval = null;
         this.king = false;
     }

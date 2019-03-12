@@ -21,12 +21,10 @@ class CheckersData {
             BLACK = 3,
             BLACK_KING = 4;
 
-
     final Piece[][] gamePieces;
 
-
     /**
-     * Constructor.  Create the board and set it up for a new game.
+     * Setup board for new game
      */
     CheckersData() {
         gamePieces = new Piece[numRowsAndColumns][numRowsAndColumns];
@@ -121,11 +119,11 @@ class CheckersData {
      * <p>
      * Piece Organization:
      * Northwest           North (illegal Move)            Northeast
-     * \                  |                      /
-     * \                 |                     /
+     *          \                  |                      /
+     *           \                 |                     /
      * West (illegal Move) -------   Player's Game Piece     ------- East (illegal Move)
-     * /                 |                     \
-     * /                  |                      \
+     *           /                 |                     \
+     *          /                  |                      \
      * Southwest           South (illegal Move)            Southeast
      */
     //!@#$%^&*() Refactor
@@ -287,6 +285,8 @@ class CheckersData {
 
 
     /**
+     * Check if jump is legal
+     *
      * @param player  Player's ID
      * @param fromRow Row from which the Player moves
      * @param fromCol Column from which the Player moves
@@ -328,6 +328,7 @@ class CheckersData {
     }
 
 //    /**
+    // * Check if jump is legal
 //     * @param player  Player's ID (Assumed to be RED or BLACK)
 //     * @param fromRow Row from which the Player moves
 //     * @param fromCol Column from which the Player moves
@@ -376,6 +377,8 @@ class CheckersData {
 
 
     /**
+     * Check if move is legal
+     * 
      * @param player  Player's ID
      * @param fromRow Row from which the Player moves
      * @param fromCol Column from which the Player moves

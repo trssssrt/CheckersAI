@@ -21,9 +21,7 @@ class Checkers extends JPanel {
     private final Board board = new Board(backgroundColor);
 
     /**
-     * Main routine makes it possible to run Checkers as a stand-alone
-     * application.  Opens a window showing a Checkers panel; the program
-     * ends when the user closes the window.
+     * Main JFrame window created here. Most of the work is passed into Board
      */
     public static void main(String[] args) {
         JFrame window = new JFrame("Checkers");
@@ -39,24 +37,13 @@ class Checkers extends JPanel {
         window.setResizable(false);
         window.setVisible(true);
     }
-    /**
-     * The constructor creates the Board (which in turn creates and manages
-     * the buttons and message label), adds all the components, and sets
-     * the bounds of the components.  A null layout is used.  (This is
-     * the only thing that is done in the main Checkers class.)
-     */
-    private Checkers() {
 
-//        setLayout(null);  // This is the cause of the sizing issues
+    private Checkers() {
         setPreferredSize(new Dimension(windowDimensions.get("width"), windowDimensions.get("height")));
 
-        setBackground(backgroundColor);  // Dark green background.//!@#$%^&*()
+        setBackground(backgroundColor);
 
         /* Create the components and add them to the panel. */
-
-//        Board board = new Board();  // Note: The constructor for the
-//        //   board also creates the buttons
-//        //   and label.
         add(board);
         //!@#$%^&*() Buttons No Longer Work
 //        add(newGameButton);
