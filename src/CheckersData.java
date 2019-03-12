@@ -1,6 +1,11 @@
 import java.util.ArrayList;
 
 /**
+ * Stores game data:
+ *      - Board Size
+ *      - Piece Types
+ *      - Piece location
+ *      -
  * An object of this class holds data about a game of checkers.
  * It knows what kind of piece is on each square of the checkerboard.
  * Note that RED moves "up" the board (i.e. row number decreases)
@@ -9,11 +14,6 @@ import java.util.ArrayList;
  */
 class CheckersData {
     private int numRowsAndColumns = 8;
-
-      /*  The following constants represent the possible contents of a square
-          on the board.  The constants RED and BLACK also represent players
-          in the game. */
-
     static final int
             EMPTY = 0,
             RED = 1,
@@ -22,18 +22,25 @@ class CheckersData {
             BLACK_KING = 4;
 
 
-    final Piece[][] gamePieces = new Piece[numRowsAndColumns][numRowsAndColumns];
+    final Piece[][] gamePieces;
 
 
     /**
      * Constructor.  Create the board and set it up for a new game.
      */
     CheckersData() {
+        gamePieces = new Piece[numRowsAndColumns][numRowsAndColumns];
         setUpCheckerBoard(numRowsAndColumns);
     }
 
     /**
      * buildCheckerBoard
+     *
+     * Set up board with checkers in every other position.
+     * That is, pieces reside at row % 2 == col % 2.
+     *
+     * Starting positions are first 3 and last 3 rows
+     * which hold Black and Red pieces respectively.
      *
      * @param numRowsAndColumns Represents number of squares forming the rows/columns
      *                          <p>
@@ -59,14 +66,6 @@ class CheckersData {
         }
     }
 
-    /**
-     * Set up the board with checkers in position for the beginning
-     * of a game.  Note that checkers can only be found in squares
-     * that satisfy  row % 2 == col % 2.  At the start of the game,
-     * all such squares in the first three rows contain black squares
-     * and all such squares in the last three rows contain red squares.
-     */
-
 
     /**
      * Make the move from (fromRow,fromCol) to (toRow,toCol).  It is
@@ -76,32 +75,33 @@ class CheckersData {
      * piece becomes a king.
      */
     void makeMove(int fromRow, int fromCol, int toRow, int toCol) {
-        boolean isKing = false;
+        boolean isKing = false; //!@#$%^&*() Only used for testing. Triggers print when a piece becomes a king
         Piece temp = gamePieces[toRow][toCol];
         temp.resetPiece();
         gamePieces[toRow][toCol] = gamePieces[fromRow][fromCol];
         gamePieces[fromRow][fromCol] = temp;
-//        gamePieces[fromRow][fromCol].setPieceVal(EMPTY);
-        if (fromRow - toRow == 2 || fromRow - toRow == -2) {
+        if (Math.abs(fromRow - toRow) == 2) {
             // The move is a jump.  Remove the jumped piece from the board.
             int jumpRow = (fromRow + toRow) / 2;  // Row of the jumped piece.
             int jumpCol = (fromCol + toCol) / 2;  // Column of the jumped piece.
-//            gamePieces[jumpRow][jumpCol].setPieceVal(EMPTY);
-            gamePieces[jumpRow][jumpCol].resetPiece();//setOval(null);//!@#$%^&*()
+            gamePieces[jumpRow][jumpCol].resetPiece();//!@#$%^&*()
         }
-        if (toRow == 0 && gamePieces[toRow][toCol].getPieceVal() == RED) {
-            gamePieces[toRow][toCol].setPieceVal(RED_KING);
+
+        // If piece gets to other side of board make it into a king
+        if (toRow == 0 && gamePieces[toRow][toCol].getPieceType() == RED) {
+            gamePieces[toRow][toCol].setPieceType(RED_KING);
             gamePieces[toRow][toCol].setKing();
             isKing = true;
         }
-        if (toRow == numRowsAndColumns - 1 && gamePieces[toRow][toCol].getPieceVal() == BLACK) {
-            gamePieces[toRow][toCol].setPieceVal(BLACK_KING);
+        if (toRow == numRowsAndColumns - 1 && gamePieces[toRow][toCol].getPieceType() == BLACK) {
+            gamePieces[toRow][toCol].setPieceType(BLACK_KING);
             gamePieces[toRow][toCol].setKing();
             isKing = true;
         }
 
+        // Prints ONLY when piece becomes a king
         if (isKing) {
-            System.out.printf("\nUPDATED KING\n");
+            System.out.println("\nNew King: Printing Board");
             printBoardPieces();
         }
     }
@@ -115,7 +115,8 @@ class CheckersData {
      * entirely of jump moves or entirely of regular moves, since
      * if the player can jump, only jumps are legal moves.
      */
-    Move[] getLegalMoves(int player) { // WORKS
+    //!@#$%^&*() Refactor
+    Move[] getLegalMoves(int player) {
         if (player != RED && player != BLACK) { //!@#$%^&*() What? DO NOT PLAY IF EMPTY?
             return null;
         }
@@ -129,15 +130,14 @@ class CheckersData {
 
         ArrayList<Move> moves = new ArrayList<>();  // Moves will be stored in this list.
 
-         /*  First, check for any possible jumps.  Look at each square on the board.
-          If that square contains one of the player's pieces, look at a possible
-          jump in each of the four directions from that square.  If there is
-          a legal jump in that direction, put it in the moves ArrayList.
-          */
+        /*  If a jump is possible, find them first.
+         *  Examine each location for a possible jump.
+         *  Check if move is legal, if so, add to ArrayList
+         */
 
         for (int row = 0; row < numRowsAndColumns; row++) {
             for (int col = 0; col < numRowsAndColumns; col++) {
-                if (gamePieces[row][col].getPieceVal() == player || gamePieces[row][col].getPieceVal() == playerKing) {
+                if (gamePieces[row][col].getPieceType() == player || gamePieces[row][col].getPieceType() == playerKing) {
                     if (canJump(player, row, col, row + 1, col + 1, row + 2, col + 2)) {
                         moves.add(new Move(row, col, row + 2, col + 2));
                     }
@@ -154,28 +154,39 @@ class CheckersData {
             }
         }
 
-         /*  If any jump moves were found, then the user must jump, so we don't
-          add any regular moves.  However, if no jumps were found, check for
-          any legal regular moves.  Look at each square on the board.
-          If that square contains one of the player's pieces, look at a possible
-          move in each of the four directions from that square.  If there is
-          a legal move in that direction, put it in the moves ArrayList.
-          */
+        /*  If there are any legal jumps, force user to jump.
+         *  Otherwise, look for regular legal moves for player's
+         *  pieces. If there is a legal move, add to ArrayList
+         *
+         *  Piece Organization:
+         *            Northwest           North (illegal Move)            Northeast
+         *                     \                  |                      /
+         *                      \                 |                     /
+         *  West (illegal Move) -------   Player's Game Piece     ------- East (illegal Move)
+         *                      /                 |                     \
+         *                     /                  |                      \
+         *            Southwest           South (illegal Move)            Southeast
+         *
+         */
 
         if (moves.size() == 0) {
             for (int row = 0; row < numRowsAndColumns; row++) {
                 for (int col = 0; col < numRowsAndColumns; col++) {
-                    if (gamePieces[row][col].getPieceVal() == player || gamePieces[row][col].getPieceVal() == playerKing) {
-                        if (canMove(player, row, col, row + 1, col + 1)) {
+                    if (gamePieces[row][col].getPieceType() == player || gamePieces[row][col].getPieceType() == playerKing) {
+                        // Diagonal to the Northeast
+                        if (isLegalMove(player, row, col, row + 1, col + 1)) {
                             moves.add(new Move(row, col, row + 1, col + 1));
                         }
-                        if (canMove(player, row, col, row - 1, col + 1)) {
+                        // Diagonal to the Southeast
+                        if (isLegalMove(player, row, col, row - 1, col + 1)) {
                             moves.add(new Move(row, col, row - 1, col + 1));
                         }
-                        if (canMove(player, row, col, row + 1, col - 1)) {
+                        // Diagonal to the Northwest
+                        if (isLegalMove(player, row, col, row + 1, col - 1)) {
                             moves.add(new Move(row, col, row + 1, col - 1));
                         }
-                        if (canMove(player, row, col, row - 1, col - 1)) {
+                        // Diagonal to the Southwest
+                        if (isLegalMove(player, row, col, row - 1, col - 1)) {
                             moves.add(new Move(row, col, row - 1, col - 1));
                         }
                     }
@@ -206,6 +217,7 @@ class CheckersData {
      * jumps are possible, null is returned.  The logic is similar
      * to the logic of the getLegalMoves() method.
      */
+    //!@#$%^&*() Refactor
     Move[] getLegalJumpsFrom(int player, int row, int col) { // WORKS
         if (player != RED && player != BLACK) {
             return null;
@@ -217,7 +229,7 @@ class CheckersData {
             playerKing = BLACK_KING;
         }
         ArrayList<Move> moves = new ArrayList<>();  // The legal jumps will be stored in this list.
-        if (gamePieces[row][col].getPieceVal() == player || gamePieces[row][col].getPieceVal() == playerKing) {
+        if (gamePieces[row][col].getPieceType() == player || gamePieces[row][col].getPieceType() == playerKing) {
             if (canJump(player, row, col, row + 1, col + 1, row + 2, col + 2)) {
                 moves.add(new Move(row, col, row + 2, col + 2));
             }
@@ -240,7 +252,7 @@ class CheckersData {
             }
             return moveArray;
         }
-    }  // end getLegalMovesFrom()
+    }
 
 
     /**
@@ -255,30 +267,29 @@ class CheckersData {
         if (r3 < 0 || r3 >= numRowsAndColumns || c3 < 0 || c3 >= numRowsAndColumns) {
             return false;  // (r3,c3) is off the board.
         }
-        if (gamePieces[r3][c3].getPieceVal() != EMPTY) {
+        if (gamePieces[r3][c3].getPieceType() != EMPTY) {
             return false;  // (r3,c3) already contains a piece.
         }
 
         if (player == RED) {
             // Regular red pieces
-            if (gamePieces[r1][c1].getPieceVal() == RED && r3 > r1) {
+            if (gamePieces[r1][c1].getPieceType() == RED && r3 > r1) {
                 return false;  // Regular red piece can only move  up.
             }
-            if (gamePieces[r2][c2].getPieceVal() != BLACK && gamePieces[r2][c2].getPieceVal() != BLACK_KING) {
+            if (gamePieces[r2][c2].getPieceType() != BLACK && gamePieces[r2][c2].getPieceType() != BLACK_KING) {
                 return false;  // There is no black piece to jump.
             }
         } else {
-            if (gamePieces[r1][c1].getPieceVal() == BLACK && r3 < r1) {
+            if (gamePieces[r1][c1].getPieceType() == BLACK && r3 < r1) {
                 return false;  // Regular black piece can only move down.
             }
-            if (gamePieces[r2][c2].getPieceVal() != RED && gamePieces[r2][c2].getPieceVal() != RED_KING) {
-
+            if (gamePieces[r2][c2].getPieceType() != RED && gamePieces[r2][c2].getPieceType() != RED_KING) {
                 return false;  // There is no red piece to jump.
             }
         }
         return true;  // The jump is legal.
 
-    }  // end canJump()
+    }
 
 
     /**
@@ -287,28 +298,28 @@ class CheckersData {
      * assumed that (r1,r2) contains one of the player's pieces and
      * that (r2,c2) is a neighboring square.
      */
-    private boolean canMove(int player, int r1, int c1, int r2, int c2) { // WORKS
+    private boolean isLegalMove(int player, int r1, int c1, int r2, int c2) { // WORKS
         if (r2 < 0 || r2 >= numRowsAndColumns || c2 < 0 || c2 >= numRowsAndColumns) {
             return false;  // (r2,c2) is off the board.
         }
 
-        if (gamePieces[r2][c2].getPieceVal() != EMPTY) {
+        if (gamePieces[r2][c2].getPieceType() != EMPTY) {
             return false;  // (r2,c2) already contains a piece.
         }
 
-        if (player == RED && gamePieces[r1][c1].getPieceVal() == RED && r2 > r1) {
+        if (player == RED && gamePieces[r1][c1].getPieceType() == RED && r2 > r1) {
             return false;  // Regular red piece can only move down.
-        } else return gamePieces[r1][c1].getPieceVal() != BLACK || r2 >= r1;
+        } else return gamePieces[r1][c1].getPieceType() != BLACK || r2 >= r1;
 
-    }  // end canMove()
+    }
 
 
-    public void printBoardPieces() {
+    private void printBoardPieces() {
         for (int row = 0; row < numRowsAndColumns; row++) {
             for (int col = 0; col < numRowsAndColumns; col++) {
-                System.out.printf("%s ", gamePieces[row][col].getPieceVal());
+                System.out.printf("%s ", gamePieces[row][col].getPieceType());
             }
-            System.out.printf("\n");
+            System.out.println();
         }
     }
-} // end class CheckersData
+}

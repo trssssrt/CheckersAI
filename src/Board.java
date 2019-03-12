@@ -210,43 +210,44 @@ class Board extends JPanel implements ActionListener, MouseListener {
     }  // end doClickSquare()
 
 
-    //!@#$%^&*()
-
     /**
-     * This is called when the current player has chosen the specified
-     * move.  Make the move, and then either end or continue the game
-     * appropriately.
+     * Moves players piece from old Row and Column to new ones.
+     * If move is a jump, look for more jumps. If there are
+     * more jumps, the player continues his turn.
+     *
+     * @param move The player's selected move
      */
-
+    //!@#$%^&*()
     private void doMakeMove(Move move) {
 
         board.makeMove(move.fromRow, move.fromCol, move.toRow, move.toCol);
 
-         /* If the move was a jump, it's possible that the player has another
-          jump.  Check for legal jumps starting from the square that the player
-          just moved to.  If there are any, the player must jump.  The same
-          player continues moving.
-          */
+        /* If there is a legal jump, look for more possible jumps
+         * starting from the tile onto which the player jumps.
+         * Force multiple jumps if possible.
+         */
 
         if (move.isJump()) {
             legalMoves = board.getLegalJumpsFrom(currentPlayer, move.toRow, move.toCol);
             if (legalMoves != null) {
-                if (currentPlayer == CheckersData.RED) {
-                    message.setText("RED:  You must continue jumping.");
-                } else {
-                    message.setText("BLACK:  You must continue jumping.");
-                }
+//                if (currentPlayer == CheckersData.RED) {
+//                    message.setText("RED:  You must continue jumping.");
+//                } else {
+//                    message.setText("BLACK:  You must continue jumping.");
+//                }
                 selectedRow = move.toRow;  // Since only one piece can be moved, select it.
                 selectedCol = move.toCol;
+                // Update board
                 repaint();
                 return;
             }
         }
 
-         /* The current player's turn is ended, so change to the other player.
-          Get that player's legal moves.  If the player has no legal moves,
-          then the game ends. */
-
+         /*
+          * When turn ends, change player.
+          * End game if there are no more legal moves.
+          */
+         //!@#$%^&*()
         if (currentPlayer == CheckersData.RED) {
             currentPlayer = CheckersData.BLACK;
             legalMoves = board.getLegalMoves(currentPlayer);
@@ -269,14 +270,11 @@ class Board extends JPanel implements ActionListener, MouseListener {
             }
         }
 
-         /* Set selectedRow = -1 to record that the player has not yet selected
-          a piece to move. */
+         // Player has not selected piece: selectedRow = -1
 
         selectedRow = -1;
 
-         /* As a courtesy to the user, if all legal moves use the same piece, then
-          select that piece automatically so the user won't have to click on it
-          to select it. */
+         // Auto select piece if it is the only legal piece to move
 
         if (legalMoves != null) {
             boolean sameStartSquare = true;
@@ -307,7 +305,6 @@ class Board extends JPanel implements ActionListener, MouseListener {
      */
     @Override
     public void paintComponent(Graphics g) {
-
         Color darkColor = Color.decode("#9D7D5C");
         Color lightColor = Color.decode("#F1EBDE");
 
@@ -330,16 +327,16 @@ class Board extends JPanel implements ActionListener, MouseListener {
                 g2d.fill(new Rectangle2D.Double(currentX, currentY, squareSize, squareSize));
                 gameBoardGraphics[row][col] = g;
                 //Checks what piece is to be drawn and sets the colour that is appropriate
-                if (board.gamePieces[row][col].getPieceVal() == 1 || board.gamePieces[row][col].getPieceVal() == 2) {
+                if (board.gamePieces[row][col].getPieceType() == 1 || board.gamePieces[row][col].getPieceType() == 2) {
                     g2d.setColor(gameBlack);
-                } else if (board.gamePieces[row][col].getPieceVal() == 3 || board.gamePieces[row][col].getPieceVal() == 4) {
+                } else if (board.gamePieces[row][col].getPieceType() == 3 || board.gamePieces[row][col].getPieceType() == 4) {
                     g2d.setColor(gameRed);
-                } else if (board.gamePieces[row][col].getPieceVal() == 0) {
+                } else if (board.gamePieces[row][col].getPieceType() == 0) {
                     g2d.setColor(new Color(0, 0, 0, 0));
                 }
 
                 // Draw Ellipse around gamePieces
-                if (board.gamePieces[row][col].getPieceVal() != 0) {
+                if (board.gamePieces[row][col].getPieceType() != 0) {
                     Ellipse2D pieceShape = new Ellipse2D.Double(currentX + initialX / 10.0,
                             currentY + initialX / 10.0, pieceSize, pieceSize);
                     board.gamePieces[row][col].setOval(pieceShape);
@@ -350,7 +347,6 @@ class Board extends JPanel implements ActionListener, MouseListener {
                 if (board.gamePieces[row][col].isKing()) {
                     drawCrown(currentX + squareSize / 2, currentY + squareSize / 2, g2d);
                 }
-
                 currentX += squareSize;
             }
             currentY += squareSize;
@@ -358,7 +354,6 @@ class Board extends JPanel implements ActionListener, MouseListener {
         }
 
         if (gameInProgress) {
-
             // Add border around tiles that are valid moves for player
             for (Move legalMove : legalMoves) {
                 gameBoardGraphics[legalMove.fromRow][legalMove.fromCol].setColor(legalMoveColor);
@@ -418,7 +413,6 @@ class Board extends JPanel implements ActionListener, MouseListener {
             }
         }
     }
-    //!@#$%^&*()
 
     /**
      * Draws a crown for a piece at the specified position.
@@ -441,24 +435,27 @@ class Board extends JPanel implements ActionListener, MouseListener {
         drawCrown(row, col, g, Color.YELLOW);
     }
 
-    //!@#$%^&*()
-
     /**
-     * Respond to a user click on the board.  If no game is in progress, show
-     * an error message.  Otherwise, find the row and column that the user
-     * clicked and call doClickSquare() to handle it.
+     * mousePressed
+     *
+     * Responds when the user clicks the game board.
+     * Calculate row and column that the user clicks,
+     * then send calculated data to handler.
+     *
+     * @param evt   The Java generated MouseEvent
      */
     public void mousePressed(MouseEvent evt) {
-        if (!gameInProgress) {
-            message.setText("Click \"New Game\" to start a new game.");
-        } else {
+        if (gameInProgress) {
+            // Approximate value is floored by int to give data
             int col = (evt.getX() - initialX) / squareSize;
             int row = (evt.getY() - initialY) / squareSize;
-            if (col >= 0 && col < numRowsAndColumns && row >= 0 && row < numRowsAndColumns)
+            if (col >= 0 && col < numRowsAndColumns && row >= 0 && row < numRowsAndColumns) {
                 doClickSquare(row, col);
+            }
+        } else {
+            message.setText("Click \"New Game\" to start a new game.");
         }
     }
-
 
     public void mouseReleased(MouseEvent evt) {
     }
@@ -473,4 +470,4 @@ class Board extends JPanel implements ActionListener, MouseListener {
     }
 
 
-}  // end class Board
+}

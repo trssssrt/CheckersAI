@@ -3,20 +3,10 @@ import javax.swing.*;
 import java.util.HashMap;
 import java.util.Map;
 
-
 /**
- * This panel lets two users play checkers against each other.
- * Red always starts the game.  If a player can jump an opponent's
- * piece, then the player must jump.  When a player can make no more
- * moves, the game ends.
- * <p>
- * The class has a main() routine that lets it be run as a stand-alone
- * application.  The application just opens a window that uses an object
- * of type Checkers as its content pane.
+ * Create Swing Application of Checkers game
  */
 class Checkers extends JPanel {
-
-
     private JButton newGameButton;  // Button for starting a new game.
     private JButton resignButton;   // Button that a player can use to end
     //    the game by resigning.
@@ -96,5 +86,5 @@ class Checkers extends JPanel {
 //        message.setFont(new Font("Serif", Font.BOLD, 14));
 //        message.setForeground(Color.green);
 
-    } // end constructor
-} // end class Checkers
+    }
+}
