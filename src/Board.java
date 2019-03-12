@@ -8,20 +8,12 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
 
 /**
- * This panel displays a 160-by-160 checkerboard pattern with
- * a 2-pixel black border.  It is assumed that the size of the
- * canvas is set to exactly 164-by-164 pixels.  This class does
- * the work of letting the users play checkers, and it displays
- * the checkerboard.
+ * Create and Paint checker board
  */
 class Board extends JPanel implements ActionListener, MouseListener {
 
     private final CheckersData board = new CheckersData();
-    // The data for the checkers board is kept here.
-    //    This board is also responsible for generating
-    //    lists of legal moves.
-
-    private boolean gameInProgress; // Is a game currently in progress?
+    private boolean gameInProgress;
 
     /* The next three variables are valid only when the game is in progress. */
 
@@ -37,21 +29,21 @@ class Board extends JPanel implements ActionListener, MouseListener {
     //   current player.
     private static int numRowsAndColumns = 8;
 
-    final Piece[][] gamePieces = new Piece[numRowsAndColumns][numRowsAndColumns]; //!@#$%^&*() NOT USED
     private static final Color gameBlack = Color.BLACK.brighter(),
             gameRed = Color.RED.darker(),
+            legalMovePieceColor = Color.ORANGE,
             legalMoveColor = Color.MAGENTA,
             selectedPiece = Color.WHITE,
             selectedPieceLegalMove = Color.GREEN;
-    private static final float legalMoveBorder = 1.5f,
-            selectedLegalMoveBorder = 1.5f,
+    private static final float legalMoveBorder = 1.9f,
+            selectedLegalMoveBorder = 1.9f,
             selectedPieceBorder = 2f;
 
     private static Graphics[][] gameBoardGraphics = new Graphics[numRowsAndColumns][numRowsAndColumns];
 
     private static final int initialX = 100, initialY = 50;
-    private static final int squareSize = 80, pieceSize = 60;//!@#$%^&*()
-    //        private static final int squareSize = 20, pieceSize = 15;//!@#$%^&*()
+    private static final int squareSize = 80, pieceSize = 60;
+
     // THIS SHOULD UPDATE the buttons on Main Screen
     //!@#$%^&*()
     private JButton resignButton, newGameButton;
@@ -59,12 +51,6 @@ class Board extends JPanel implements ActionListener, MouseListener {
 
 
     //!@#$%^&*()
-
-    /**
-     * Constructor.  Create the buttons and label.  Listens for mouse
-     * clicks and for clicks on the buttons.  Create the board and
-     * start the first game.
-     */
     Board() {
         setBackground(Color.BLACK);
         addMouseListener(this);
@@ -79,7 +65,6 @@ class Board extends JPanel implements ActionListener, MouseListener {
     }
 
     //!@#$%^&*()
-
     /**
      * Respond to user's click on one of the two buttons.
      */
@@ -92,7 +77,6 @@ class Board extends JPanel implements ActionListener, MouseListener {
     }
 
     //!@#$%^&*()
-
     /**
      * Start a new game
      */
@@ -121,7 +105,6 @@ class Board extends JPanel implements ActionListener, MouseListener {
 
 
     //!@#$%^&*()
-
     /**
      * Current player resigns.  Game ends.  Opponent wins.
      */
@@ -139,7 +122,6 @@ class Board extends JPanel implements ActionListener, MouseListener {
 
 
     //!@#$%^&*()
-
     /**
      * The game ends.  The parameter, str, is displayed as a message
      * to the user.  The states of the buttons are adjusted so the players
@@ -155,7 +137,6 @@ class Board extends JPanel implements ActionListener, MouseListener {
 
 
     //!@#$%^&*()
-
     /**
      * This is called by mousePressed() when a player clicks on the
      * square in the specified row and col.  It has already been checked
@@ -243,11 +224,11 @@ class Board extends JPanel implements ActionListener, MouseListener {
             }
         }
 
-         /*
-          * When turn ends, change player.
-          * End game if there are no more legal moves.
-          */
-         //!@#$%^&*()
+        /*
+         * When turn ends, change player.
+         * End game if there are no more legal moves.
+         */
+        //!@#$%^&*()
         if (currentPlayer == CheckersData.RED) {
             currentPlayer = CheckersData.BLACK;
             legalMoves = board.getLegalMoves(currentPlayer);
@@ -270,11 +251,11 @@ class Board extends JPanel implements ActionListener, MouseListener {
             }
         }
 
-         // Player has not selected piece: selectedRow = -1
+        // Player has not selected piece: selectedRow = -1
 
         selectedRow = -1;
 
-         // Auto select piece if it is the only legal piece to move
+        // Auto select piece if it is the only legal piece to move
 
         if (legalMoves != null) {
             boolean sameStartSquare = true;
@@ -354,21 +335,29 @@ class Board extends JPanel implements ActionListener, MouseListener {
         }
 
         if (gameInProgress) {
-            // Add border around tiles that are valid moves for player
             for (Move legalMove : legalMoves) {
+                // Add border around tiles to which a player can legally move
                 gameBoardGraphics[legalMove.fromRow][legalMove.fromCol].setColor(legalMoveColor);
                 gameBoardGraphics[legalMove.fromRow][legalMove.fromCol].drawRect(
                         initialX + squareSize * legalMove.toCol,
                         initialY + squareSize * legalMove.toRow,
                         squareSize,
                         squareSize);
+
+                // Add border around tiles that indicate pieces which can legally move
+                gameBoardGraphics[legalMove.fromRow][legalMove.fromCol].setColor(legalMovePieceColor);
+                gameBoardGraphics[legalMove.fromRow][legalMove.fromCol].drawRect(
+                        initialX + squareSize * legalMove.fromCol,
+                        initialY + squareSize * legalMove.fromRow,
+                        squareSize,
+                        squareSize);
+
+                // Set border on changed tiles
                 g2d.setStroke(new BasicStroke(legalMoveBorder));
             }
 
             //!@#$%^&*()
-               /* If a piece is selected for moving (i.e. if selectedRow >= 0), then
-                draw a 2-pixel white border around that piece and draw green borders
-                around each square that that piece can be moved to. */
+            // If a piece is selected add add border to piece's tile and another borde to legal moves
             if (selectedRow >= 0) {
                 // Draw border around selected piece
                 gameBoardGraphics[selectedRow][selectedCol].setColor(selectedPiece);
@@ -378,25 +367,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
                         squareSize,
                         squareSize);
 
-//                //!@#$%^&*() SHOULD I ADD A WHITE CIRCLE AROUND THE SELECTED ELLIPSE???
-//                Ellipse2D pieceShape = new Ellipse2D.Double(initialX + squareSize * selectedCol + initialX / 10,
-//                        initialY + squareSize * selectedRow + initialX / 10,
-//                        pieceSize,
-//                        pieceSize);
-//                g2d.setColor(selectedPiece);
-//
-//                Point2D center = new Point2D.Float(initialX + squareSize * selectedCol + initialX / 10,
-//                        initialY + squareSize * selectedRow + initialX / 10);
-//                float radius = pieceSize;
-//                float[] dist = {0.0f, 0.6f, 1.0f};
-//                Color[] colors = {Color.RED, Color.WHITE, selectedPiece};
-//                RadialGradientPaint p = new RadialGradientPaint(center, radius, dist, colors);
-//
-//                g2d.setPaint(p);
-//
-//                g2d.fill(pieceShape);
                 g2d.setStroke(new BasicStroke(selectedPieceBorder));
-//                board.gamePieces[selectedRow][selectedCol].setOval(pieceShape);
 
                 // Add border around the legal moves of selected piece
                 for (Move legalMove : legalMoves) {
@@ -437,12 +408,12 @@ class Board extends JPanel implements ActionListener, MouseListener {
 
     /**
      * mousePressed
-     *
+     * <p>
      * Responds when the user clicks the game board.
      * Calculate row and column that the user clicks,
      * then send calculated data to handler.
      *
-     * @param evt   The Java generated MouseEvent
+     * @param evt The Java generated MouseEvent
      */
     public void mousePressed(MouseEvent evt) {
         if (gameInProgress) {
@@ -468,6 +439,4 @@ class Board extends JPanel implements ActionListener, MouseListener {
 
     public void mouseExited(MouseEvent evt) {
     }
-
-
 }
