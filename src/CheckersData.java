@@ -38,9 +38,9 @@ class CheckersData {
      * Starting positions are first 3 and last 3 rows
      * which hold Black and Red pieces respectively.
      *
-     * @param numRowsAndColumns Represents number of squares forming the rows/columns
+     * @param numRowsAndColumns Represents number of tiles forming the rows/columns
      */
-    void setUpCheckerBoard(int numRowsAndColumns) {
+    public void setUpCheckerBoard(int numRowsAndColumns) {
         for (int row = 0; row < numRowsAndColumns; row++) {
             for (int col = 0; col < numRowsAndColumns; col++) {
                 if (row % 2 == col % 2) {
@@ -67,7 +67,7 @@ class CheckersData {
      * @param toRow   Row to which the Player moves
      * @param toCol   Column to which the Player moves
      */
-    void makeMove(int fromRow, int fromCol, int toRow, int toCol) {
+    public void makeMove(int fromRow, int fromCol, int toRow, int toCol) {
         boolean isKing = false; //!@#$%^&*() Only used for testing. Triggers print when a piece becomes a king
         Piece temp = gamePieces[toRow][toCol];
         temp.resetPiece(EMPTY);
@@ -98,7 +98,7 @@ class CheckersData {
             printBoardPieces();
         }
     }
-    
+
     /**
      * @param playerID Current Player's ID (RED or BLACK)
      * @return Returns Moves array if there are any legal moves
@@ -117,7 +117,7 @@ class CheckersData {
      *                  /                  |                      \
      *         Southwest           South (illegal Move)            Southeast
      */
-    Move[] getLegalMoves(int playerID) {
+    public Move[] getLegalMoves(int playerID) {
         // Reject if player isn't Red or Black (Should never happen)
         if (playerID != RED && playerID != BLACK) {
             return null;
@@ -216,7 +216,7 @@ class CheckersData {
      * @param currentCol Game piece's current column
      * @return Return array of legal jumps
      */
-    Move[] getLegalJumpsFromPosition(int playerID, int currentRow, int currentCol) {
+    public Move[] getLegalJumpsFromPosition(int playerID, int currentRow, int currentCol) {
         // Reject if player isn't Red or Black
         if (playerID != RED && playerID != BLACK) {
             return null;
@@ -274,7 +274,7 @@ class CheckersData {
      * @param toCol   The colum the player arrives at after jump
      * @return True if jump is legal
      */
-    //!@#$%^&*() Superior Logic, but not for Submission
+    //!@#$%^&*() Superior Logic, but not for Submission //!@#$%^&*()
     private boolean isLegalJump(int player, int fromRow, int fromCol, int jumpRow, int jumpCol, int toRow, int toCol) { // WORKS
         // Check if jump is on the board
         if (toRow < 0 || toRow >= numRowsAndColumns || toCol < 0 || toCol >= numRowsAndColumns) {

@@ -27,11 +27,6 @@ class Piece {
         return pieceType;
     }
 
-    //!@#$%^&*() DELETE NEXT LINE
-    Ellipse2D getOval() {
-        return oval;
-    }
-
     void setOval(Ellipse2D oval) {
         this.oval = oval;
     }
@@ -40,7 +35,6 @@ class Piece {
         this.pieceType = pieceType;
     }
 
-    // TYLER's CODE
     void setKing() {
         this.king = true;
     }
