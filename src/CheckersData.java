@@ -138,7 +138,7 @@ class CheckersData {
             isKing = true;
         }
 
-        if (isKing){
+        if (isKing) {
             printBoard();
             System.out.printf("\n\n");
             printBoardPieces();
@@ -176,9 +176,7 @@ class CheckersData {
 
         for (int row = 0; row < numRowsAndColumns; row++) {
             for (int col = 0; col < numRowsAndColumns; col++) {
-//                if (board[row][col] == player || board[row][col] == playerKing) {
-                    if (gamePieces[row][col].getPieceVal() == player || gamePieces[row][col].getPieceVal() == playerKing) {
-//                if (gamePieces[row][col].getPieceVal() == player || gamePieces[row][col].getPieceVal() == playerKing) {
+                if (gamePieces[row][col].getPieceVal() == player || gamePieces[row][col].getPieceVal() == playerKing) {
                     if (canJump(player, row, col, row + 1, col + 1, row + 2, col + 2)) {
                         moves.add(new Move(row, col, row + 2, col + 2));
                     }
@@ -206,9 +204,7 @@ class CheckersData {
         if (moves.size() == 0) {
             for (int row = 0; row < numRowsAndColumns; row++) {
                 for (int col = 0; col < numRowsAndColumns; col++) {
-//                    if (board[row][col] == player || board[row][col] == playerKing) {
-                        if (gamePieces[row][col].getPieceVal() == player || gamePieces[row][col].getPieceVal() == playerKing) {
-//                    if (gamePieces[row][col].getPieceVal() == player || gamePieces[row][col].getPieceVal() == playerKing) {
+                    if (gamePieces[row][col].getPieceVal() == player || gamePieces[row][col].getPieceVal() == playerKing) {
                         if (canMove(player, row, col, row + 1, col + 1)) {
                             moves.add(new Move(row, col, row + 1, col + 1));
                         }
@@ -260,8 +256,7 @@ class CheckersData {
             playerKing = BLACK_KING;
         }
         ArrayList<Move> moves = new ArrayList<>();  // The legal jumps will be stored in this list.
-//        if (board[row][col] == player || board[row][col] == playerKing) {
-            if (gamePieces[row][col].getPieceVal() == player || gamePieces[row][col].getPieceVal() == playerKing) {
+        if (gamePieces[row][col].getPieceVal() == player || gamePieces[row][col].getPieceVal() == playerKing) {
             if (canJump(player, row, col, row + 1, col + 1, row + 2, col + 2)) {
                 moves.add(new Move(row, col, row + 2, col + 2));
             }
@@ -299,29 +294,25 @@ class CheckersData {
         if (r3 < 0 || r3 >= numRowsAndColumns || c3 < 0 || c3 >= numRowsAndColumns) {
             return false;  // (r3,c3) is off the board.
         }
-        if (board[r3][c3] != EMPTY) {
+        if (gamePieces[r3][c3].getPieceVal() != EMPTY) {
             return false;  // (r3,c3) already contains a piece.
         }
 
         if (player == RED) {
             // Regular red pieces
-//            if (board[r1][c1] == RED && r3 > r1) {
-                if (gamePieces[r1][c1].getPieceVal() == RED && r3 > r1) {
+            if (gamePieces[r1][c1].getPieceVal() == RED && r3 > r1) {
                 return false;  // Regular red piece can only move  up.
             }
-//            if (board[r2][c2] != BLACK && board[r2][c2] != BLACK_KING) {
-                if (gamePieces[r2][c2].getPieceVal() != BLACK && gamePieces[r2][c2].getPieceVal() != BLACK_KING) {
+            if (gamePieces[r2][c2].getPieceVal() != BLACK && gamePieces[r2][c2].getPieceVal() != BLACK_KING) {
                 return false;  // There is no black piece to jump.
             }
         } else {
-//            if (board[r1][c1] == BLACK && r3 < r1) {
-                if (gamePieces[r1][c1].getPieceVal() == BLACK && r3 < r1) {
-                    return false;  // Regular black piece can only move down.
+            if (gamePieces[r1][c1].getPieceVal() == BLACK && r3 < r1) {
+                return false;  // Regular black piece can only move down.
             }
-//            if (board[r2][c2] != RED && board[r2][c2] != RED_KING) {
-                if (gamePieces[r2][c2].getPieceVal() != RED && gamePieces[r2][c2].getPieceVal() != RED_KING) {
+            if (gamePieces[r2][c2].getPieceVal() != RED && gamePieces[r2][c2].getPieceVal() != RED_KING) {
 
-                    return false;  // There is no red piece to jump.
+                return false;  // There is no red piece to jump.
             }
         }
         return true;  // The jump is legal.
@@ -336,21 +327,17 @@ class CheckersData {
      * that (r2,c2) is a neighboring square.
      */
     private boolean canMove(int player, int r1, int c1, int r2, int c2) { // WORKS
-
         if (r2 < 0 || r2 >= numRowsAndColumns || c2 < 0 || c2 >= numRowsAndColumns) {
             return false;  // (r2,c2) is off the board.
         }
 
-//        if (board[r2][c2] != EMPTY) {
-            if (gamePieces[r2][c2].getPieceVal() != EMPTY) {
+        if (gamePieces[r2][c2].getPieceVal() != EMPTY) {
             return false;  // (r2,c2) already contains a piece.
         }
 
-//        if (player == RED && board[r1][c1] == RED && r2 > r1) {
-            if (player == RED && gamePieces[r1][c1].getPieceVal() == RED && r2 > r1) {
+        if (player == RED && gamePieces[r1][c1].getPieceVal() == RED && r2 > r1) {
             return false;  // Regular red piece can only move down.
-//            } else return board[r1][c1] != BLACK || r2 >= r1;
-    } else return gamePieces[r1][c1].getPieceVal() != BLACK || r2 >= r1;
+        } else return gamePieces[r1][c1].getPieceVal() != BLACK || r2 >= r1;
 
     }  // end canMove()
 
