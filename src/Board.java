@@ -7,9 +7,6 @@ import java.awt.event.MouseListener;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
 
-
-import java.awt.geom.GeneralPath;
-
 /**
  * This panel displays a 160-by-160 checkerboard pattern with
  * a 2-pixel black border.  It is assumed that the size of the
@@ -19,43 +16,46 @@ import java.awt.geom.GeneralPath;
  */
 class Board extends JPanel implements ActionListener, MouseListener {
 
-    final CheckersData board = new CheckersData();
-    ;  // The data for the checkers board is kept here.
+    private final CheckersData board = new CheckersData();
+    // The data for the checkers board is kept here.
     //    This board is also responsible for generating
     //    lists of legal moves.
 
-    boolean gameInProgress; // Is a game currently in progress?
+    private boolean gameInProgress; // Is a game currently in progress?
 
     /* The next three variables are valid only when the game is in progress. */
 
-    int currentPlayer;      // Whose turn is it now?  The possible values
+    private int currentPlayer;      // Whose turn is it now?  The possible values
     //    are CheckersData.RED and CheckersData.BLACK.
 
-    int selectedRow, selectedCol;  // If the current player has selected a piece to
+    private int selectedRow, selectedCol;  // If the current player has selected a piece to
     //     move, these give the row and column
     //     containing that piece.  If no piece is
     //     yet selected, then selectedRow is -1.
 
-    static Move[] legalMoves;  // An array containing the legal moves for the
+    private static Move[] legalMoves;  // An array containing the legal moves for the
     //   current player.
     private static int numRowsAndColumns = 8;
 
-    final Piece[][] gamePieces = new Piece[numRowsAndColumns][numRowsAndColumns];
+    final Piece[][] gamePieces = new Piece[numRowsAndColumns][numRowsAndColumns]; //!@#$%^&*() NOT USED
     private static final Color gameBlack = Color.BLACK.brighter(),
             gameRed = Color.RED.darker(),
             legalMoveColor = Color.MAGENTA,
             selectedPiece = Color.WHITE,
             selectedPieceLegalMove = Color.GREEN;
+    private static final float legalMoveBorder = 1.5f,
+            selectedLegalMoveBorder = 1.5f,
+            selectedPieceBorder = 2f;
 
-    static Graphics[][] gameBoardGraphics = new Graphics[numRowsAndColumns][numRowsAndColumns];
+    private static Graphics[][] gameBoardGraphics = new Graphics[numRowsAndColumns][numRowsAndColumns];
 
     private static final int initialX = 100, initialY = 50;
     private static final int squareSize = 80, pieceSize = 60;//!@#$%^&*()
     //        private static final int squareSize = 20, pieceSize = 15;//!@#$%^&*()
     // THIS SHOULD UPDATE the buttons on Main Screen
     //!@#$%^&*()
-    public JButton resignButton, newGameButton;
-    public JLabel message;
+    private JButton resignButton, newGameButton;
+    private JLabel message;
 
 
     //!@#$%^&*()
@@ -96,7 +96,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
     /**
      * Start a new game
      */
-    void doNewGame() {
+    private void doNewGame() {
         if (gameInProgress) {
             // This should not be possible, but it doesn't hurt to check.
             message.setText("Finish the current game first!");
@@ -126,7 +126,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
     /**
      * Current player resigns.  Game ends.  Opponent wins.
      */
-    void doResign() {
+    private void doResign() {
         if (!gameInProgress) {
             message.setText("There is no game in progress!");
             return;
@@ -147,7 +147,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
      * can start a new game.  This method is called when the game
      * ends at any point in this class.
      */
-    void gameOver(String str) {
+    private void gameOver(String str) {
         message.setText(str);
         newGameButton.setEnabled(true);
         resignButton.setEnabled(false);
@@ -162,7 +162,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
      * square in the specified row and col.  It has already been checked
      * that a game is, in fact, in progress.
      */
-    void doClickSquare(int row, int col) {
+    private void doClickSquare(int row, int col) {
 
          /* If the player clicked on one of the pieces that the player
           can move, mark this row and col as selected and return.  (This
@@ -218,7 +218,8 @@ class Board extends JPanel implements ActionListener, MouseListener {
      * move.  Make the move, and then either end or continue the game
      * appropriately.
      */
-    void doMakeMove(Move move) {
+
+    private void doMakeMove(Move move) {
 
         board.makeMove(move.fromRow, move.fromCol, move.toRow, move.toCol);
 
@@ -301,87 +302,10 @@ class Board extends JPanel implements ActionListener, MouseListener {
 
 
     /**
-     * Draw checkerboard pattern in gray and lightGray.  Draw the
-     * checkers.  If a game is in progress, highlight the legal moves.
+     * Draw checkerboard pattern, then the checkers pieces.
+     * If we have an active game, highlight legal moves for
+     * current player
      */
-//    @Override
-//    public void paintComponent(Graphics g) {
-//        Color darkColor = Color.decode("#9D7D5C");
-//        Color lightColor = Color.decode("#F1EBDE");
-//
-//        /* Draw a two-pixel black border around the edges of the canvas. */
-//
-//        g.setColor(Color.black);
-//        g.drawRect(0, 0, getSize().width - 1, getSize().height - 1);
-//        g.drawRect(1, 1, getSize().width - 3, getSize().height - 3);
-//
-//        /* Draw the squares of the checkerboard and the checkers. */
-//        int currentX = 100;
-//        int currentY = 50;
-//        for (int row = 0; row < numRowsAndColumns; row++) {
-//            for (int col = 0; col < numRowsAndColumns; col++) {
-//                if (row % 2 == col % 2)
-//                    g.setColor(Color.LIGHT_GRAY);
-//                else
-//                    g.setColor(Color.GRAY);
-//                g.fillRect(2 + col * squareSize, 2 + row * squareSize, squareSize, squareSize);
-//                switch (board.pieceAt(row, col)) {
-//                    case CheckersData.RED:
-//                        g.setColor(Color.RED);
-//                        g.fillOval(4 + col * squareSize, 4 + row * squareSize, pieceSize, pieceSize);
-//                        break;
-//                    case CheckersData.BLACK:
-//                        g.setColor(Color.BLACK);
-//                        g.fillOval(4 + col * squareSize, 4 + row * squareSize, pieceSize, pieceSize);
-//                        break;
-//                    case CheckersData.RED_KING:
-//                        g.setColor(Color.RED);
-//                        g.fillOval(4 + col * squareSize, 4 + row * squareSize, pieceSize, pieceSize);
-//                        g.setColor(Color.WHITE);
-//                        g.drawString("K", 7 + col * squareSize, 16 + row * squareSize);
-//                        break;
-//                    case CheckersData.BLACK_KING:
-//                        g.setColor(Color.BLACK);
-//                        g.fillOval(4 + col * squareSize, 4 + row * squareSize, pieceSize, pieceSize);
-//                        g.setColor(Color.WHITE);
-//                        g.drawString("K", 7 + col * squareSize, 16 + row * squareSize);
-//                        break;
-//                }
-//
-//                currentX += squareSize;
-//            }
-//            currentY += squareSize;
-//            currentX = 100;
-//        }
-//
-//         /* If a game is in progress, highlight the legal moves.   Note that legalMoves
-//          is never null while a game is in progress. */
-//
-//        if (gameInProgress) {
-//            /* First, draw a 2-pixel cyan border around the pieces that can be moved. */
-//            g.setColor(Color.cyan);
-//            for (Move legalMove : legalMoves) {
-//                g.drawRect(2 + legalMove.fromCol * squareSize, 2 + legalMove.fromRow * squareSize, squareSize - 1, squareSize - 1);
-//                g.drawRect(3 + legalMove.fromCol * squareSize, 3 + legalMove.fromRow * squareSize, squareSize - 3, squareSize - 3);
-//            }
-//               /* If a piece is selected for moving (i.e. if selectedRow >= 0), then
-//                draw a 2-pixel white border around that piece and draw green borders
-//                around each square that that piece can be moved to. */
-//            if (selectedRow >= 0) {
-//                g.setColor(Color.white);
-//                g.drawRect(2 + selectedCol * squareSize, 2 + selectedRow * squareSize, squareSize - 1, squareSize - 1);
-//                g.drawRect(3 + selectedCol * squareSize, 3 + selectedRow * squareSize, squareSize - 3, squareSize - 3);
-//                g.setColor(Color.green);
-//                for (Move legalMove : legalMoves) {
-//                    if (legalMove.fromCol == selectedCol && legalMove.fromRow == selectedRow) {
-//                        g.drawRect(2 + legalMove.toCol * squareSize, 2 + legalMove.toRow * squareSize, squareSize - 1, squareSize - 1);
-//                        g.drawRect(3 + legalMove.toCol * squareSize, 3 + legalMove.toRow * squareSize, squareSize - 3, squareSize - 3);
-//                    }
-//                }
-//            }
-//        }
-//
-//    }  // end paintComponent()
     @Override
     public void paintComponent(Graphics g) {
 
@@ -417,7 +341,8 @@ class Board extends JPanel implements ActionListener, MouseListener {
 
                 // Draw Ellipse around gamePieces
                 if (board.gamePieces[row][col].getPieceVal() != 0) {
-                    Ellipse2D pieceShape = new Ellipse2D.Double(currentX + initialX / 10, currentY + initialX / 10, pieceSize, pieceSize);
+                    Ellipse2D pieceShape = new Ellipse2D.Double(currentX + initialX / 10.0,
+                            currentY + initialX / 10.0, pieceSize, pieceSize);
                     board.gamePieces[row][col].setOval(pieceShape);
                     g2d.fill(pieceShape);
                 }
@@ -434,99 +359,61 @@ class Board extends JPanel implements ActionListener, MouseListener {
         }
 
         if (gameInProgress) {
-            /* First, draw a 2-pixel cyan border around the pieces that can be moved. */
-            g.setColor(Color.BLUE);
-//            System.out.println("Valid Moves");
+
+            // Add border around tiles that are valid moves for player
             for (Move legalMove : legalMoves) {
-                // TEST WITH gameBoardGraphics
                 gameBoardGraphics[legalMove.fromRow][legalMove.fromCol].setColor(legalMoveColor);
                 gameBoardGraphics[legalMove.fromRow][legalMove.fromCol].drawRect(
                         initialX + squareSize * legalMove.toCol,
                         initialY + squareSize * legalMove.toRow,
                         squareSize,
                         squareSize);
-                g2d.setStroke(new BasicStroke(1.5f));
-                // END TEST
-//
-//
-////                System.out.printf("Move -> (%s,%s) TO (%s,%s)\n", legalMove.fromRow, legalMove.fromCol, legalMove.toRow, legalMove.toCol);
-//                // If Piece has a legal move, turn it white
-//                g2d.setColor(Color.WHITE);
-//                Ellipse2D oval = board.gamePieces[legalMove.fromRow][legalMove.fromCol].getOval();
-//                g2d.draw(oval);
-//                g2d.setStroke(new BasicStroke(1.5f)); //!@#$%^setStroke&*() Something is wrong with the thickness...
-//                // Draw a rectangle around the tiles that are legal moves
-////                g.setColor(Color.black);
-//                g.fillRect(initialX + squareSize * legalMove.toCol, initialY + squareSize * legalMove.toRow, squareSize, squareSize);
-////                g.fillRect(initialX + squareSize * legalMove.toRow, initialY + squareSize * legalMove.toCol, squareSize, squareSize);
-////                ((Graphics2D) g).setStroke(new BasicStroke(4));
-////                g.drawRect(2 + legalMove.fromCol * squareSize, 2 + legalMove.fromRow * squareSize, squareSize - 1, squareSize - 1);
-////                g.drawRect(3 + legalMove.fromCol * squareSize, 3 + legalMove.fromRow * squareSize, squareSize - 3, squareSize - 3);
+                g2d.setStroke(new BasicStroke(legalMoveBorder));
             }
+
+            //!@#$%^&*()
                /* If a piece is selected for moving (i.e. if selectedRow >= 0), then
                 draw a 2-pixel white border around that piece and draw green borders
                 around each square that that piece can be moved to. */
             if (selectedRow >= 0) {
-                // TEST WITH gameBoardGraphics
+                // Draw border around selected piece
                 gameBoardGraphics[selectedRow][selectedCol].setColor(selectedPiece);
                 gameBoardGraphics[selectedRow][selectedCol].drawRect(
                         initialX + squareSize * selectedCol,
                         initialY + squareSize * selectedRow,
                         squareSize,
                         squareSize);
-                Ellipse2D pieceShape = new Ellipse2D.Double(initialX + squareSize * selectedCol + initialX / 10,
-                        initialY + squareSize * selectedRow + initialX / 10,
-                        pieceSize,
-                        pieceSize);
-                g2d.setColor(selectedPiece);
-                g2d.setStroke(new BasicStroke(2f));
-//                g2d.
-                board.gamePieces[selectedRow][selectedCol].setOval(pieceShape);
+
+//                //!@#$%^&*() SHOULD I ADD A WHITE CIRCLE AROUND THE SELECTED ELLIPSE???
+//                Ellipse2D pieceShape = new Ellipse2D.Double(initialX + squareSize * selectedCol + initialX / 10,
+//                        initialY + squareSize * selectedRow + initialX / 10,
+//                        pieceSize,
+//                        pieceSize);
+//                g2d.setColor(selectedPiece);
+//
+//                Point2D center = new Point2D.Float(initialX + squareSize * selectedCol + initialX / 10,
+//                        initialY + squareSize * selectedRow + initialX / 10);
+//                float radius = pieceSize;
+//                float[] dist = {0.0f, 0.6f, 1.0f};
+//                Color[] colors = {Color.RED, Color.WHITE, selectedPiece};
+//                RadialGradientPaint p = new RadialGradientPaint(center, radius, dist, colors);
+//
+//                g2d.setPaint(p);
+//
 //                g2d.fill(pieceShape);
-                float thickness = 2;
-                Stroke oldStroke = g2d.getStroke();
-                g2d.setStroke(new BasicStroke(thickness));
-                g2d.drawRect(initialX + squareSize * selectedCol,
-                        initialY + squareSize * selectedRow,
-                        squareSize,
-                        squareSize);
-                g2d.setStroke(oldStroke);
-//                float dash1[] = {10.0f};
-//                g2d.setStroke(new BasicStroke(1.0f,
-//                        BasicStroke.CAP_BUTT,
-//                        BasicStroke.JOIN_MITER,
-//                        10.0f, dash1, 0.0f));
-//                g2d.setStroke(new BasicStroke(2f));
-                // END TEST
-//                g.setColor(Color.WHITE);
-//                Ellipse2D oval = board.gamePieces[selectedRow][selectedCol].getOval();
-//                g2d.draw(oval);
-//                g2d.setColor(Color.WHITE);
-//                g2d.setStroke(new BasicStroke(3)); //!@#$%^&*() Something is wrong with the thickness...
-//                g.fillRect(initialX + squareSize * selectedCol, initialY + squareSize * selectedRow, squareSize, squareSize);
-//                g.drawRect(2 + selectedCol * squareSize, 2 + selectedRow * squareSize, squareSize - 1, squareSize - 1);
-//                g.drawRect(3 + selectedCol * squareSize, 3 + selectedRow * squareSize, squareSize - 3, squareSize - 3);
-//                g.setColor(Color.GREEN);
+                g2d.setStroke(new BasicStroke(selectedPieceBorder));
+//                board.gamePieces[selectedRow][selectedCol].setOval(pieceShape);
+
+                // Add border around the legal moves of selected piece
                 for (Move legalMove : legalMoves) {
                     if (legalMove.fromCol == selectedCol && legalMove.fromRow == selectedRow) {
-                        // TEST WITH gameBoardGraphics
                         gameBoardGraphics[legalMove.fromRow][legalMove.fromCol].setColor(selectedPieceLegalMove);
                         gameBoardGraphics[legalMove.fromRow][legalMove.fromCol].drawRect(
                                 initialX + squareSize * legalMove.toCol,
                                 initialY + squareSize * legalMove.toRow,
                                 squareSize,
                                 squareSize);
-                        g2d.setStroke(new BasicStroke(1.5f));
-                        // END TEST
-                        // TEST WITH gameBoardGraphics
-//                        gameBoardGraphics[legalMove.fromRow][legalMove.fromCol].setColor(Color.MAGENTA);
-//                        gameBoardGraphics[legalMove.fromRow][legalMove.fromCol].drawRect(initialX + squareSize * selectedCol, initialY + squareSize * selectedRow, squareSize, squareSize);
-                        // END TEST
-
-
-//                        g.fillRect(initialX + squareSize * legalMove.toCol, initialY + squareSize * legalMove.toRow, squareSize, squareSize);
-//                        g.drawRect(2 + legalMove.toCol * squareSize, 2 + legalMove.toRow * squareSize, squareSize - 1, squareSize - 1);
-//                        g.drawRect(3 + legalMove.toCol * squareSize, 3 + legalMove.toRow * squareSize, squareSize - 3, squareSize - 3);
+                        g2d.setStroke(new BasicStroke(selectedLegalMoveBorder));
                     }
                 }
             }
@@ -555,21 +442,13 @@ class Board extends JPanel implements ActionListener, MouseListener {
         drawCrown(row, col, g, Color.YELLOW);
     }
 
+    //!@#$%^&*()
+
     /**
      * Respond to a user click on the board.  If no game is in progress, show
      * an error message.  Otherwise, find the row and column that the user
      * clicked and call doClickSquare() to handle it.
      */
-//    public void mousePressed(MouseEvent evt) {
-//        if (!gameInProgress)
-//            message.setText("Click \"New Game\" to start a new game.");
-//        else {
-//            int col = (evt.getX() - 2) / squareSize;
-//            int row = (evt.getY() - 2) / squareSize;
-//            if (col >= 0 && col < numRowsAndColumns && row >= 0 && row < numRowsAndColumns)
-//                doClickSquare(row, col);
-//        }
-//    }
     public void mousePressed(MouseEvent evt) {
         if (!gameInProgress) {
             message.setText("Click \"New Game\" to start a new game.");

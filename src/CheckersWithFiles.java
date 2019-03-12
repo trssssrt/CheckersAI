@@ -1,15 +1,7 @@
 import java.awt.*;
-import java.awt.event.*;
 import javax.swing.*;
-import java.io.*;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Scanner;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 
 
 /**
@@ -35,7 +27,7 @@ class Checkers extends JPanel {
         put("height", 750);
     }};
     private static int numRowsAndColumns = 8;
-    final Board board = new Board();
+    private final Board board = new Board();
 
     /**
      * Main routine makes it possible to run Checkers as a stand-alone

@@ -27,6 +27,7 @@ class Piece {
         return pieceVal;
     }
 
+    //!@#$%^&*() DELETE NEXT LINE
     Ellipse2D getOval() {
         return oval;
     }
