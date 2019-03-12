@@ -34,19 +34,13 @@ class CheckersData {
     }
 
     /**
-     * buildCheckerBoard
-     * <p>
      * Set up board with checkers in every other position.
      * That is, pieces reside at row % 2 == col % 2.
-     * <p>
+     *
      * Starting positions are first 3 and last 3 rows
      * which hold Black and Red pieces respectively.
      *
      * @param numRowsAndColumns Represents number of squares forming the rows/columns
-     *                          <p>
-     *                          Used to create the checkerboard
-     *                          <p>
-     *                          TYLER's CODE //!@#$%^&*() Remove once done
      */
     void setUpCheckerBoard(int numRowsAndColumns) {
         for (int row = 0; row < numRowsAndColumns; row++) {
@@ -66,13 +60,14 @@ class CheckersData {
         }
     }
 
-
     /**
-     * Make the move from (fromRow,fromCol) to (toRow,toCol).  It is
-     * assumed that this move is legal.  If the move is a jump, the
-     * jumped piece is removed from the board.  If a piece moves
-     * the last row on the opponent's side of the board, the
-     * piece becomes a king.
+     * This updates the gamePieces array once the player moves a piece
+     * If the player's piece arrives at the end of the board we 'king' it.
+     *
+     * @param fromRow Row from which the Player moves
+     * @param fromCol Column from which the Player moves
+     * @param toRow   Row to which the Player moves
+     * @param toCol   Column to which the Player moves
      */
     void makeMove(int fromRow, int fromCol, int toRow, int toCol) {
         boolean isKing = false; //!@#$%^&*() Only used for testing. Triggers print when a piece becomes a king
@@ -115,14 +110,33 @@ class CheckersData {
      * entirely of jump moves or entirely of regular moves, since
      * if the player can jump, only jumps are legal moves.
      */
+    /**
+     * @param playerID Current Player's ID (RED or BLACK)
+     * @return Returns Moves array if there are any legal moves
+     * <p>
+     * <p>
+     * First check for jumps, then moves.
+     * If a jump is possible, enforce it.
+     * <p>
+     * <p>
+     * Piece Organization:
+     * Northwest           North (illegal Move)            Northeast
+     * \                  |                      /
+     * \                 |                     /
+     * West (illegal Move) -------   Player's Game Piece     ------- East (illegal Move)
+     * /                 |                     \
+     * /                  |                      \
+     * Southwest           South (illegal Move)            Southeast
+     */
     //!@#$%^&*() Refactor
-    Move[] getLegalMoves(int player) {
-        if (player != RED && player != BLACK) { //!@#$%^&*() What? DO NOT PLAY IF EMPTY?
+    Move[] getLegalMoves(int playerID) {
+        // Reject if player isn't Red or Black (Should never happen)
+        if (playerID != RED && playerID != BLACK) {
             return null;
         }
 
-        int playerKing;  // The constant representing a King belonging to player.
-        if (player == RED) {
+        int playerKing;  // Get Player's King ID
+        if (playerID == RED) {
             playerKing = RED_KING;
         } else {
             playerKing = BLACK_KING;
@@ -137,17 +151,27 @@ class CheckersData {
 
         for (int row = 0; row < numRowsAndColumns; row++) {
             for (int col = 0; col < numRowsAndColumns; col++) {
-                if (gamePieces[row][col].getPieceType() == player || gamePieces[row][col].getPieceType() == playerKing) {
-                    if (isLegalJump(player, row, col, row + 1, col + 1, row + 2, col + 2)) {
+
+                // Check if piece is current player's
+                if (gamePieces[row][col].getPieceType() == playerID || gamePieces[row][col].getPieceType() == playerKing) {
+
+                    // Check if player can jump Northeast
+                    if (isLegalJump(playerID, row, col, row + 1, col + 1, row + 2, col + 2)) {
                         moves.add(new Move(row, col, row + 2, col + 2));
                     }
-                    if (isLegalJump(player, row, col, row - 1, col + 1, row - 2, col + 2)) {
+
+                    // Check if player can jump Northwest
+                    if (isLegalJump(playerID, row, col, row - 1, col + 1, row - 2, col + 2)) {
                         moves.add(new Move(row, col, row - 2, col + 2));
                     }
-                    if (isLegalJump(player, row, col, row + 1, col - 1, row + 2, col - 2)) {
+
+                    // Check if player can jump Southeast
+                    if (isLegalJump(playerID, row, col, row + 1, col - 1, row + 2, col - 2)) {
                         moves.add(new Move(row, col, row + 2, col - 2));
                     }
-                    if (isLegalJump(player, row, col, row - 1, col - 1, row - 2, col - 2)) {
+
+                    // Check if player can jump Southwest
+                    if (isLegalJump(playerID, row, col, row - 1, col - 1, row - 2, col - 2)) {
                         moves.add(new Move(row, col, row - 2, col - 2));
                     }
                 }
@@ -157,36 +181,26 @@ class CheckersData {
         /*  If there are any legal jumps, force user to jump.
          *  Otherwise, look for regular legal moves for player's
          *  pieces. If there is a legal move, add to ArrayList
-         *
-         *  Piece Organization:
-         *            Northwest           North (illegal Move)            Northeast
-         *                     \                  |                      /
-         *                      \                 |                     /
-         *  West (illegal Move) -------   Player's Game Piece     ------- East (illegal Move)
-         *                      /                 |                     \
-         *                     /                  |                      \
-         *            Southwest           South (illegal Move)            Southeast
-         *
          */
 
         if (moves.size() == 0) {
             for (int row = 0; row < numRowsAndColumns; row++) {
                 for (int col = 0; col < numRowsAndColumns; col++) {
-                    if (gamePieces[row][col].getPieceType() == player || gamePieces[row][col].getPieceType() == playerKing) {
+                    if (gamePieces[row][col].getPieceType() == playerID || gamePieces[row][col].getPieceType() == playerKing) {
                         // Diagonal to the Northeast
-                        if (isLegalMove(player, row, col, row + 1, col + 1)) {
+                        if (isLegalMove(playerID, row, col, row + 1, col + 1)) {
                             moves.add(new Move(row, col, row + 1, col + 1));
                         }
                         // Diagonal to the Southeast
-                        if (isLegalMove(player, row, col, row - 1, col + 1)) {
+                        if (isLegalMove(playerID, row, col, row - 1, col + 1)) {
                             moves.add(new Move(row, col, row - 1, col + 1));
                         }
                         // Diagonal to the Northwest
-                        if (isLegalMove(player, row, col, row + 1, col - 1)) {
+                        if (isLegalMove(playerID, row, col, row + 1, col - 1)) {
                             moves.add(new Move(row, col, row + 1, col - 1));
                         }
                         // Diagonal to the Southwest
-                        if (isLegalMove(player, row, col, row - 1, col - 1)) {
+                        if (isLegalMove(playerID, row, col, row - 1, col - 1)) {
                             moves.add(new Move(row, col, row - 1, col - 1));
                         }
                     }
@@ -194,25 +208,23 @@ class CheckersData {
             }
         }
 
-         /* If no legal moves have been found, return null.  Otherwise, create
-          an array just big enough to hold all the legal moves, copy the
-          legal moves from the ArrayList into the array, and return the array. */
-
+        // If there are no moves return null, otherwise return moves as an array
         if (moves.size() == 0) {
             return null;
         } else {
-            Move[] moveArray = new Move[moves.size()];
-            for (int i = 0; i < moves.size(); i++) {
-                moveArray[i] = moves.get(i);
-            }
-            return moveArray;
+            return moves.toArray(new Move[moves.size()]); // Convert Move List to Move Array
+//            Move[] moveArray = new Move[moves.size()];
+//            for (int i = 0; i < moves.size(); i++) {
+//                moveArray[i] = moves.get(i);
+//            }
+//            return moveArray;
         }
 
-    }  // end getLegalMoves
+    }
 
     /**
      * Constructs an array of legal jumps for a given player
-     *
+     * <p>
      * This is separate from the function looking for legal moves
      * because the player must jump if possible
      *
@@ -233,30 +245,43 @@ class CheckersData {
         } else {
             playerKingID = BLACK_KING;
         }
-        ArrayList<Move> moves = new ArrayList<>();  // The legal jumps will be stored in this list.
+        ArrayList<Move> moves = new ArrayList<>();
+
+        // Check if current location is the player's piece
         if (gamePieces[currentRow][currentCol].getPieceType() == playerID || gamePieces[currentRow][currentCol].getPieceType() == playerKingID) {
+
+            // Check if there is a legal jump to the Northeast
             if (isLegalJump(playerID, currentRow, currentCol, currentRow + 1, currentCol + 1, currentRow + 2, currentCol + 2)) {
                 moves.add(new Move(currentRow, currentCol, currentRow + 2, currentCol + 2));
             }
+
+            // Check if there is a legal jump to the Southeast
             if (isLegalJump(playerID, currentRow, currentCol, currentRow - 1, currentCol + 1, currentRow - 2, currentCol + 2)) {
                 moves.add(new Move(currentRow, currentCol, currentRow - 2, currentCol + 2));
             }
+
+            // Check if there is a legal jump to the Northwest
             if (isLegalJump(playerID, currentRow, currentCol, currentRow + 1, currentCol - 1, currentRow + 2, currentCol - 2)) {
                 moves.add(new Move(currentRow, currentCol, currentRow + 2, currentCol - 2));
             }
+
+            // Check if there is a legal jump to the Southwest
             if (isLegalJump(playerID, currentRow, currentCol, currentRow - 1, currentCol - 1, currentRow - 2, currentCol - 2)) {
                 moves.add(new Move(currentRow, currentCol, currentRow - 2, currentCol - 2));
             }
         }
+
+        // If there are no jumps return null, otherwise return moves as an array
         if (moves.size() == 0) {
             return null;
-        } else {
-            Move[] moveArray = new Move[moves.size()];
-            //!@#$%^&*() foreach?
-            for (int i = 0; i < moves.size(); i++) {
-                moveArray[i] = moves.get(i);
-            }
-            return moveArray;
+        } else {//!@#$%^&*() Why can't we just return moves? -- Because they are a different type
+            return moves.toArray(new Move[moves.size()]);
+//            Move[] moveArray = new Move[moves.size()];
+//            //!@#$%^&*() foreach?
+//            for (int i = 0; i < moves.size(); i++) {
+//                moveArray[i] = moves.get(i);
+//            }
+//            return moveArray;
         }
     }
 
