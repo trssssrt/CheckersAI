@@ -30,9 +30,9 @@ class CheckersData {
      * Constructor.  Create the board and set it up for a new game.
      */
     CheckersData() {
-        board = new int[numRowsAndColumns][numRowsAndColumns];
+//        board = new int[numRowsAndColumns][numRowsAndColumns];
         setUpCheckerBoard(numRowsAndColumns);
-        setUpGame();
+//        setUpGame();
     }
 
     /**
@@ -69,23 +69,23 @@ class CheckersData {
      * all such squares in the first three rows contain black squares
      * and all such squares in the last three rows contain red squares.
      */
-    void setUpGame() {
-        for (int row = 0; row < numRowsAndColumns; row++) {
-            for (int col = 0; col < numRowsAndColumns; col++) {
-                if (row % 2 == col % 2) {
-                    if (row < 3) {
-                        board[row][col] = BLACK;
-                    } else if (row > (numRowsAndColumns - 3 - 1)) { // Check if last 3 rows (-1 since numRowsAndColumns is indexed at 1, and -3 to represent the last 3 rows
-                        board[row][col] = RED;
-                    } else {
-                        board[row][col] = EMPTY;
-                    }
-                } else {
-                    board[row][col] = EMPTY;
-                }
-            }
-        }
-    }  // end setUpGame()
+//    void setUpGame() {
+//        for (int row = 0; row < numRowsAndColumns; row++) {
+//            for (int col = 0; col < numRowsAndColumns; col++) {
+//                if (row % 2 == col % 2) {
+//                    if (row < 3) {
+//                        board[row][col] = BLACK;
+//                    } else if (row > (numRowsAndColumns - 3 - 1)) { // Check if last 3 rows (-1 since numRowsAndColumns is indexed at 1, and -3 to represent the last 3 rows
+//                        board[row][col] = RED;
+//                    } else {
+//                        board[row][col] = EMPTY;
+//                    }
+//                } else {
+//                    board[row][col] = EMPTY;
+//                }
+//            }
+//        }
+//    }  // end setUpGame()
 
 
     /**
@@ -121,26 +121,27 @@ class CheckersData {
         }
 
 
-        board[toRow][toCol] = board[fromRow][fromCol];
-        board[fromRow][fromCol] = EMPTY;
-        if (fromRow - toRow == 2 || fromRow - toRow == -2) {
-            // The move is a jump.  Remove the jumped piece from the board.
-            int jumpRow = (fromRow + toRow) / 2;  // Row of the jumped piece.
-            int jumpCol = (fromCol + toCol) / 2;  // Column of the jumped piece.
-            board[jumpRow][jumpCol] = EMPTY;
-        }
-        if (toRow == 0 && board[toRow][toCol] == RED) {
-            board[toRow][toCol] = RED_KING;
-            isKing = true;
-        }
-        if (toRow == numRowsAndColumns - 1 && board[toRow][toCol] == BLACK) {
-            board[toRow][toCol] = BLACK_KING;
-            isKing = true;
-        }
+//        board[toRow][toCol] = board[fromRow][fromCol];
+//        board[fromRow][fromCol] = EMPTY;
+//        if (fromRow - toRow == 2 || fromRow - toRow == -2) {
+//            // The move is a jump.  Remove the jumped piece from the board.
+//            int jumpRow = (fromRow + toRow) / 2;  // Row of the jumped piece.
+//            int jumpCol = (fromCol + toCol) / 2;  // Column of the jumped piece.
+//            board[jumpRow][jumpCol] = EMPTY;
+//        }
+//        if (toRow == 0 && board[toRow][toCol] == RED) {
+//            board[toRow][toCol] = RED_KING;
+//            isKing = true;
+//        }
+//        if (toRow == numRowsAndColumns - 1 && board[toRow][toCol] == BLACK) {
+//            board[toRow][toCol] = BLACK_KING;
+//            isKing = true;
+//        }
 
         if (isKing) {
-            printBoard();
-            System.out.printf("\n\n");
+            System.out.printf("UPDATED KING\n\n");
+//            printBoard();
+//            System.out.printf("\n\n");
             printBoardPieces();
         }
     }
@@ -341,14 +342,14 @@ class CheckersData {
 
     }  // end canMove()
 
-    public void printBoard() {
-        for (int row = 0; row < numRowsAndColumns; row++) {
-            for (int col = 0; col < numRowsAndColumns; col++) {
-                System.out.printf("%s ", board[row][col]);
-            }
-            System.out.printf("\n");
-        }
-    }
+//    public void printBoard() {
+//        for (int row = 0; row < numRowsAndColumns; row++) {
+//            for (int col = 0; col < numRowsAndColumns; col++) {
+//                System.out.printf("%s ", board[row][col]);
+//            }
+//            System.out.printf("\n");
+//        }
+//    }
 
     public void printBoardPieces() {
         for (int row = 0; row < numRowsAndColumns; row++) {

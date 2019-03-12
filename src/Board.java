@@ -102,7 +102,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
             message.setText("Finish the current game first!");
             return;
         }
-        board.setUpGame();   // Set up the pieces.
+//        board.setUpGame();   // Set up the pieces.
         board.setUpCheckerBoard(numRowsAndColumns);
         // My Changes, my changes SHOULD include gamePieces... CHECK THAT
 //        currentPlayer = CheckersData.BLACK;   // BLACK moves first.
