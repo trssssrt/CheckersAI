@@ -1,30 +1,12 @@
 import java.awt.*;
-import java.awt.event.*;
 import javax.swing.*;
-import java.io.*;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Scanner;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-
 
 /**
- * This panel lets two users play checkers against each other.
- * Red always starts the game.  If a player can jump an opponent's
- * piece, then the player must jump.  When a player can make no more
- * moves, the game ends.
- * <p>
- * The class has a main() routine that lets it be run as a stand-alone
- * application.  The application just opens a window that uses an object
- * of type Checkers as its content pane.
+ * Create Swing Application of Checkers game
  */
 class Checkers extends JPanel {
-
-
     private JButton newGameButton;  // Button for starting a new game.
     private JButton resignButton;   // Button that a player can use to end
     //    the game by resigning.
@@ -35,12 +17,11 @@ class Checkers extends JPanel {
         put("height", 750);
     }};
     private static int numRowsAndColumns = 8;
-    final Board board = new Board();
+    private static Color backgroundColor = Color.decode("#492A1B");
+    private final Board board = new Board(backgroundColor);
 
     /**
-     * Main routine makes it possible to run Checkers as a stand-alone
-     * application.  Opens a window showing a Checkers panel; the program
-     * ends when the user closes the window.
+     * Main JFrame window created here. Most of the work is passed into Board
      */
     public static void main(String[] args) {
         JFrame window = new JFrame("Checkers");
@@ -57,30 +38,18 @@ class Checkers extends JPanel {
         window.setVisible(true);
     }
 
-    /**
-     * The constructor creates the Board (which in turn creates and manages
-     * the buttons and message label), adds all the components, and sets
-     * the bounds of the components.  A null layout is used.  (This is
-     * the only thing that is done in the main Checkers class.)
-     */
     private Checkers() {
-
-//        setLayout(null);  // This is the cause of the sizing issues
         setPreferredSize(new Dimension(windowDimensions.get("width"), windowDimensions.get("height")));
 
-        setBackground(new Color(0, 150, 0));  // Dark green background.//!@#$%^&*()
+        setBackground(backgroundColor);
 
         /* Create the components and add them to the panel. */
-
-//        Board board = new Board();  // Note: The constructor for the
-//        //   board also creates the buttons
-//        //   and label.
         add(board);
         //!@#$%^&*() Buttons No Longer Work
 //        add(newGameButton);
 //        add(resignButton);
 //        add(message);
-      
+
       /* Set the position and size of each component by calling
        its setBounds() method. */
 
@@ -104,5 +73,5 @@ class Checkers extends JPanel {
 //        message.setFont(new Font("Serif", Font.BOLD, 14));
 //        message.setForeground(Color.green);
 
-    } // end constructor
-} // end class Checkers
+    }
+}
