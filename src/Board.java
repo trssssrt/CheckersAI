@@ -46,6 +46,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
 
     public int computerDifficulty = 2; // 0 - Human, 1 - Easy, 2 - Medium, 3 - Hard
     private boolean displayLegalMoveColors; // If True, highlight legal moves for player
+    private AI_Heuristic computerPlayer;
 
 
     //!@#$%^&*()
@@ -98,7 +99,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
 
     private void doNewGame() {
         if (gameInProgress) {
-            message.setText("Finish the current game first!");
+            message.setText("Cannot start new game if there is one currently in progress!");
             return;
         }
         board.setUpCheckerBoard(numRowsAndColumns);
@@ -112,6 +113,10 @@ class Board extends JPanel implements ActionListener, MouseListener {
         resignButton.setEnabled(true);
         // Update screen
         repaint();
+
+        if (computerDifficulty != 0) {
+            computerPlayer = new AI_Heuristic(computerDifficulty);
+        }
     }
 
 
@@ -130,11 +135,11 @@ class Board extends JPanel implements ActionListener, MouseListener {
             return;
         }
         if (currentPlayer == CheckersData.RED) {
-//            gameOver("RED resigns.  BLACK wins.");
-            gameOverPopUp("RED");
+            gameOver("RED resigns.  BLACK wins.");
+//            gameOverPopUp("RED");
         } else {
-//            gameOver("BLACK resigns.  RED wins.");
-            gameOverPopUp("BLACK");
+            gameOver("BLACK resigns.  RED wins.");
+//            gameOverPopUp("BLACK");
         }
     }
 
@@ -145,7 +150,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
      * @param str Message sent to players at the end of the game
      */
     private void gameOver(String str) {
-        gameOverPopUp(str);
+//        gameOverPopUp(str);
         message.setText(str);
         newGameButton.setEnabled(true);
         resignButton.setEnabled(false);
@@ -235,7 +240,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
         }
 
         /*
-         * When turn ends, change player.
+         * When turn ends, change player. (Switch players)
          * End game if there are no more legal moves.
          */
         //!@#$%^&*()
