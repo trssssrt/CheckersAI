@@ -45,6 +45,9 @@ class Board extends JPanel implements ActionListener, MouseListener {
     private JButton resignButton, newGameButton;
     private JLabel message;
 
+    public int computerDifficulty;
+    private boolean displayLegalMoveColors; // If True, highlight legal moves for player
+
 
     //!@#$%^&*()
     Board(Color backgroundColor) {
@@ -56,9 +59,13 @@ class Board extends JPanel implements ActionListener, MouseListener {
         resignButton.addActionListener(this);
         newGameButton = new JButton("New Game");
         newGameButton.addActionListener(this);
+//        add(newGameButton);
+//        add(resignButton);
         message = new JLabel("", JLabel.CENTER);
         message.setFont(new Font("Serif", Font.BOLD, 14));
         message.setForeground(Color.green);
+
+        displayLegalMoveColors = false;
         doNewGame();
     }
 
@@ -80,6 +87,9 @@ class Board extends JPanel implements ActionListener, MouseListener {
     /**
      * Start a new game
      */
+    public void performDoNewGame() {
+        doNewGame();
+    }
     private void doNewGame() {
         if (gameInProgress) {
 //            message.setText("Finish the current game first!");
@@ -104,6 +114,9 @@ class Board extends JPanel implements ActionListener, MouseListener {
     /**
      * If the current player resigns, then the game ends and opponent wins
      */
+    public void performDoResign(){
+        doResign();
+    }
     private void doResign() {
         if (!gameInProgress) {
             message.setText("There is no game in progress!");
@@ -330,7 +343,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
             currentX = initialX;
         }
 
-        if (gameInProgress) {
+        if (gameInProgress && displayLegalMoveColors) {
             for (Move legalMove : legalMoves) {
                 // Add border around tiles to which a player can legally move
                 gameBoardGraphics[legalMove.fromRow][legalMove.fromCol].setColor(legalMoveColor);
@@ -433,5 +446,10 @@ class Board extends JPanel implements ActionListener, MouseListener {
     }
 
     public void mouseExited(MouseEvent evt) {
+    }
+
+    public void toggleLegalMoveColors(){
+        displayLegalMoveColors = !displayLegalMoveColors;
+        repaint();
     }
 }
