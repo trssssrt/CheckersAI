@@ -238,7 +238,6 @@ class Checkers extends JPanel {
 
         // Update Message in Board.java
         board.userMessage.setText(messageToUser.getText());
-
     }
 
     /**

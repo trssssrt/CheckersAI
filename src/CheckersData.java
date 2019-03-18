@@ -84,12 +84,12 @@ class CheckersData {
         if (toRow == 0 && gamePieces[toRow][toCol].getPieceType() == RED) {
             gamePieces[toRow][toCol].setPieceType(RED_KING);
             gamePieces[toRow][toCol].setKing();
-            isKing = true;
+//            isKing = true;
         }
         if (toRow == numRowsAndColumns - 1 && gamePieces[toRow][toCol].getPieceType() == BLACK) {
             gamePieces[toRow][toCol].setPieceType(BLACK_KING);
             gamePieces[toRow][toCol].setKing();
-            isKing = true;
+//            isKing = true;
         }
 
         // Prints ONLY when piece becomes a king

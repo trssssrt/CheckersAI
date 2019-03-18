@@ -44,7 +44,8 @@ class Board extends JPanel implements ActionListener, MouseListener {
     private JLabel message;
     public JLabel userMessage;
 
-    public int computerDifficulty = 2; // 0 - Human, 1 - Easy, 2 - Medium, 3 - Hard
+    //    public int computerDifficulty = 2; // 0 - Human, 1 - Easy, 2 - Medium, 3 - Hard
+    public int computerDifficulty = 1; //!@#$%^&*() Remove after testing
     private boolean displayLegalMoveColors; // If True, highlight legal moves for player
     private AI_Heuristic computerPlayer;
 
@@ -111,12 +112,20 @@ class Board extends JPanel implements ActionListener, MouseListener {
         gameInProgress = true;
         newGameButton.setEnabled(false);
         resignButton.setEnabled(true);
-        // Update screen
-        repaint();
 
         if (computerDifficulty != 0) {
-            computerPlayer = new AI_Heuristic(computerDifficulty);
+            computerPlayer = new AI_Heuristic(computerDifficulty,
+                    board.gamePieces,
+                    numRowsAndColumns,
+                    CheckersData.EMPTY,
+                    CheckersData.RED,
+                    CheckersData.RED_KING,
+                    CheckersData.BLACK,
+                    CheckersData.BLACK_KING);
         }
+
+        // Update screen
+        repaint();
     }
 
 
@@ -225,6 +234,11 @@ class Board extends JPanel implements ActionListener, MouseListener {
             // Check for double jump (this will continue to get called until there are no more successive jumps)
             legalMoves = board.getLegalJumpsFromPosition(currentPlayer, move.toRow, move.toCol);
             if (legalMoves != null) {
+                // Check if an AI is playing and if it is the AI's turn
+                if (computerDifficulty > 0 && currentPlayer == CheckersData.BLACK) {
+                    doMakeMove(computerPlayer.selectMove(legalMoves));
+                    repaint();
+                }
 //                if (currentPlayer == CheckersData.RED) {
 //                    message.setText("RED:  You must continue jumping.");
 //                } else {
@@ -249,6 +263,10 @@ class Board extends JPanel implements ActionListener, MouseListener {
             legalMoves = board.getLegalMoves(currentPlayer);
             if (legalMoves == null) {
                 gameOver("RED"); //!@#$%^&*()
+            }
+            // AI's turn
+            else if (computerDifficulty > 0) {
+                doMakeMove(computerPlayer.selectMove(legalMoves));
             } else if (legalMoves[0].isJump()) {
                 message.setText("RED:  You must jump.");
             } else {
