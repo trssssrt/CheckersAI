@@ -73,30 +73,21 @@ class Checkers extends JPanel {
 //        add(resignButton);
 //        add(message);
         createMenuBar();
-//        add(messageToUser, BorderLayout.EAST);
+
+
 
       /* Set the position and size of each component by calling
        its setBounds() method. */
 
         board.setPreferredSize(new Dimension(windowDimensions.get("width"), windowDimensions.get("height")));
+//        board.setAlignmentX(0);
+//        board.setAlignmentY(0);
 //        board.setBounds(20, 20, 164, 164); // Note:  size MUST be 164-by-164 ! // This is the cause of the sizing issue
 //        newGameButton. //!@#$%^&*()
 //        newGameButton.setBounds(210, 20, 120, 30);
 //        resignButton.setBounds(210, 155, 120, 30);
 //        message.setBounds(0, 200, 350, 30);
-
-
-        // ADDED FROM BOARD.JAVA //!@#$%^&*()
-//        board.newGameButton = newGameButton;
-//        board.resignButton = resignButton;
-//        board.message = message;
-//        resignButton = new JButton("Resign");
-//        resignButton.addActionListener(board);
-//        newGameButton = new JButton("New Game");
-//        newGameButton.addActionListener(board);
-//        message = new JLabel("", JLabel.CENTER);
-//        message.setFont(new Font("Serif", Font.BOLD, 14));
-//        message.setForeground(Color.green);
+        board.userMessage.setText(messageToUser.getText());
     }
 
     private void createMenuBar() {
@@ -119,6 +110,7 @@ class Checkers extends JPanel {
 
                 // update messageToUser & deselect difficulty level
                 messageToUser.setText(humanVsHuman);
+                board.userMessage.setText(humanVsHuman);
             }
         });
         ComputerVSHuman.addActionListener(new ActionListener() {
@@ -138,6 +130,7 @@ class Checkers extends JPanel {
                 }
                 board.computerDifficulty = difficulty;
                 board.performDoNewGame();
+                board.userMessage.setText(messageToUser.getText());
             }
         });
 
@@ -194,6 +187,8 @@ class Checkers extends JPanel {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     if (!messageToUser.getText().contains(humanVsHuman)) {
                         messageToUser.setText(computerDifficulty_Text + difficultyLevel1);
+                        //!@#$%^&*() INCLUDE SIMILAR CODE IF I WANT TO UPDATE ON CLICK
+//                        board.userMessage.setText(messageToUser.getText());
                     }
                 }
             }
@@ -206,6 +201,8 @@ class Checkers extends JPanel {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     if (!messageToUser.getText().contains(humanVsHuman)) {
                         messageToUser.setText(computerDifficulty_Text + difficultyLevel2);
+                        //!@#$%^&*() INCLUDE SIMILAR CODE IF I WANT TO UPDATE ON CLICK
+//                        board.userMessage.setText(messageToUser.getText());
                     }
                 }
             }
@@ -219,6 +216,8 @@ class Checkers extends JPanel {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     if (!messageToUser.getText().contains(humanVsHuman)) {
                         messageToUser.setText(computerDifficulty_Text + difficultyLevel3);
+                        //!@#$%^&*() INCLUDE SIMILAR CODE IF I WANT TO UPDATE ON CLICK
+//                        board.userMessage.setText(messageToUser.getText());
                     }
                 }
             }
@@ -234,9 +233,11 @@ class Checkers extends JPanel {
 
         menuBar.add(difficultyMenu);
 
-        // MOVE TO OTHER LOCATION
-//        messageToUser.setBorder(BorderFactory.createEtchedBorder());
-        menuBar.add(messageToUser, BorderLayout.EAST);
+        menuBar.add(messageToUser, BorderLayout.LINE_END);
+
+
+        // Update Message in Board.java
+        board.userMessage.setText(messageToUser.getText());
     }
 
     /**
