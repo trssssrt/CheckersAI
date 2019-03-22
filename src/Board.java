@@ -113,9 +113,13 @@ class Board extends JPanel implements ActionListener, MouseListener {
         newGameButton.setEnabled(false);
         resignButton.setEnabled(true);
 
+
+        // We can later add implementation for Computer VS Computer HERE too
         if (computerDifficulty != 0) {
-            computerPlayer = new AI_Heuristic(computerDifficulty,
-                    board.gamePieces,
+            computerPlayer = new AI_Heuristic(
+                    CheckersData.BLACK,
+                    computerDifficulty,
+                    board.gamePieces.clone(),
                     numRowsAndColumns,
                     CheckersData.EMPTY,
                     CheckersData.RED,
@@ -236,7 +240,8 @@ class Board extends JPanel implements ActionListener, MouseListener {
             if (legalMoves != null) {
                 // Check if an AI is playing and if it is the AI's turn
                 if (computerDifficulty > 0 && currentPlayer == CheckersData.BLACK) {
-                    doMakeMove(computerPlayer.selectMove(legalMoves));
+                    computerPlayer.setGameBoard(board.gamePieces);
+                    doMakeMove(computerPlayer.selectMove());
                     repaint();
                 }
 //                if (currentPlayer == CheckersData.RED) {
@@ -266,8 +271,11 @@ class Board extends JPanel implements ActionListener, MouseListener {
             }
             // AI's turn
             else if (computerDifficulty > 0) {
-                doMakeMove(computerPlayer.selectMove(legalMoves));
-            } else if (legalMoves[0].isJump()) {
+                computerPlayer.setGameBoard(board.gamePieces);
+                doMakeMove(computerPlayer.selectMove());
+            }
+            // These only appear in Human V. Human
+            else if (legalMoves[0].isJump()) {
                 message.setText("RED:  You must jump.");
             } else {
                 message.setText("RED:  Make your move.");
@@ -347,6 +355,8 @@ class Board extends JPanel implements ActionListener, MouseListener {
                 gameBoardGraphics[row][col] = g;
 
                 // Check piece type and color it appropriately
+                //!@#$%^&*() I SWITCHED THE COLORS. CHANGE BACK!!!
+                //!@#$%^&*() HOWEVER, IT DOESN'T EFFECT GAMEPLAY
                 if (board.gamePieces[row][col].getPieceType() == CheckersData.RED
                         || board.gamePieces[row][col].getPieceType() == CheckersData.RED_KING) {
                     g2d.setColor(gameBlack);

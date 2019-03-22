@@ -305,6 +305,7 @@ class CheckersData {
 
     }
 
+//!@#$%^&*() ENABLE THIS LOGIC CHECK IN ACTUAL GAME
 //    /**
     // * Check if jump is legal
 //     * @param player  Player's ID (Assumed to be RED or BLACK)
