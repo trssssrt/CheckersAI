@@ -1,9 +1,7 @@
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
 
@@ -44,6 +42,12 @@ class Board extends JPanel implements ActionListener, MouseListener {
     //!@#$%^&*()
     private JButton resignButton, newGameButton;
     private JLabel message;
+    public JLabel userMessage;
+
+    //    public int computerDifficulty = 2; // 0 - Human, 1 - Easy, 2 - Medium, 3 - Hard
+    public int computerDifficulty = 1; //!@#$%^&*() Remove after testing
+    private boolean displayLegalMoveColors; // If True, highlight legal moves for player
+    private AI_Heuristic computerPlayer;
 
 
     //!@#$%^&*()
@@ -56,9 +60,19 @@ class Board extends JPanel implements ActionListener, MouseListener {
         resignButton.addActionListener(this);
         newGameButton = new JButton("New Game");
         newGameButton.addActionListener(this);
+//        add(newGameButton);
+//        add(resignButton);
         message = new JLabel("", JLabel.CENTER);
         message.setFont(new Font("Serif", Font.BOLD, 14));
         message.setForeground(Color.green);
+        add(message, BorderLayout.LINE_START);
+
+        userMessage = new JLabel("", JLabel.RIGHT);
+        userMessage.setFont(new Font("Serif", Font.BOLD, 14));
+        userMessage.setForeground(Color.YELLOW);
+        add(userMessage, BorderLayout.LINE_END);
+
+        displayLegalMoveColors = false;
         doNewGame();
     }
 
@@ -80,9 +94,13 @@ class Board extends JPanel implements ActionListener, MouseListener {
     /**
      * Start a new game
      */
+    public void performDoNewGame() {
+        doNewGame();
+    }
+
     private void doNewGame() {
         if (gameInProgress) {
-//            message.setText("Finish the current game first!");
+            message.setText("Cannot start new game if there is one currently in progress!");
             return;
         }
         board.setUpCheckerBoard(numRowsAndColumns);
@@ -90,10 +108,26 @@ class Board extends JPanel implements ActionListener, MouseListener {
         legalMoves = board.getLegalMoves(CheckersData.RED);  // Get RED's legal moves.
 
         selectedRow = -1;   // No pieces are selected at start of game
-//        message.setText("Black:  Make your move.");
+        message.setText("Black:  Make your move.");
         gameInProgress = true;
-//        newGameButton.setEnabled(false);
-//        resignButton.setEnabled(true);
+        newGameButton.setEnabled(false);
+        resignButton.setEnabled(true);
+
+
+        // We can later add implementation for Computer VS Computer HERE too
+        if (computerDifficulty != 0) {
+            computerPlayer = new AI_Heuristic(
+                    CheckersData.BLACK,
+                    computerDifficulty,
+                    board.gamePieces.clone(),
+                    numRowsAndColumns,
+                    CheckersData.EMPTY,
+                    CheckersData.RED,
+                    CheckersData.RED_KING,
+                    CheckersData.BLACK,
+                    CheckersData.BLACK_KING);
+        }
+
         // Update screen
         repaint();
     }
@@ -104,6 +138,10 @@ class Board extends JPanel implements ActionListener, MouseListener {
     /**
      * If the current player resigns, then the game ends and opponent wins
      */
+    public void performDoResign() {
+        doResign();
+    }
+
     private void doResign() {
         if (!gameInProgress) {
             message.setText("There is no game in progress!");
@@ -111,8 +149,10 @@ class Board extends JPanel implements ActionListener, MouseListener {
         }
         if (currentPlayer == CheckersData.RED) {
             gameOver("RED resigns.  BLACK wins.");
+//            gameOverPopUp("RED");
         } else {
             gameOver("BLACK resigns.  RED wins.");
+//            gameOverPopUp("BLACK");
         }
     }
 
@@ -123,10 +163,11 @@ class Board extends JPanel implements ActionListener, MouseListener {
      * @param str Message sent to players at the end of the game
      */
     private void gameOver(String str) {
+//        gameOverPopUp(str);
         message.setText(str);
         newGameButton.setEnabled(true);
         resignButton.setEnabled(false);
-        gameInProgress = false;
+        gameInProgress = !gameInProgress;
     }
 
 
@@ -143,20 +184,18 @@ class Board extends JPanel implements ActionListener, MouseListener {
             if (legalMove.fromRow == clickedRow && legalMove.fromCol == clickedCol) {
                 selectedRow = clickedRow;
                 selectedCol = clickedCol;
-//                if (currentPlayer == CheckersData.RED) {
-//                    message.setText("RED:  Make your move.");
-//                } else {
-//                    message.setText("BLACK:  Make your move.");
-//                }
                 // Update Screen
                 repaint();
                 return;
             }
         }
 
-        // Inform player that they can only select their pieces //!@#$%^&*()
+        // Inform player that they can only select their pieces
         if (selectedRow < 0) {
-//            message.setText("Click the piece you want to move.");
+            message.setText(
+                    (currentPlayer == CheckersData.RED ? "BLACK: " : "RED: ")
+                            + "Please select piece to move."
+            );
             return;
         }
 
@@ -170,7 +209,11 @@ class Board extends JPanel implements ActionListener, MouseListener {
         }
 
         // Inform player that they can only select the highlighted
-//        message.setText("Click the square you want to move to.");
+        if (currentPlayer == CheckersData.RED) {
+            message.setText("BLACK: Invalid move. Please select legal move.");
+        } else if (currentPlayer == CheckersData.BLACK) {
+            message.setText("RED: Invalid move. Please select legal move.");
+        }
 
     }
 
@@ -184,7 +227,6 @@ class Board extends JPanel implements ActionListener, MouseListener {
      */
     //!@#$%^&*()
     private void doMakeMove(Move move) {
-
         board.makeMove(move.fromRow, move.fromCol, move.toRow, move.toCol);
 
         /* If there is a legal jump, look for more possible jumps
@@ -196,6 +238,12 @@ class Board extends JPanel implements ActionListener, MouseListener {
             // Check for double jump (this will continue to get called until there are no more successive jumps)
             legalMoves = board.getLegalJumpsFromPosition(currentPlayer, move.toRow, move.toCol);
             if (legalMoves != null) {
+                // Check if an AI is playing and if it is the AI's turn
+                if (computerDifficulty > 0 && currentPlayer == CheckersData.BLACK) {
+                    computerPlayer.setGameBoard(board.gamePieces);
+                    doMakeMove(computerPlayer.selectMove());
+                    repaint();
+                }
 //                if (currentPlayer == CheckersData.RED) {
 //                    message.setText("RED:  You must continue jumping.");
 //                } else {
@@ -211,7 +259,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
         }
 
         /*
-         * When turn ends, change player.
+         * When turn ends, change player. (Switch players)
          * End game if there are no more legal moves.
          */
         //!@#$%^&*()
@@ -219,21 +267,28 @@ class Board extends JPanel implements ActionListener, MouseListener {
             currentPlayer = CheckersData.BLACK;
             legalMoves = board.getLegalMoves(currentPlayer);
             if (legalMoves == null) {
-                gameOver("BLACK has no moves.  RED wins."); //!@#$%^&*()
-            } else if (legalMoves[0].isJump()) {
-//                message.setText("BLACK:  Make your move.  You must jump.");
+                gameOver("RED"); //!@#$%^&*()
+            }
+            // AI's turn
+            else if (computerDifficulty > 0) {
+                computerPlayer.setGameBoard(board.gamePieces);
+                doMakeMove(computerPlayer.selectMove());
+            }
+            // These only appear in Human V. Human
+            else if (legalMoves[0].isJump()) {
+                message.setText("RED:  You must jump.");
             } else {
-//                message.setText("BLACK:  Make your move.");
+                message.setText("RED:  Make your move.");
             }
         } else {
             currentPlayer = CheckersData.RED;
             legalMoves = board.getLegalMoves(currentPlayer);
             if (legalMoves == null) {
-                gameOver("RED has no moves.  BLACK wins.");//!@#$%^&*()
+                gameOver("BLACK");//!@#$%^&*()
             } else if (legalMoves[0].isJump()) {
-//                message.setText("RED:  Make your move.  You must jump.");
+                message.setText("BLACK:   You must jump.");
             } else {
-//                message.setText("RED:  Make your move.");
+                message.setText("BLACK:  Make your move.");
             }
         }
 
@@ -300,6 +355,8 @@ class Board extends JPanel implements ActionListener, MouseListener {
                 gameBoardGraphics[row][col] = g;
 
                 // Check piece type and color it appropriately
+                //!@#$%^&*() I SWITCHED THE COLORS. CHANGE BACK!!!
+                //!@#$%^&*() HOWEVER, IT DOESN'T EFFECT GAMEPLAY
                 if (board.gamePieces[row][col].getPieceType() == CheckersData.RED
                         || board.gamePieces[row][col].getPieceType() == CheckersData.RED_KING) {
                     g2d.setColor(gameBlack);
@@ -330,7 +387,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
             currentX = initialX;
         }
 
-        if (gameInProgress) {
+        if (gameInProgress && displayLegalMoveColors) {
             for (Move legalMove : legalMoves) {
                 // Add border around tiles to which a player can legally move
                 gameBoardGraphics[legalMove.fromRow][legalMove.fromCol].setColor(legalMoveColor);
@@ -433,5 +490,41 @@ class Board extends JPanel implements ActionListener, MouseListener {
     }
 
     public void mouseExited(MouseEvent evt) {
+    }
+
+    public void toggleLegalMoveColors() {
+        displayLegalMoveColors = !displayLegalMoveColors;
+        repaint();
+    }
+
+    /**
+     * Displays a game over screen and asks player if they'd like to play again
+     * Resets game configuration if player does want another game
+     *
+     * @param playerColor The Player's Color for the dialogue box
+     */
+    private void gameOverPopUp(String playerColor) {
+        JOptionPane gameOverScreen = new JOptionPane();
+        int confirm = gameOverScreen.showConfirmDialog(null,
+                "<html>" +
+                        "<head>" +
+//                        "<style>" +
+//                        "p {" +
+//                        "  width: " + windowDimensions.get("width") / 3 + "px;" +
+//                        "}" +
+//                        "ul {" +
+//                        "  width: " + windowDimensions.get("width") / 3 + "px;" +
+//                        "}" +
+//                        "</style>" +
+                        "</head>" +
+                        "<h1>" + playerColor + " Wins!!</h1>" +
+                        "<h2>Play Again?</h2>" +
+                        "</html>",
+                "GAME OVER",
+                JOptionPane.YES_NO_OPTION);
+        gameInProgress = false;
+        if (confirm == JOptionPane.YES_OPTION) {
+            doNewGame();
+        }
     }
 }
