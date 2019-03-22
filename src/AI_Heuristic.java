@@ -17,7 +17,6 @@ public class AI_Heuristic {
     private int EMPTY, RED, RED_KING, BLACK, BLACK_KING;
 
 
-    private HashMap<String, Piece> gameBoardHashMap;
 
     // Piece Accomplishment Values
     private final int NORMAL_PIECE_VALUE = 10,
@@ -39,22 +38,6 @@ public class AI_Heuristic {
         this.RED_KING = RED_KING;
         this.BLACK = BLACK;
         this.BLACK_KING = BLACK_KING;
-
-        gameBoardHashMap = new HashMap<>();
-        boardToHashMap(gameBoard);
-        System.out.println(gameBoardHashMap);
-    }
-
-    private void boardToHashMap(Piece[][] board) {
-        for (int row = 0; row < numRowsAndColumns; row++) {
-            for (int col = 0; col < numRowsAndColumns; col++) {
-                if (board[row][col].getPieceType() != EMPTY) {
-                    gameBoardHashMap.put("(" + row + "," + col + ")", board[row][col]);
-//                    gameBoardHashMap.put(intsToString(row, col), board[row][col]);
-                }
-            }
-        }
-
     }
 
     /**
@@ -80,7 +63,7 @@ public class AI_Heuristic {
     AI_Move selectMove() {
         System.out.println("Computer ID: " + computerPlayerID);
         AI_Move[] legalMoves = getLegalMoves(computerPlayerID, null);
-        negamaxAB(legalMoves[0], 1, Integer.MIN_VALUE, Integer.MAX_VALUE, 1);
+//        negamaxAB(legalMoves[0], 1, Integer.MIN_VALUE, Integer.MAX_VALUE, 1);
         if (difficulty > 1) {
             System.out.println("CURRENT DIFFICULTY: " + difficulty);
             return legalMoves[0];
@@ -279,9 +262,6 @@ public class AI_Heuristic {
 
                 // Check if piece is current player's
                 if (gameBoard[row][col].getPieceType() == playerID || gameBoard[row][col].getPieceType() == playerKingID) {
-                    // if (gameBoardHashMap.get(intsToString(row,col)) != null)
-                    //if (gameBoardHashMap.get(intsToString(row,col)).getPieceType() == playerID || gameBoardHashMap.get(intsToString(row,col)).getPieceType() == playerKingID) {
-
                     // Check if player can jump Northeast
                     if (isLegalJump(playerID, row, col, row + 1, col + 1, row + 2, col + 2)) {
                         moves.add(new AI_Move(row, col, row + 2, col + 2, parent));
@@ -314,8 +294,6 @@ public class AI_Heuristic {
             for (int row = 0; row < numRowsAndColumns; row++) {
                 for (int col = 0; col < numRowsAndColumns; col++) {
                     if (gameBoard[row][col].getPieceType() == playerID || gameBoard[row][col].getPieceType() == playerKingID) {
-                        // if (gameBoardHashMap.get(intsToString(row,col)) != null)
-                        //if (gameBoardHashMap.get(intsToString(row,col)).getPieceType() == playerID || gameBoardHashMap.get(intsToString(row,col)).getPieceType() == playerKingID) {
                         // Diagonal to the Northeast
                         if (isLegalMove(playerID, row, col, row + 1, col + 1)) {
                             moves.add(new AI_Move(row, col, row + 1, col + 1, parent));
@@ -487,7 +465,7 @@ public class AI_Heuristic {
 //        }
 //
 //        // Cannot jump over player's own pieces
-//        // Recall that "Color"_KING = "Color" + 1
+//        // Recall that "Color"_KING = "Color" + 1 <- BAD what if I change it in the future?
 //        if (gameBoard[jumpRow][jumpCol].getPieceType() == player
 //                || (
 //                         gameBoard[jumpRow][jumpCol].getPieceType() == player
