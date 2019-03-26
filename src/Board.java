@@ -18,7 +18,8 @@ class Board extends JPanel implements ActionListener, MouseListener {
 
     private static Move[] legalMoves;  // Current Player's legal moves
     private static int numRowsAndColumns = 8;
-    private int COMPUTER_MOVE_DELAY_IN_MILLISECONDS = 500;
+    private int COMPUTER_MOVE_DELAY_IN_MILLISECONDS = 500,
+            COMPUTER_JUMP_DELAY_IN_MILLISECONDS = 100;
 
 
     // Variables dealing with game Paints & Graphics
@@ -237,10 +238,18 @@ class Board extends JPanel implements ActionListener, MouseListener {
             legalMoves = board.getLegalJumpsFromPosition(currentPlayer, move.toRow, move.toCol);
             if (legalMoves != null) {
 //                // Check if an AI is playing and if it is the AI's turn
-                if (isComputerPlayingAndIsItComputersTurn()) {
-                    computerPlayer.updateGameBoard(board.gamePieces);
-                    doMakeMove(computerPlayer.getBestMove());
-                }
+                new java.util.Timer().schedule(
+                        new java.util.TimerTask() {
+                            @Override
+                            public void run() {
+                                if (isComputerPlayingAndIsItComputersTurn()) {
+                                    computerPlayer.updateGameBoard(board.gamePieces);
+                                    doMakeMove(computerPlayer.getBestMove());
+                                }
+                            }
+                        },
+                        COMPUTER_JUMP_DELAY_IN_MILLISECONDS
+                );
                 // Enforce Jump Rule
                 selectedRow = move.toRow;
                 selectedCol = move.toCol;

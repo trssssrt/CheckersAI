@@ -1,6 +1,6 @@
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Vector;
 
 /**
  * Here we employ a
@@ -29,9 +29,10 @@ public class AI_Heuristic {
     private int NORMAL_PIECE = 100,
             KING = 175,
             CORNER_KING = 25,
-            NORMAL_PIECE_ROW_VALUE = 10,// Encourage Pieces to move forward
-            PROTECTED_PIECE_VALUE = 5,// Encourage Pieces to be protected
-            POSSIBLE_JUMP_VALUE = 2;
+            NORMAL_PIECE_ROW_VALUE = 10,// Encourages Pieces to move forward
+            PROTECTED_PIECE_VALUE = 5,// Encourages Pieces to be protected
+            POSSIBLE_JUMP_VALUE = 2,// Encourages pieces to move to jump locations
+            ADVANCED_DISTANCE_VALUE = 1 / 2;
 
 
     AI_Heuristic(int computerPlayerID, int difficulty, Piece[][] board, int numRowsAndColumns) {
@@ -120,20 +121,25 @@ public class AI_Heuristic {
     }
 
     private int evaluateHeuristic(Piece[][] board, int playerID) {
-        return simpleScore(board, playerID) + distanceScore(board, playerID)
+        return simpleScore(board, playerID)
+                + simpleDistanceScore(board, playerID)
+//                + advancedDistanceScore(board, playerID, 2) * ADVANCED_DISTANCE_VALUE // Causes Issues
                 + trappedKingScore(board, playerID) * NORMAL_PIECE_ROW_VALUE
                 + protectedPieceScore(board, playerID) * PROTECTED_PIECE_VALUE
                 + possibleJumpsScore(board, playerID) * POSSIBLE_JUMP_VALUE;
 //        if (difficulty == 1) {
 //            return simpleScore(board, playerID);
 //        } else if (difficulty == 2) {
-//            return simpleScore(board, playerID) + distanceScore(board, playerID);
+//            return simpleScore(board, playerID) + simpleDistanceScore(board, playerID);
 //        } else if (difficulty == 3) {
-//            return simpleScore(board, playerID) + distanceScore(board, playerID)
+//            return simpleScore(board, playerID)
+//            + simpleDistanceScore(board, playerID)
 //                    + trappedKingScore(board, playerID) * NORMAL_PIECE_ROW_VALUE;
 //        } else {
-//            return simpleScore(board, playerID) + distanceScore(board, playerID)
-//                    + trappedKingScore(board, playerID) * NORMAL_PIECE_ROW_VALUE;
+//            return simpleScore(board, playerID)
+//            + simpleDistanceScore(board, playerID)
+//                    + trappedKingScore(board, playerID) * NORMAL_PIECE_ROW_VALUE
+//                + possibleJumpsScore(board, playerID) * POSSIBLE_JUMP_VALUE;
 //        }
     }
 
@@ -166,14 +172,14 @@ public class AI_Heuristic {
     }
 
     /**
-     * distanceScore encourages the non-King pieces to
+     * simpleDistanceScore encourages the non-King pieces to
      * move towards their respective ends
      *
      * @param board  Current Board State
      * @param player Current player ID
      * @return The difference between how close pieces are to the back of the board.
      */
-    private int distanceScore(Piece[][] board, int player) {
+    private int simpleDistanceScore(Piece[][] board, int player) {
         int black = 0, red = 0;
         for (int row = 0; row < numRowsAndColumns; row++) {
             for (int col = 0; col < numRowsAndColumns; col++) {
@@ -190,7 +196,104 @@ public class AI_Heuristic {
     }
 
     /**
-     * distanceScore punishes player if a
+     * advancedDistanceScore encourages
+     * pieces to 'attack' or 'flee'.
+     * Measures and averages the
+     * distance between EVERY
+     * king to EVERY opponent's piece
+     *
+     * @param board  Current Board State
+     * @param player Current player ID
+     * @return The difference between how close pieces are to the back of the board.
+     */
+    private int advancedDistanceScore(Piece[][] board, int player, int norm) {
+        int black = 0, red = 0;
+
+        Vector<String> redKingsCoord = new Vector<>(),
+                blackKingsCoord = new Vector<>(),
+                redNormalCoord = new Vector<>(),
+                blackNormalCoord = new Vector<>();
+        Vector<Integer> redNorm = new Vector<>(),
+                blackNorm = new Vector<>();
+
+        // Find Piece locations
+        for (int row = 0; row < numRowsAndColumns; row++) {
+            for (int col = 0; col < numRowsAndColumns; col++) {
+                if (board[row][col].getPieceType() == RED_KING && board[row][col].isKing()) {
+                    redKingsCoord.add("" + row + "," + col);
+//                    red += (numRowsAndColumns - row);
+                } else if (board[row][col].getPieceType() == BLACK_KING && board[row][col].isKing()) {
+                    blackKingsCoord.add("" + row + "," + col);
+                } else if (board[row][col].getPieceType() == RED && !board[row][col].isKing()) {
+                    redNormalCoord.add("" + row + "," + col);
+                } else if (board[row][col].getPieceType() == BLACK && !board[row][col].isKing()) {
+                    blackNormalCoord.add("" + row + "," + col);
+                }
+            }
+        }
+        for (String king : redKingsCoord) {
+            int sum = 0;
+
+            String s[] = king.split(",");
+            int row = 0, col = 0;
+            for (int i = 0; i < s.length; i += 2) {
+                row = Integer.parseInt(s[i + 1]);
+                col = Integer.parseInt((s[i]));
+            }
+            for (String normal : blackNormalCoord) {
+                String sN[] = normal.split(",");
+                for (int i = 0; i < sN.length; i += 2) {
+                    int rowN = Integer.parseInt(sN[i + 1]);
+                    int colN = Integer.parseInt((sN[i]));
+                    sum += Math.pow(row - rowN, norm);
+                    sum += Math.pow(col - colN, norm);
+                }
+                redNorm.add(sum ^ (1 / norm));
+            }
+        }
+
+
+        for (String king : blackKingsCoord) {
+            int sum = 0;
+
+            String s[] = king.split(",");
+            int row = 0, col = 0;
+            for (int i = 0; i < s.length; i += 2) {
+                row = Integer.parseInt(s[i + 1]);
+                col = Integer.parseInt((s[i]));
+            }
+            for (String normal : redNormalCoord) {
+                String sN[] = normal.split(",");
+                for (int i = 0; i < sN.length; i += 2) {
+                    int rowN = Integer.parseInt(sN[i + 1]);
+                    int colN = Integer.parseInt((sN[i]));
+                    sum += Math.pow(row - rowN, norm);
+                    sum += Math.pow(col - colN, norm);
+                }
+                blackNorm.add(sum ^ (1 / norm));
+            }
+        }
+
+        // Get average distance
+        if (redNorm.size() != 0) {
+            for (int i = 0; i < redNorm.size(); i++) {
+                red += redNorm.get(i);
+            }
+            red /= redNorm.size();
+        }
+        // Get average distance
+        if (blackNorm.size() != 0) {
+            for (int i = 0; i < blackNorm.size(); i++) {
+                black += blackNorm.get(i);
+            }
+            black /= blackNorm.size();
+        }
+
+        return player == RED ? red - black : black - red;
+    }
+
+    /**
+     * trappedKingScore punishes player if a
      * king is in the corner (it could get
      * trapped)
      *
@@ -285,6 +388,15 @@ public class AI_Heuristic {
         return player == RED ? red - black : black - red;
     }
 
+    /**
+     * possibleJumpsScore encourages
+     * players to move to/from
+     * jump locations
+     *
+     * @param board  Current Board State
+     * @param player Current player ID
+     * @return Returns difference in possible jumps
+     */
     private int possibleJumpsScore(Piece[][] board, int player) {
         int black = 0, red = 0;
 
@@ -520,62 +632,6 @@ public class AI_Heuristic {
             return moves.toArray(new Move[moves.size()]); // Convert Move List to Move Array
         }
 
-    }
-
-    /**
-     * Constructs an array of legal jumps for a given player
-     * <p>
-     * This is separate from the function looking for legal moves
-     * because the player must jump if possible
-     *
-     * @param playerID   Player's ID (Red or Black)
-     * @param currentRow Game piece's current row
-     * @param currentCol Game piece's current column
-     * @return Return array of legal jumps
-     */
-    public Move[] getLegalJumpsFromPosition(Piece[][] gameBoard, int playerID, int currentRow, int currentCol) {
-        // Reject if player isn't Red or Black
-        if (playerID != RED && playerID != BLACK) {
-            return null;
-        }
-        int playerKingID;  // Get Player's King ID
-        if (playerID == RED) {
-            playerKingID = RED_KING;
-        } else {
-            playerKingID = BLACK_KING;
-        }
-        ArrayList<Move> moves = new ArrayList<>();
-
-        // Check if current location is the player's piece
-        if (gameBoard[currentRow][currentCol].getPieceType() == playerID || gameBoard[currentRow][currentCol].getPieceType() == playerKingID) {
-
-            // Check if there is a legal jump to the Northeast
-            if (isLegalJump(gameBoard, playerID, currentRow, currentCol, currentRow + 1, currentCol + 1, currentRow + 2, currentCol + 2)) {
-                moves.add(new Move(currentRow, currentCol, currentRow + 2, currentCol + 2));
-            }
-
-            // Check if there is a legal jump to the Southeast
-            if (isLegalJump(gameBoard, playerID, currentRow, currentCol, currentRow - 1, currentCol + 1, currentRow - 2, currentCol + 2)) {
-                moves.add(new Move(currentRow, currentCol, currentRow - 2, currentCol + 2));
-            }
-
-            // Check if there is a legal jump to the Northwest
-            if (isLegalJump(gameBoard, playerID, currentRow, currentCol, currentRow + 1, currentCol - 1, currentRow + 2, currentCol - 2)) {
-                moves.add(new Move(currentRow, currentCol, currentRow + 2, currentCol - 2));
-            }
-
-            // Check if there is a legal jump to the Southwest
-            if (isLegalJump(gameBoard, playerID, currentRow, currentCol, currentRow - 1, currentCol - 1, currentRow - 2, currentCol - 2)) {
-                moves.add(new Move(currentRow, currentCol, currentRow - 2, currentCol - 2));
-            }
-        }
-
-        // If there are no jumps return null, otherwise return moves as an array
-        if (moves.size() == 0) {
-            return null;
-        } else {//!@#$%^&*() Why can't we just return moves? -- Because they are a different type
-            return moves.toArray(new Move[moves.size()]);
-        }
     }
 
 
