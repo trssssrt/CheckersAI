@@ -44,8 +44,8 @@ class Board extends JPanel implements ActionListener, MouseListener {
     private JLabel message;
     public JLabel userMessage;
 
-    //    public int computerDifficulty = 2; // 0 - Human, 1 - Easy, 2 - Medium, 3 - Hard
-    public int computerDifficulty = 1; //!@#$%^&*() Remove after testing
+        public int computerDifficulty = 2; // 0 - Human, 1 - Easy, 2 - Medium, 3 - Hard
+//    public int computerDifficulty = 1; //!@#$%^&*() Remove after testing
     private boolean displayLegalMoveColors; // If True, highlight legal moves for player
     private AI_Heuristic computerPlayer;
 
@@ -120,12 +120,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
                     CheckersData.BLACK,
                     computerDifficulty,
                     board.gamePieces.clone(),
-                    numRowsAndColumns,
-                    CheckersData.EMPTY,
-                    CheckersData.RED,
-                    CheckersData.RED_KING,
-                    CheckersData.BLACK,
-                    CheckersData.BLACK_KING);
+                    numRowsAndColumns);
         }
 
         // Update screen
@@ -240,8 +235,8 @@ class Board extends JPanel implements ActionListener, MouseListener {
             if (legalMoves != null) {
                 // Check if an AI is playing and if it is the AI's turn
                 if (computerDifficulty > 0 && currentPlayer == CheckersData.BLACK) {
-                    computerPlayer.setGameBoard(board.gamePieces);
-                    doMakeMove(computerPlayer.selectMove());
+                    computerPlayer.updateGameBoard(board.gamePieces);
+                    doMakeMove(computerPlayer.getBestMove());
                     repaint();
                 }
 //                if (currentPlayer == CheckersData.RED) {
@@ -271,8 +266,8 @@ class Board extends JPanel implements ActionListener, MouseListener {
             }
             // AI's turn
             else if (computerDifficulty > 0) {
-                computerPlayer.setGameBoard(board.gamePieces);
-                doMakeMove(computerPlayer.selectMove());
+                computerPlayer.updateGameBoard(board.gamePieces);
+                doMakeMove(computerPlayer.getBestMove());
             }
             // These only appear in Human V. Human
             else if (legalMoves[0].isJump()) {
