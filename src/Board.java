@@ -237,7 +237,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
             // Check for double jump (this will continue to get called until there are no more successive jumps)
             legalMoves = board.getLegalJumpsFromPosition(currentPlayer, move.toRow, move.toCol);
             if (legalMoves != null) {
-//                // Check if an AI is playing and if it is the AI's turn
+                // Delay move to allow user to see computer 'think'
                 new java.util.Timer().schedule(
                         new java.util.TimerTask() {
                             @Override
@@ -321,8 +321,9 @@ class Board extends JPanel implements ActionListener, MouseListener {
         }
 
         /* Make sure the board is redrawn in its new state. */
-
         repaint();
+
+        // Delay move to allow user to see computer 'think'
         new java.util.Timer().schedule(
                 new java.util.TimerTask() {
                     @Override

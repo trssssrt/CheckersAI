@@ -21,9 +21,8 @@ public class AI_Heuristic {
             BLACK_KING = CheckersData.BLACK_KING;
 
     private int DEPTH,
-            DEPTH_DIFFICULTY_FACTOR = 4;// = 16;//10;
+            DEPTH_DIFFICULTY_FACTOR = 4;
 
-    private List<Move> successorEvaluations;
     private Move bestMove;
 
     private int NORMAL_PIECE = 100,
@@ -32,7 +31,7 @@ public class AI_Heuristic {
             NORMAL_PIECE_ROW_VALUE = 10,// Encourages Pieces to move forward
             PROTECTED_PIECE_VALUE = 5,// Encourages Pieces to be protected
             POSSIBLE_JUMP_VALUE = 2,// Encourages pieces to move to jump locations
-            ADVANCED_DISTANCE_VALUE = 1 / 2;
+            ADVANCED_DISTANCE_VALUE = 1 / 1000;
 
 
     AI_Heuristic(int computerPlayerID, int difficulty, Piece[][] board, int numRowsAndColumns) {
@@ -40,7 +39,6 @@ public class AI_Heuristic {
         this.difficulty = difficulty;
         this.gameBoard = deepCopy(board);
         this.numRowsAndColumns = numRowsAndColumns;
-        this.successorEvaluations = new ArrayList();
 
         this.DEPTH = difficulty * DEPTH_DIFFICULTY_FACTOR;
     }
@@ -50,9 +48,8 @@ public class AI_Heuristic {
     }
 
     Move getBestMove() {
-        System.out.println("DIFFICULTY: " + difficulty);
+//        System.out.println("DIFFICULTY: " + difficulty);
         if (difficulty > 1) {
-            this.successorEvaluations = new ArrayList<>();
 //            System.out.println("--Player ID: " + computerPlayerID);
             int a = this.negamaxAB(gameBoard, DEPTH, Integer.MIN_VALUE, Integer.MAX_VALUE, computerPlayerID);
 //            System.out.println("BEST MOVE: " + bestMove);
@@ -92,7 +89,10 @@ public class AI_Heuristic {
             if (playerID != computerPlayerID) {
                 System.out.println("HELP");
             }
-            return evaluateHeuristic(board, playerID);
+
+            // If there are equal scores, then the game is completely deterministic
+            // So, to prevent this, we add a pseudo-random number.
+            return evaluateHeuristic(board, playerID) + randomInt(-3, 3);
         }
 
         int bestValue = Integer.MIN_VALUE;
@@ -123,7 +123,7 @@ public class AI_Heuristic {
     private int evaluateHeuristic(Piece[][] board, int playerID) {
         return simpleScore(board, playerID)
                 + simpleDistanceScore(board, playerID)
-//                + advancedDistanceScore(board, playerID, 2) * ADVANCED_DISTANCE_VALUE // Causes Issues
+                + advancedDistanceScore(board, playerID, 2) * ADVANCED_DISTANCE_VALUE // Causes Issues, Most likely need SMALL scaling factor//!@#$%^&*()
                 + trappedKingScore(board, playerID) * NORMAL_PIECE_ROW_VALUE
                 + protectedPieceScore(board, playerID) * PROTECTED_PIECE_VALUE
                 + possibleJumpsScore(board, playerID) * POSSIBLE_JUMP_VALUE;
@@ -494,6 +494,16 @@ public class AI_Heuristic {
             }
         }
         return newBoard;
+    }
+
+    /**
+     *
+     * @param min Minimum Integer
+     * @param max Maximum Integer
+     * @return Random Integer Between min and max
+     */
+    private int randomInt(int min, int max) {
+        return (int) (Math.random() * ((max - min) + 1)) + min;
     }
 
     /**

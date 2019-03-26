@@ -207,7 +207,7 @@ class Checkers extends JPanel {
                 }
             }
         });
-        mediumDifficultyMenuItem.setSelected(true);
+//        mediumDifficultyMenuItem.setSelected(true); //!@#$%^&*() uncomment for production use
 
         hardDifficultyMenuItem = new JRadioButtonMenuItem(difficultyLevel3);
         hardDifficultyMenuItem.addItemListener(new ItemListener() {
@@ -222,6 +222,9 @@ class Checkers extends JPanel {
                 }
             }
         });
+
+        hardDifficultyMenuItem.setSelected(true);
+
 
         difficultyMenu.add(easyDifficultyMenuItem);
         difficultyMenu.add(mediumDifficultyMenuItem);
