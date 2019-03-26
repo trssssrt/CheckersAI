@@ -1,5 +1,4 @@
 import javax.swing.*;
-import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Ellipse2D;
@@ -19,6 +18,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
 
     private static Move[] legalMoves;  // Current Player's legal moves
     private static int numRowsAndColumns = 8;
+    private int COMPUTER_MOVE_DELAY_IN_MILLISECONDS = 500;
 
 
     // Variables dealing with game Paints & Graphics
@@ -44,8 +44,8 @@ class Board extends JPanel implements ActionListener, MouseListener {
     private JLabel message;
     public JLabel userMessage;
 
-        public int computerDifficulty = 2; // 0 - Human, 1 - Easy, 2 - Medium, 3 - Hard
-//    public int computerDifficulty = 1; //!@#$%^&*() Remove after testing
+    //    public int computerDifficulty = 2; // 0 - Human, 1 - Easy, 2 - Medium, 3 - Hard
+    public int computerDifficulty = 3; //!@#$%^&*() Remove after testing
     private boolean displayLegalMoveColors; // If True, highlight legal moves for player
     private AI_Heuristic computerPlayer;
 
@@ -94,7 +94,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
     /**
      * Start a new game
      */
-    public void performDoNewGame() {
+    void performDoNewGame() {
         doNewGame();
     }
 
@@ -119,7 +119,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
             computerPlayer = new AI_Heuristic(
                     CheckersData.BLACK,
                     computerDifficulty,
-                    board.gamePieces.clone(),
+                    board.gamePieces,
                     numRowsAndColumns);
         }
 
@@ -133,7 +133,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
     /**
      * If the current player resigns, then the game ends and opponent wins
      */
-    public void performDoResign() {
+    void performDoResign() {
         doResign();
     }
 
@@ -222,6 +222,9 @@ class Board extends JPanel implements ActionListener, MouseListener {
      */
     //!@#$%^&*()
     private void doMakeMove(Move move) {
+        if (computerDifficulty > 0 && currentPlayer == CheckersData.BLACK) {
+            repaint();
+        }
         board.makeMove(move.fromRow, move.fromCol, move.toRow, move.toCol);
 
         /* If there is a legal jump, look for more possible jumps
@@ -233,17 +236,11 @@ class Board extends JPanel implements ActionListener, MouseListener {
             // Check for double jump (this will continue to get called until there are no more successive jumps)
             legalMoves = board.getLegalJumpsFromPosition(currentPlayer, move.toRow, move.toCol);
             if (legalMoves != null) {
-                // Check if an AI is playing and if it is the AI's turn
-                if (computerDifficulty > 0 && currentPlayer == CheckersData.BLACK) {
+//                // Check if an AI is playing and if it is the AI's turn
+                if (isComputerPlayingAndIsItComputersTurn()) {
                     computerPlayer.updateGameBoard(board.gamePieces);
                     doMakeMove(computerPlayer.getBestMove());
-                    repaint();
                 }
-//                if (currentPlayer == CheckersData.RED) {
-//                    message.setText("RED:  You must continue jumping.");
-//                } else {
-//                    message.setText("BLACK:  You must continue jumping.");
-//                }
                 // Enforce Jump Rule
                 selectedRow = move.toRow;
                 selectedCol = move.toCol;
@@ -264,11 +261,12 @@ class Board extends JPanel implements ActionListener, MouseListener {
             if (legalMoves == null) {
                 gameOver("RED"); //!@#$%^&*()
             }
-            // AI's turn
-            else if (computerDifficulty > 0) {
-                computerPlayer.updateGameBoard(board.gamePieces);
-                doMakeMove(computerPlayer.getBestMove());
-            }
+//            // AI's turn
+//            else if (computerDifficulty > 0) {
+//                repaint();
+//                computerPlayer.updateGameBoard(board.gamePieces);
+//                doMakeMove(computerPlayer.getBestMove());
+//            }
             // These only appear in Human V. Human
             else if (legalMoves[0].isJump()) {
                 message.setText("RED:  You must jump.");
@@ -316,9 +314,32 @@ class Board extends JPanel implements ActionListener, MouseListener {
         /* Make sure the board is redrawn in its new state. */
 
         repaint();
-
+        new java.util.Timer().schedule(
+                new java.util.TimerTask() {
+                    @Override
+                    public void run() {
+                        if (isComputerPlayingAndIsItComputersTurn()) {
+                            computerPlayer.updateGameBoard(board.gamePieces);
+                            doMakeMove(computerPlayer.getBestMove());
+                        }
+                    }
+                },
+                COMPUTER_MOVE_DELAY_IN_MILLISECONDS
+        );
     }
 
+    /**
+     * Determines if we have an AI and if it is the AI's turn
+     *
+     * @return True if is the computer's turn, False otherwise
+     */
+    private boolean isComputerPlayingAndIsItComputersTurn() {
+        if (computerDifficulty != 0) {
+            return currentPlayer == computerPlayer.getComputerPlayerID();
+        } else {
+            return false;
+        }
+    }
 
     /**
      * Draw checkerboard pattern, then the checkers pieces.
@@ -382,7 +403,8 @@ class Board extends JPanel implements ActionListener, MouseListener {
             currentX = initialX;
         }
 
-        if (gameInProgress && displayLegalMoveColors) {
+
+        if (gameInProgress && displayLegalMoveColors && !isComputerPlayingAndIsItComputersTurn()) {
             for (Move legalMove : legalMoves) {
                 // Add border around tiles to which a player can legally move
                 gameBoardGraphics[legalMove.fromRow][legalMove.fromCol].setColor(legalMoveColor);
@@ -468,7 +490,11 @@ class Board extends JPanel implements ActionListener, MouseListener {
             int col = (evt.getX() - initialX) / squareSize;
             int row = (evt.getY() - initialY) / squareSize;
             if (col >= 0 && col < numRowsAndColumns && row >= 0 && row < numRowsAndColumns) {
-                doClickTile(row, col);
+                // If we are playing with a computer And it's the computer's turn,
+                // then don't respond to mouse clicks within the game board
+                if (!isComputerPlayingAndIsItComputersTurn()) {
+                    doClickTile(row, col);
+                }
             }
         } else {
             message.setText("Click \"New Game\" to start a new game.");

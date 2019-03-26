@@ -29,7 +29,6 @@ class CheckersData {
     CheckersData() {
         gamePieces = new Piece[numRowsAndColumns][numRowsAndColumns];
         setUpCheckerBoard(numRowsAndColumns);
-        printBoardPieces();
     }
 
     /**
@@ -69,7 +68,6 @@ class CheckersData {
      * @param toCol   Column to which the Player moves
      */
     void makeMove(int fromRow, int fromCol, int toRow, int toCol) {
-        boolean isKing = false; //!@#$%^&*() Only used for testing. Triggers print when a piece becomes a king
         Piece temp = gamePieces[toRow][toCol];
         temp.resetPiece(EMPTY);
         gamePieces[toRow][toCol] = gamePieces[fromRow][fromCol];
@@ -85,18 +83,10 @@ class CheckersData {
         if (toRow == 0 && gamePieces[toRow][toCol].getPieceType() == RED) {
             gamePieces[toRow][toCol].setPieceType(RED_KING);
             gamePieces[toRow][toCol].setKing();
-//            isKing = true;
         }
         if (toRow == numRowsAndColumns - 1 && gamePieces[toRow][toCol].getPieceType() == BLACK) {
             gamePieces[toRow][toCol].setPieceType(BLACK_KING);
             gamePieces[toRow][toCol].setKing();
-//            isKing = true;
-        }
-
-        // Prints ONLY when piece becomes a king
-        if (isKing) {
-            System.out.println("\nNew King: Printing Board");
-            printBoardPieces();
         }
     }
 

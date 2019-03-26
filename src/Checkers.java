@@ -234,6 +234,7 @@ class Checkers extends JPanel {
         menuBar.add(difficultyMenu);
 
         menuBar.add(messageToUser, BorderLayout.LINE_END);
+        //!@#$%^&*() ADD EVEN MORE DIFFICULTY LEVELS HERE
 
 
         // Update Message in Board.java
