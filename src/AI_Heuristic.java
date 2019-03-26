@@ -22,11 +22,12 @@ public class AI_Heuristic {
 
     private int DEPTH = 10;
 
-    private List<AI_Move> successorEvaluations;
-    private AI_Move bestMove;
+    private List<Move> successorEvaluations;
+    private Move bestMove;
 
     private int NORMAL_PIECE = 100,
-    KING = 175;
+    KING = 175,
+    CORNER_KING = 25;
 
 
     AI_Heuristic(int computerPlayerID, int difficulty, Piece[][] board, int numRowsAndColumns) {
@@ -42,7 +43,7 @@ public class AI_Heuristic {
         if (difficulty > 1) {
             this.successorEvaluations = new ArrayList<>();
 //            System.out.println("--Player ID: " + computerPlayerID);
-            int a = this.negamaxAB(gameBoard, null, DEPTH, Integer.MIN_VALUE, Integer.MAX_VALUE, computerPlayerID);
+            int a = this.negamaxAB(gameBoard, DEPTH, Integer.MIN_VALUE, Integer.MAX_VALUE, computerPlayerID);
 //            System.out.println("BEST MOVE: " + bestMove);
             System.out.println("Best Move SCORE: " + a
                     +" (" + bestMove.fromRow + ", " + bestMove.fromCol +
@@ -50,53 +51,75 @@ public class AI_Heuristic {
             return bestMove;
         }
 
-        AI_Move[] legalMoves = getLegalMoves(gameBoard,null, computerPlayerID);
+        Move[] legalMoves = getLegalMoves(gameBoard, computerPlayerID);
         return legalMoves[(int) (legalMoves.length * Math.random())];
 
 
     }
 
     // Remember 2 ply = 1 move
-    private int negamaxAB(Piece[][] board, AI_Move ply, int depth, int alpha, int beta, int playerID) {
-        AI_Move[] legalMoveList = getLegalMoves(board, ply, playerID);
-        // IF we reach the end
-        if (depth == 0 //){
-        || legalMoveList == null) {
-//            System.out.println("Player ID: " + playerID);
-            return evaluateHeuristic(board, playerID);
-        }
-
-        int bestValue = Integer.MIN_VALUE;
-        for (AI_Move move: legalMoveList) {
-            // Create deep copy of board
-            Piece[][] newBoard = deepCopy(board);
-            makeMove(newBoard, move.fromRow,move.fromCol, move.toRow,move.toCol);
-            // Switch Players
+    // To speed up negamax we need to change the board. Here, we have a 2D object array.
+    //      If we converted the board to bits then we can implement this much faster
+    // To change the algorithm to N players we would need to
+    //      Change the Switch Players section, which would depend on the particular
+    //      game's internal structure (i.e. does 1->2->3? Or can 1->3->1->2? etc.)
+    private int negamaxAB(Piece[][] board, int depth, int alpha, int beta, int playerID) {
+        // Switch Players if not on first iteration
+        if (DEPTH != depth) {
+//            playerID = playerID == RED ? BLACK : RED;
             if (playerID == RED) {
                 playerID = BLACK;
             } else {
                 playerID = RED;
             }
-
-            int val = -negamaxAB(newBoard, move, depth - 1, -beta, -alpha, playerID);
-            bestValue = Math.max(bestValue, val);
-            if (val >= alpha && depth == DEPTH) {
-                bestMove = move;
+        }
+        Move[] legalMoveList = getLegalMoves(board, playerID);
+        // IF we reach the end
+        if (depth == 0 ){
+//        || legalMoveList == null) {
+//            System.out.println(computerPlayerID + " -- " + playerID);
+            if (playerID != computerPlayerID) {
+                System.out.println("HELP");
             }
-            alpha = Math.max(alpha, val);
-            if (alpha >= beta) {
-                if (depth == DEPTH) {bestMove = move;}
-                break;
+            return evaluateHeuristic(board, playerID);
+        }
+
+        int bestValue = Integer.MIN_VALUE;
+
+        if (legalMoveList != null) {
+            for (Move move: legalMoveList) {
+                // Create deep copy of board
+                Piece[][] newBoard = deepCopy(board);
+                makeMove(newBoard, move.fromRow,move.fromCol, move.toRow,move.toCol);
+
+                int val = -negamaxAB(newBoard, depth - 1, -beta, -alpha, playerID);
+                bestValue = Math.max(bestValue, val);
+                if (val >= alpha && depth == DEPTH) {
+                    bestMove = move;
+                }
+                alpha = Math.max(alpha, val);
+                if (alpha >= beta) {
+                    if (depth == DEPTH) {bestMove = move;}
+                    break;
+                }
             }
         }
         return bestValue;
     }
     private int evaluateHeuristic(Piece[][] board, int playerID) {
-        return simpleScore(board, playerID);
+        return simpleScore(board, playerID) + distanceScore(board, playerID) + trappedKingScore(board, playerID);
     }
 
-    // Returns the difference in pieces
-    protected int simpleScore(Piece[][] board, int player) {
+    /**
+     * simpleScore does nothing more than count the
+     *  current number of pieces (and relative values)
+     *  and subtract each player's pieces' values.
+     *
+     * @param board Current Board State
+     * @param player Current player ID
+     * @return  The difference is piece values
+     */
+    private int simpleScore(Piece[][] board, int player) {
         int black = 0, red = 0;
         for (int row = 0; row < numRowsAndColumns; row++) {
             for (int col = 0; col < numRowsAndColumns; col++) {
@@ -117,20 +140,76 @@ public class AI_Heuristic {
             return black - red;
         }
     }
-    private int whoIs(int playerID) {
-        int id = 0;
-        if (playerID == 1) {
-            id =  computerPlayerID;
-        } else if (playerID == -1) {
-            id =  computerPlayerID == RED ? RED : BLACK;
-        } else if (playerID == RED) {
-            id =  computerPlayerID == RED ? 1 : -1;;
+
+    /**
+     * distanceScore encourages the non-King pieces to
+     *  move towards their respective ends
+     * @param board Current Board State
+     * @param player Current player ID
+     * @return  The difference between how close pieces are to the back of the board.
+     */
+    private int distanceScore(Piece[][] board, int player) {
+        int black = 0, red = 0;
+        for (int row = 0; row < numRowsAndColumns; row++) {
+            for (int col = 0; col < numRowsAndColumns; col++) {
+                if (board[row][col].getPieceType() == RED && !board[row][col].isKing()) {
+                    // RED moves South towards higher values
+//                    red += row^2;
+                    red += (numRowsAndColumns - row)^2;
+                } else if (board[row][col].getPieceType() == BLACK && !board[row][col].isKing()) {
+                    // BLACK moves North towards higher values
+//                    black += (numRowsAndColumns - row)^2;
+                    black += row^2;
+                }
+            }
         }
-        return id;
+        return player == RED? red-black: black-red;
     }
+
+    /**
+     * distanceScore punishes player if a
+     *  king is in the corner (it could get
+     *  trapped)
+     * @param board Current Board State
+     * @param player Current player ID
+     * @return
+     */
+    private int trappedKingScore(Piece[][] board, int player) {
+        int black = 0, red = 0;
+        for (int row = 0; row < numRowsAndColumns; row++) {
+                if (board[row][0].getPieceType() != EMPTY && board[row][0].isKing()) {
+                    if (board[row][0].getPieceType() == RED_KING) {
+                        red -= CORNER_KING;
+                    } else if (board[row][0].getPieceType() == BLACK_KING) {
+                        black -= CORNER_KING;
+                    }
+                } else if (board[row][numRowsAndColumns-1].getPieceType() != EMPTY && board[row][numRowsAndColumns-1].isKing()) {
+                    if (board[row][numRowsAndColumns-1].getPieceType() == RED_KING) {
+                        red -= CORNER_KING;
+                    } else if (board[row][numRowsAndColumns-1].getPieceType() == BLACK_KING) {
+                        black -= CORNER_KING;
+                    }
+                }
+        }
+        return player == RED? red-black: black-red;
+    }
+
+    /**
+     * @param localBoard Update gameBoard with a new board
+     */
     void updateGameBoard(Piece[][] localBoard) {
         this.gameBoard = deepCopy(localBoard);
     }
+
+    /**
+     * While deepCopy creates a full clone of the board,
+     * it is actually an inefficient technique.
+     * A better method would be to make a move and then
+     * unmake said move.
+     *
+     * @param localBoard The board that will be copied
+     * @return  A deep copyied version of the localBoard
+     */
     private Piece[][] deepCopy(Piece[][] localBoard) {
         Piece[][] newBoard = new Piece[numRowsAndColumns][numRowsAndColumns];
 
@@ -153,7 +232,7 @@ public class AI_Heuristic {
      * @param toRow   Row to which the Player moves
      * @param toCol   Column to which the Player moves
      */
-    void makeMove(Piece[][] gameBoard, int fromRow, int fromCol, int toRow, int toCol) {
+    private void makeMove(Piece[][] gameBoard, int fromRow, int fromCol, int toRow, int toCol) {
         Piece temp = gameBoard[toRow][toCol];
         temp.resetPiece(EMPTY);
         gameBoard[toRow][toCol] = gameBoard[fromRow][fromCol];
@@ -194,7 +273,7 @@ public class AI_Heuristic {
      *                  /                  |                      \
      *         Southwest           South (illegal Move)            Southeast
      */
-    AI_Move[] getLegalMoves(Piece[][] gameBoard, AI_Move parent,  int playerID) {
+    private Move[] getLegalMoves(Piece[][] gameBoard,  int playerID) {
         // Reject if player isn't Red or Black (Should never happen)
         if (playerID != RED && playerID != BLACK) {
             return null;
@@ -207,7 +286,7 @@ public class AI_Heuristic {
             playerKingID = BLACK_KING;
         }
 
-        ArrayList<AI_Move> moves = new ArrayList<>();  // Moves will be stored in this list.
+        ArrayList<Move> moves = new ArrayList<>();  // Moves will be stored in this list.
 
         /*  If a jump is possible, find them first.
          *  Examine each location for a possible jump.
@@ -222,22 +301,22 @@ public class AI_Heuristic {
 
                     // Check if player can jump Northeast
                     if (isLegalJump(gameBoard, playerID, row, col, row + 1, col + 1, row + 2, col + 2)) {
-                        moves.add(new AI_Move(row, col, row + 2, col + 2, parent));
+                        moves.add(new Move(row, col, row + 2, col + 2));
                     }
 
                     // Check if player can jump Northwest
                     if (isLegalJump(gameBoard, playerID, row, col, row - 1, col + 1, row - 2, col + 2)) {
-                        moves.add(new AI_Move(row, col, row - 2, col + 2, parent));
+                        moves.add(new Move(row, col, row - 2, col + 2));
                     }
 
                     // Check if player can jump Southeast
                     if (isLegalJump(gameBoard, playerID, row, col, row + 1, col - 1, row + 2, col - 2)) {
-                        moves.add(new AI_Move(row, col, row + 2, col - 2, parent));
+                        moves.add(new Move(row, col, row + 2, col - 2));
                     }
 
                     // Check if player can jump Southwest
                     if (isLegalJump(gameBoard, playerID, row, col, row - 1, col - 1, row - 2, col - 2)) {
-                        moves.add(new AI_Move(row, col, row - 2, col - 2, parent));
+                        moves.add(new Move(row, col, row - 2, col - 2));
                     }
                 }
             }
@@ -254,19 +333,19 @@ public class AI_Heuristic {
                     if (gameBoard[row][col].getPieceType() == playerID || gameBoard[row][col].getPieceType() == playerKingID) {
                         // Diagonal to the Northeast
                         if (isLegalMove(gameBoard, playerID, row, col, row + 1, col + 1)) {
-                            moves.add(new AI_Move(row, col, row + 1, col + 1, parent));
+                            moves.add(new Move(row, col, row + 1, col + 1));
                         }
                         // Diagonal to the Southeast
                         if (isLegalMove(gameBoard, playerID, row, col, row - 1, col + 1)) {
-                            moves.add(new AI_Move(row, col, row - 1, col + 1, parent));
+                            moves.add(new Move(row, col, row - 1, col + 1));
                         }
                         // Diagonal to the Northwest
                         if (isLegalMove(gameBoard, playerID, row, col, row + 1, col - 1)) {
-                            moves.add(new AI_Move(row, col, row + 1, col - 1, parent));
+                            moves.add(new Move(row, col, row + 1, col - 1));
                         }
                         // Diagonal to the Southwest
                         if (isLegalMove(gameBoard, playerID, row, col, row - 1, col - 1)) {
-                            moves.add(new AI_Move(row, col, row - 1, col - 1, parent));
+                            moves.add(new Move(row, col, row - 1, col - 1));
                         }
                     }
                 }
@@ -277,7 +356,7 @@ public class AI_Heuristic {
         if (moves.size() == 0) {
             return null;
         } else {
-            return moves.toArray(new AI_Move[moves.size()]); // Convert Move List to Move Array
+            return moves.toArray(new Move[moves.size()]); // Convert Move List to Move Array
         }
 
     }
