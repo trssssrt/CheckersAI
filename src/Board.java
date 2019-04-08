@@ -17,17 +17,18 @@ class Board extends JPanel implements ActionListener, MouseListener {
     private int selectedRow, selectedCol;  // -1 if Player has not selected Row & Col
 
     private static Move[] legalMoves;  // Current Player's legal moves
-    private static int numRowsAndColumns = 8;
-    private int COMPUTER_MOVE_DELAY_IN_MILLISECONDS = 0,//500,//!@#$%^&*()
-            COMPUTER_JUMP_DELAY_IN_MILLISECONDS = 0;//100;
+    private static int numRowsAndColumns = Constants.defaultNumRowsAndColumns;
+    private int COMPUTER_MOVE_DELAY_IN_MILLISECONDS = Constants.default_COMPUTER_MOVE_DELAY_IN_MILLISECONDS,//!@#$%^&*()
+            COMPUTER_JUMP_DELAY_IN_MILLISECONDS = Constants.default_COMPUTER_JUMP_DELAY_IN_MILLISECONDS;
 
 
     // Variables dealing with game Paints & Graphics
     private static final Color darkColor = Color.decode("#9D7D5C");
     private static final Color lightColor = Color.decode("#F1EBDE");
-    private static final Color gameBlack = Color.BLACK.brighter(),
-            gameRed = Color.RED.darker(),
-            emptyPieceColor = new Color(0, 0, 0, 0),
+    private static Color gameBlack = Constants.gameBlack,
+            gameRed = Constants.gameRed;
+    private boolean playerOneIsBlack = true;
+    private static final Color emptyPieceColor = new Color(0, 0, 0, 0),
             legalMovePieceColor = Color.ORANGE,
             legalMoveColor = Color.MAGENTA,
             selectedPiece = Color.WHITE,
@@ -36,8 +37,8 @@ class Board extends JPanel implements ActionListener, MouseListener {
             selectedLegalMoveBorder = 1.9f,
             selectedPieceBorder = 2f;
     private static Graphics[][] gameBoardGraphics = new Graphics[numRowsAndColumns][numRowsAndColumns];
-    private static final int initialX = 100, initialY = 50;
-    private static final int squareSize = 80, pieceSize = 60;
+    private static final int initialX = Constants.defaultinitialX, initialY = Constants.defaultinitialY;
+    private static final int squareSize = Constants.default_squareSize, pieceSize = Constants.default_pieceSize;
 
     // THIS SHOULD UPDATE the buttons on Main Screen
     //!@#$%^&*()
@@ -45,11 +46,10 @@ class Board extends JPanel implements ActionListener, MouseListener {
     private JLabel message;
     public JLabel userMessage;
 
-    //    public int computerDifficulty = 2; // 0 - Human, 1 - Easy, 2 - Medium, 3 - Intermediate, 4 - Hard
-    public int computerDifficulty = 3; //!@#$%^&*() Remove after testing
+    //    public int computerDifficulty = 2;
+    public int computerDifficulty = Constants.defaultGameDifficulty; //!@#$%^&*() Remove after testing
     private boolean displayLegalMoveColors; // If True, highlight legal moves for player
-        public boolean singleAI = true; //!@#$%^&*() Remove after testing
-//    public boolean singleAI = !true;
+    public boolean singleAI = Constants.default_SingleAI;
     private AI_Heuristic computerPlayer, computerPlayer2;
 
 
@@ -106,6 +106,8 @@ class Board extends JPanel implements ActionListener, MouseListener {
             message.setText("Cannot start new game if there is one currently in progress!");
             return;
         }
+        playerOneIsBlack();
+
         board.setUpCheckerBoard(numRowsAndColumns);
         currentPlayer = CheckersData.RED;   // RED moves first.
         legalMoves = board.getLegalMoves(CheckersData.RED);  // Get RED's legal moves.
@@ -118,7 +120,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
 
 
         // We can later add implementation for Computer VS Computer HERE too
-        if (computerDifficulty != 0) {
+        if (computerDifficulty != Constants.difficulty_ZERO) {
             computerPlayer = new AI_Heuristic(
                     CheckersData.BLACK,
                     computerDifficulty,
@@ -150,6 +152,19 @@ class Board extends JPanel implements ActionListener, MouseListener {
         repaint();
     }
 
+    public void setPlayerTwoIsBlack(boolean playerOneIsBlack) {
+        this.playerOneIsBlack = playerOneIsBlack;
+    }
+
+    void playerOneIsBlack() {
+        if (this.playerOneIsBlack) {
+            gameBlack = Constants.gameBlack;
+            gameRed = Constants.gameRed;
+        } else {
+            gameBlack = Constants.gameRed;
+            gameRed  = Constants.gameBlack;
+        }
+    }
 
     //!@#$%^&*() I may cut this out entirely. I have not modified it from original
 
@@ -245,7 +260,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
      */
     //!@#$%^&*()
     private void doMakeMove(Move move) {
-        if (computerDifficulty > 0 && currentPlayer == CheckersData.BLACK) {
+        if (computerDifficulty > Constants.difficulty_ZERO && currentPlayer == CheckersData.BLACK) {
             repaint();
         }
         board.makeMove(move.fromRow, move.fromCol, move.toRow, move.toCol);
@@ -397,7 +412,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
      * @return True if is the computer's turn, False otherwise
      */
     private boolean isComputerPlayingAndIsItComputersTurn() {
-        if (computerDifficulty != 0) {
+        if (computerDifficulty != Constants.difficulty_ZERO) {
             if (singleAI) {
                 return currentPlayer == computerPlayer.getComputerPlayerID();
             } else

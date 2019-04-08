@@ -36,7 +36,8 @@ public class AI_Heuristic {
             POSSIBLE_JUMP_VALUE = 0,// Originally 5 // Encourages pieces to move to jump locations
             SIMPLE_DISTANCE_VALUE = 0,
             ADVANCED_DISTANCE_VALUE = 30;// Originally 4
-    private int PAWN_PIECE_ROW_VALUE = PAWN_PIECE / 2;
+    private int PAWN_PIECE_ROW_VALUE = PAWN_PIECE / 100,
+            KING_PIECE_ROW_VALUE = KING / 100;
 
     private final int[] stage = {0, 1, 3}; // 3 Stages: 0 - Beginning, 1 - Middle, 2 - End
 
@@ -135,59 +136,29 @@ public class AI_Heuristic {
         return bestValue;
     }
 
+    /**
+     * @param board    The Current State of the Game Board
+     * @param playerID Current Player's Game ID
+     * @return Relative Game Board Value
+     */
     private int evaluateHeuristic(Piece[][] board, int playerID) {
-
-
-//        //!@#$%^&*() change for production
-//        //!@#$%^&*() change for production
-//        int sS = simpleScore(board, playerID),
-//                sDS = SIMPLE_DISTANCE_VALUE != 0 ? simpleDistanceScore(board, playerID) * SIMPLE_DISTANCE_VALUE : 0,
-//                aDs = ADVANCED_DISTANCE_VALUE != 0 ? advancedDistanceScore(board, playerID, 2) * ADVANCED_DISTANCE_VALUE : 0, // Causes Issues, Most likely need SMALL scaling factor//!@#$%^&*()
-//                tKS = TRAPPED_CORNER_KING_VALUE != 0 ? trappedPieceScore(board, playerID) * TRAPPED_CORNER_KING_VALUE : 0,
-//                pPS = PROTECTED_PIECE_VALUE != 0 ? protectedPieceScore(board, playerID) * PROTECTED_PIECE_VALUE : 0,
-//                pJS = POSSIBLE_JUMP_VALUE != 0 ? possibleJumpsScore(board, playerID) * POSSIBLE_JUMP_VALUE : 0;
-////        if (aDs != 0) {
-//            System.out.println("HERE: " + aDs);
-//        }
-//        System.out.println(
-//                "sS-" +
-//                        "-sDs-" +
-//                        "-aDs-" +
-//                        "-tKS-" +
-//                        "-pPS-" +
-//                        "-pJS-"
-//        );
-//        int j = sS + sDS + aDs + tKS + pPS + pJS;
-//        System.out.println(
-//                sS + "-" +
-//                        sDS + "-" +
-//                        aDs + "-" +
-//                        tKS + "-" +
-//                        pPS + "-" +
-//                        pJS + "===" + j
-//        );
-//        return sS + sDS + aDs + tKS + pPS + pJS;
-//
-        /*return simpleScore(board, playerID)
-                + simpleDistanceScore(board, playerID)
-                + advancedDistanceScore(board, playerID, 2) * ADVANCED_DISTANCE_VALUE // Causes Issues, Most likely need SMALL scaling factor//!@#$%^&*()
-                + trappedPieceScore(board, playerID) * PAWN_PIECE_ROW_VALUE
-                + protectedPieceScore(board, playerID) * PROTECTED_PIECE_VALUE
-                + possibleJumpsScore(board, playerID) * POSSIBLE_JUMP_VALUE;*/
-        if (difficulty == 2) {
+        if (difficulty == Constants.difficulty_Medium) {
+            RMIN = -10;
+            RMAX = 10;
             return simpleScore(board, playerID);
-        } else if (difficulty == 3) {
+        } else if (difficulty == Constants.difficulty_Intermediate) {
+            RMIN = -10;
+            RMAX = 10;
             int[] tPS = trappedPieceScore(board);
             int isRed = RED == playerID ? 1 : -1;
             return simpleScore(board, playerID)
                     + simpleDistanceScore(board, playerID)
                     + advancedDistanceScore2(board, playerID, 2) * ADVANCED_DISTANCE_VALUE // Causes Issues, Most likely need SMALL scaling factor//!@#$%^&*()
                     + isRed * (tPS[0] - tPS[2]) * PAWN_PIECE_ROW_VALUE
-                    + isRed * (tPS[1] - tPS[3]) * PAWN_PIECE_ROW_VALUE
+                    + isRed * (tPS[1] - tPS[3]) * KING_PIECE_ROW_VALUE
                     + protectedPieceScore(board, playerID) * PROTECTED_PIECE_VALUE
                     + possibleJumpsScore(board, playerID) * POSSIBLE_JUMP_VALUE;
-        }
-        else  /*(difficulty > 3)*/ {
+        } else  /*(difficulty > Constants.difficulty_Intermediate)*/ {
             /**
              * C1-C8 Focus on the difference between player pieces
              * C9-C10 Focus on the current player's value

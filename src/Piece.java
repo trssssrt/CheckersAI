@@ -9,7 +9,7 @@ import java.awt.geom.Ellipse2D;
  * 2   -   Red King
  * 3   -   Black
  * 4   -   Black King
- *
+ * <p>
  * Oval is the drawn piece on game board
  */
 class Piece {
@@ -25,6 +25,14 @@ class Piece {
 
     int getPieceType() {
         return pieceType;
+    }
+
+    boolean isPiece(int color) {
+        return getPieceType() == color;
+    }
+
+    boolean isPieceAndKing(int color) {
+        return getPieceType() == color && isKing();
     }
 
     void setOval(Ellipse2D oval) {

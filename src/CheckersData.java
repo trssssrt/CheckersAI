@@ -13,13 +13,13 @@ import java.util.ArrayList;
  * Methods are provided to return lists of available legal moves.
  */
 class CheckersData {
-    private int numRowsAndColumns = 8;
+    private int numRowsAndColumns = Constants.defaultNumRowsAndColumns;
     static final int
-            EMPTY = 0,
-            RED = 1,
-            RED_KING = 2,
-            BLACK = 3,
-            BLACK_KING = 4;
+            EMPTY = Constants.EMPTY,
+            RED = Constants.RED,
+            RED_KING = Constants.RED_KING,
+            BLACK = Constants.BLACK,
+            BLACK_KING = Constants.BLACK_KING;
 
     final Piece[][] gamePieces;
 
@@ -368,8 +368,9 @@ class CheckersData {
             return false;
         }
 
-        // Check if piece can legally move up or down
-        if (player == RED && gamePieces[fromRow][fromCol].getPieceType() == RED && toRow > fromRow) {
+//        // Check if piece can legally move up or down
+//        if (player == RED && gamePieces[fromRow][fromCol].getPieceType() == RED && toRow > fromRow) {
+        if (player == RED && gamePieces[fromRow][fromCol].isPiece(RED) && toRow > fromRow) {
             return false;  // Red pieces (not a king) can only move South.
         } else return gamePieces[fromRow][fromCol].getPieceType() != BLACK || toRow >= fromRow;
 

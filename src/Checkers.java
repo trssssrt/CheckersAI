@@ -8,6 +8,7 @@ import java.util.Map;
  * Create Swing Application of Checkers game
  */
 class Checkers extends JPanel {
+
     private JFrame window;
     private JButton newGameButton;  // Button for starting a new game.
     private JButton resignButton;   // Button that a player can use to end
@@ -15,10 +16,10 @@ class Checkers extends JPanel {
 
     private JLabel message;  // Label for displaying messages to the user.
     static private Map<String, Integer> windowDimensions = new HashMap<>() {{
-        put("width", 1000);
-        put("height", 750);
+        put("width", Constants.defaultWindowWidth);
+        put("height", Constants.defaultWindowHeight);
     }};
-    private static int numRowsAndColumns = 8;
+    private static int numRowsAndColumns = Constants.defaultNumRowsAndColumns;
     private static Color backgroundColor = Color.decode("#492A1B");
     private final Board board = new Board(backgroundColor);
 
@@ -33,6 +34,17 @@ class Checkers extends JPanel {
             difficultyLevel2 = "Medium",
             difficultyLevel3 = "Intermediate",
             difficultyLevel4 = "Hard";
+    // Integer difficulty levels
+    private static int difficulty_ZERO = Constants.difficulty_ZERO,
+            difficulty_Easy = Constants.difficulty_Easy,
+            difficulty_Medium = Constants.difficulty_Medium,
+            difficulty_Intermediate = Constants.difficulty_Intermediate,
+            difficulty_Hard = Constants.difficulty_Hard;
+    private String[] playerOneColor = {"<html>Colors: ",
+            "<font color=\"", "red", "\"><strong>", "Player 1", "</strong></font>",
+            ", ",
+            "<font color=\"", "black", "\"><strong>", "Player 2", "</strong></font>",
+            "</html>"};
     private static JLabel messageToUser;
     private static ButtonGroup difGroup;
     private static JRadioButtonMenuItem easyDifficultyMenuItem, mediumDifficultyMenuItem, intermediateDifficultyMenuItem, hardDifficultyMenuItem;
@@ -70,25 +82,9 @@ class Checkers extends JPanel {
 
         /* Create the components and add them to the panel. */
         add(board);
-        //!@#$%^&*() Buttons No Longer Work
-//        add(newGameButton);
-//        add(resignButton);
-//        add(message);
         createMenuBar();
 
-
-
-      /* Set the position and size of each component by calling
-       its setBounds() method. */
-
         board.setPreferredSize(new Dimension(windowDimensions.get("width"), windowDimensions.get("height")));
-//        board.setAlignmentX(0);
-//        board.setAlignmentY(0);
-//        board.setBounds(20, 20, 164, 164); // Note:  size MUST be 164-by-164 ! // This is the cause of the sizing issue
-//        newGameButton. //!@#$%^&*()
-//        newGameButton.setBounds(210, 20, 120, 30);
-//        resignButton.setBounds(210, 155, 120, 30);
-//        message.setBounds(0, 200, 350, 30);
         board.userMessage.setText(messageToUser.getText());
     }
 
@@ -121,18 +117,18 @@ class Checkers extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 System.out.println("ADD AI");
-                int difficulty = 0;
+                int difficulty = difficulty_ZERO;
                 if (easyDifficultyMenuItem.isSelected()) {
-                    difficulty = 1;
+                    difficulty = difficulty_Easy;
                     messageToUser.setText(computerDifficulty_Text + difficultyLevel1);
                 } else if (mediumDifficultyMenuItem.isSelected()) {
-                    difficulty = 2;
+                    difficulty = difficulty_Medium;
                     messageToUser.setText(computerDifficulty_Text + difficultyLevel2);
                 } else if (intermediateDifficultyMenuItem.isSelected()) {
-                    difficulty = 3;
+                    difficulty = difficulty_Medium;
                     messageToUser.setText(computerDifficulty_Text + difficultyLevel3);
                 } else if (hardDifficultyMenuItem.isSelected()) {
-                    difficulty = 4;
+                    difficulty = difficulty_Hard;
                     messageToUser.setText(computerDifficulty_Text + difficultyLevel4);
                 }
                 board.singleAI = true;
@@ -145,18 +141,18 @@ class Checkers extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 System.out.println("ADD AI & AI");
-                int difficulty = 0;
+                int difficulty = difficulty_ZERO;
                 if (easyDifficultyMenuItem.isSelected()) {
-                    difficulty = 1;
+                    difficulty = difficulty_Easy;
                     messageToUser.setText(computerDifficulty_Text + difficultyLevel1);
                 } else if (mediumDifficultyMenuItem.isSelected()) {
-                    difficulty = 2;
+                    difficulty = difficulty_Medium;
                     messageToUser.setText(computerDifficulty_Text + difficultyLevel2);
                 } else if (intermediateDifficultyMenuItem.isSelected()) {
-                    difficulty = 3;
+                    difficulty = difficulty_Intermediate;
                     messageToUser.setText(computerDifficulty_Text + difficultyLevel3);
                 } else if (hardDifficultyMenuItem.isSelected()) {
-                    difficulty = 4;
+                    difficulty = difficulty_Hard;
                     messageToUser.setText(computerDifficulty_Text + difficultyLevel4);
                 }
                 board.singleAI = false;
@@ -199,8 +195,21 @@ class Checkers extends JPanel {
         });
         toggleLegalMoveColorsCommand.setSelected(false);
 
-        helpMenu.add(helpCommand); // Add menu item to menu.
-        helpMenu.add(toggleLegalMoveColorsCommand); // Add menu item to menu.
+        JRadioButtonMenuItem playerOneIsBlack = new JRadioButtonMenuItem(String.join("", playerOneColor)); // Create a menu item.
+        playerOneIsBlack.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                playerTwoIsBlack(playerOneIsBlack.isSelected());
+                playerOneIsBlack.setText(String.join("", playerOneColor));
+            }
+        });
+        playerOneIsBlack.setSelected(true);
+
+
+        // Add menu items to menu.
+        helpMenu.add(helpCommand);
+        helpMenu.add(toggleLegalMoveColorsCommand);
+        helpMenu.add(playerOneIsBlack);
 
         menuBar.add(helpMenu);
 
@@ -349,5 +358,15 @@ class Checkers extends JPanel {
      */
     private void toggleLegalMoveColors() {
         board.toggleLegalMoveColors();
+    }
+
+    private void playerTwoIsBlack(boolean isBlack) {
+        // Player 1 Color
+        playerOneColor[2] = isBlack ? "red" : "black";
+//        playerOneColor[4] = isBlack ? "RED" : "BLACK";
+        // Player 2 Color
+        playerOneColor[8] = isBlack ? "black" : "red";
+//        playerOneColor[10] = isBlack ? "BLACK" : "RED";
+        board.setPlayerTwoIsBlack(isBlack);
     }
 }
