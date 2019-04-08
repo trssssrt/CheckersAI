@@ -8,7 +8,7 @@ import java.util.Map;
  * Create Swing Application of Checkers game
  */
 class Checkers extends JPanel {
-    private JFrame window;
+    private JFrame mainWindow, window;
 
     static private Map<String, Integer> windowDimensions = new HashMap<>() {{
         put("width", Constants.defaultWindowWidth);
@@ -55,7 +55,7 @@ class Checkers extends JPanel {
 //        createMenuBar();
         window.setJMenuBar(menuBar);
 
-        Checkers content = new Checkers();
+        Checkers content = new Checkers(window);
         window.setContentPane(content);
 
 
@@ -70,7 +70,8 @@ class Checkers extends JPanel {
         window.setVisible(true);
     }
 
-    private Checkers() {
+    private Checkers(JFrame window) {
+        this.mainWindow = window;
         setPreferredSize(new Dimension(windowDimensions.get("width"), windowDimensions.get("height")));
 
         setBackground(backgroundColor);
@@ -100,7 +101,7 @@ class Checkers extends JPanel {
         HumanVSHuman.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                board.computerDifficulty = 0;
+                board.computerDifficulty = Constants.difficulty_ZERO;
                 board.performDoNewGame();
 
                 // update messageToUser & deselect difficulty level
@@ -292,7 +293,7 @@ class Checkers extends JPanel {
 
         menuBar.add(difficultyMenu);
 
-        menuBar.add(messageToUser, BorderLayout.LINE_END);
+//        mainWindow.add(messageToUser, BorderLayout.LINE_END); //asf
 
         // Update Message in Board.java
         board.userMessage.setText(messageToUser.getText());

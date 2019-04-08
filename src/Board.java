@@ -11,8 +11,9 @@ class Board extends JPanel implements ActionListener, MouseListener {
 
     private final CheckersData board = new CheckersData();
     private boolean gameInProgress;
-    //    private static Color backgroundColor;
+    private static Color backgroundColor;
     private int currentPlayer; // Holds Piece Type (RED or BLACK)
+    private String currentPlayerText;
 
     private int selectedRow, selectedCol;  // -1 if Player has not selected Row & Col
 
@@ -27,7 +28,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
     private static final Color lightColor = Constants.lightColor;
     private static Color gameBlack = Constants.gameBlack,
             gameRed = Constants.gameRed;
-    private boolean playerOneIsBlack = true;
+    private boolean playerTwoIsBlack = true;
     private static final Color emptyPieceColor = Constants.emptyPieceColor,
             legalMovePieceColor = Constants.legalMovePieceColor,
             legalMoveColor = Constants.legalMoveColor,
@@ -40,13 +41,9 @@ class Board extends JPanel implements ActionListener, MouseListener {
     private static final int initialX = Constants.defaultinitialX, initialY = Constants.defaultinitialY;
     private static final int squareSize = Constants.default_squareSize, pieceSize = Constants.default_pieceSize;
 
-    // THIS SHOULD UPDATE the buttons on Main Screen
-    //!@#$%^&*()
-//    private JButton resignButton, newGameButton;
     private JLabel message;
     public JLabel userMessage;
 
-    //    public int computerDifficulty = 2;
     public int computerDifficulty = Constants.defaultGameDifficulty; //!@#$%^&*() Remove after testing
     private boolean displayLegalMoveColors; // If True, highlight legal moves for player
     public boolean singleAI = Constants.default_SingleAI;
@@ -60,19 +57,20 @@ class Board extends JPanel implements ActionListener, MouseListener {
 
         message = new JLabel("", JLabel.CENTER);
         message.setFont(new Font("Serif", Font.BOLD, 14));
-        message.setForeground(Color.green);
+        message.setForeground(Color.decode("#C8D2C6"));
         add(message, BorderLayout.LINE_START);
 
         userMessage = new JLabel("", JLabel.RIGHT);
         userMessage.setFont(new Font("Serif", Font.BOLD, 14));
-        userMessage.setForeground(Color.YELLOW);
-        add(userMessage, BorderLayout.LINE_END);
+//        userMessage.setForeground(Color.YELLOW);
+//        add(userMessage, BorderLayout.LINE_END);
 
         displayLegalMoveColors = false;
         doNewGame();
     }
 
     //!@#$%^&*() WILL remove if buttons don't exist
+
     /**
      * Respond to user's click on one of the two buttons.
      */
@@ -93,17 +91,19 @@ class Board extends JPanel implements ActionListener, MouseListener {
             message.setText("Cannot start new game if there is one currently in progress!");
             return;
         }
-        playerOneIsBlack();
+        playerTwoIsBlack();
 
         board.setUpCheckerBoard(numRowsAndColumns);
         currentPlayer = CheckersData.RED;   // RED moves first.
         legalMoves = board.getLegalMoves(CheckersData.RED);  // Get RED's legal moves.
 
         selectedRow = -1;   // No pieces are selected at start of game
-        message.setText("Black:  Make your move.");
+        if (computerDifficulty != Constants.difficulty_ZERO) {
+            message.setText("<html>" + Constants.computerDifficulty_Text + Constants.difficultyLevels[computerDifficulty] + "<br/>" + getPlayerColor() + ":  Make your move." + "</html>");
+        } else {
+            message.setText(getPlayerColor() + ":  Make your move.");
+        }
         gameInProgress = true;
-//        newGameButton.setEnabled(false);
-//        resignButton.setEnabled(true);
 
 
         // We can later add implementation for Computer VS Computer HERE too
@@ -140,16 +140,28 @@ class Board extends JPanel implements ActionListener, MouseListener {
     }
 
     public void setPlayerTwoIsBlack(boolean playerOneIsBlack) {
-        this.playerOneIsBlack = playerOneIsBlack;
+        this.playerTwoIsBlack = playerOneIsBlack;
     }
 
-    void playerOneIsBlack() {
-        if (this.playerOneIsBlack) {
+    void playerTwoIsBlack() {
+        if (this.playerTwoIsBlack) {
             gameBlack = Constants.gameBlack;
             gameRed = Constants.gameRed;
         } else {
             gameBlack = Constants.gameRed;
             gameRed = Constants.gameBlack;
+        }
+    }
+
+    private String getPlayerColor() {
+        if (this.playerTwoIsBlack && currentPlayer == CheckersData.RED) {
+            return Constants.colorStringMap.get("RED");
+        } else if (this.playerTwoIsBlack && currentPlayer == CheckersData.BLACK) {
+            return Constants.colorStringMap.get("BLACK");
+        } else if (!this.playerTwoIsBlack && currentPlayer == CheckersData.RED) {
+            return Constants.colorStringMap.get("BLACK");
+        } else {//if (!this.playerTwoIsBlack && currentPlayer == CheckersData.BLACK) {
+            return Constants.colorStringMap.get("RED");
         }
     }
 
@@ -167,13 +179,8 @@ class Board extends JPanel implements ActionListener, MouseListener {
             message.setText("There is no game in progress!");
             return;
         }
-        if (currentPlayer == CheckersData.RED) {
-            gameOver("RED resigns.  BLACK wins.");
-//            gameOverPopUp("RED");
-        } else {
-            gameOver("BLACK resigns.  RED wins.");
-//            gameOverPopUp("BLACK");
-        }
+        String currentOpponent = getPlayerColor().equals(Constants.colorStringMap.get("RED")) ? Constants.colorStringMap.get("BLACK") : Constants.colorStringMap.get("RED");
+        gameOver(getPlayerColor() + " resigns.  " + currentOpponent + " wins.");
     }
 
 
@@ -185,8 +192,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
     private void gameOver(String str) {
 //        gameOverPopUp(str);
         message.setText(str);
-//        newGameButton.setEnabled(true);
-//        resignButton.setEnabled(false);
+
         gameInProgress = !gameInProgress;
     }
 
@@ -247,20 +253,106 @@ class Board extends JPanel implements ActionListener, MouseListener {
      */
     //!@#$%^&*()
     private void doMakeMove(Move move) {
-        if (computerDifficulty > Constants.difficulty_ZERO && currentPlayer == CheckersData.BLACK) {
-            repaint();
-        }
-        board.makeMove(move.fromRow, move.fromCol, move.toRow, move.toCol);
+        // Only allow AI to Make Moves IF a current game is in Progress (otherwise it will loop until game end)
+        if (gameInProgress) {
 
-        /* If there is a legal jump, look for more possible jumps
-         * starting from the tile onto which the player jumps.
-         * Force multiple jumps if possible.
-         */
+            if (computerDifficulty != Constants.difficulty_ZERO && currentPlayer == CheckersData.BLACK) {
+                repaint();
+            }
+            board.makeMove(move.fromRow, move.fromCol, move.toRow, move.toCol);
 
-        if (move.isJump()) {
-            // Check for double jump (this will continue to get called until there are no more successive jumps)
-            legalMoves = board.getLegalJumpsFromPosition(currentPlayer, move.toRow, move.toCol);
+            /* If there is a legal jump, look for more possible jumps
+             * starting from the tile onto which the player jumps.
+             * Force multiple jumps if possible.
+             */
+
+            if (move.isJump()) {
+                // Check for double jump (this will continue to get called until there are no more successive jumps)
+                legalMoves = board.getLegalJumpsFromPosition(currentPlayer, move.toRow, move.toCol);
+                if (legalMoves != null) {
+                    // Delay move to allow user to see computer 'think'
+                    new java.util.Timer().schedule(
+                            new java.util.TimerTask() {
+                                @Override
+                                public void run() {
+                                    if (isComputerPlayingAndIsItComputersTurn()) {
+                                        if (singleAI || currentPlayer == computerPlayer.getComputerPlayerID()) {
+                                            computerPlayer.updateGameBoard(board.gamePieces);
+                                            doMakeMove(computerPlayer.getBestMove());
+                                        } else if (currentPlayer == computerPlayer2.getComputerPlayerID()) {
+                                            computerPlayer2.updateGameBoard(board.gamePieces);
+                                            doMakeMove(computerPlayer2.getBestMove());
+                                        }
+                                    }
+                                }
+                            },
+                            COMPUTER_JUMP_DELAY_IN_MILLISECONDS
+                    );
+                    // Enforce Jump Rule
+                    selectedRow = move.toRow;
+                    selectedCol = move.toCol;
+                    // Update board
+                    repaint();
+                    return;
+                }
+            }
+
+            /*
+             * When turn ends, change player. (Switch players)
+             * End game if there are no more legal moves.
+             */
+            //!@#$%^&*()
+            if (currentPlayer == CheckersData.RED) {
+                currentPlayer = CheckersData.BLACK;
+                legalMoves = board.getLegalMoves(currentPlayer);
+                if (legalMoves == null) {
+                    gameOver("RED"); //!@#$%^&*()
+                }
+//            // AI's turn
+//            else if (computerDifficulty > 0) {
+//                repaint();
+//                computerPlayer.updateGameBoard(board.gamePieces);
+//                doMakeMove(computerPlayer.getBestMove());
+//            }
+                // These only appear in Human V. Human
+                else if (legalMoves[0].isJump()) {
+                    message.setText(getPlayerColor() + ":  You must jump.");
+                } else {
+                    message.setText(getPlayerColor() + ":  Make your move.");
+                }
+            } else {
+                currentPlayer = CheckersData.RED;
+                legalMoves = board.getLegalMoves(currentPlayer);
+                if (legalMoves == null) {
+                    gameOver("BLACK");//!@#$%^&*()
+                } else if (legalMoves[0].isJump()) {
+                    message.setText(getPlayerColor() + ":   You must jump.");
+                } else {
+                    message.setText(getPlayerColor() + ":  Make your move.");
+                }
+            }
+
+            // Player has not selected piece: selectedRow = -1
+            selectedRow = -1;
+
+            // Auto select piece if it is the only legal piece to move
             if (legalMoves != null) {
+                boolean isOnlyOneLegalPieceToMove = true;
+                //!@#$%^&*() Foreach?
+                for (Move legalMove : legalMoves) {
+                    if (legalMove.fromRow != legalMoves[0].fromRow
+                            || legalMove.fromCol != legalMoves[0].fromCol) {
+                        isOnlyOneLegalPieceToMove = false;
+                        break;
+                    }
+                }
+                if (isOnlyOneLegalPieceToMove) {
+                    selectedRow = legalMoves[0].fromRow;
+                    selectedCol = legalMoves[0].fromCol;
+                }
+                /* Make sure the board is redrawn in its new state. */
+                repaint();
+
                 // Delay move to allow user to see computer 'think'
                 new java.util.Timer().schedule(
                         new java.util.TimerTask() {
@@ -277,120 +369,13 @@ class Board extends JPanel implements ActionListener, MouseListener {
                                 }
                             }
                         },
-                        COMPUTER_JUMP_DELAY_IN_MILLISECONDS
+                        COMPUTER_MOVE_DELAY_IN_MILLISECONDS
                 );
-                // Enforce Jump Rule
-                selectedRow = move.toRow;
-                selectedCol = move.toCol;
-                // Update board
-                repaint();
-                return;
             }
-        }
 
-        /*
-         * When turn ends, change player. (Switch players)
-         * End game if there are no more legal moves.
-         */
-        //!@#$%^&*()
-        if (currentPlayer == CheckersData.RED) {
-            currentPlayer = CheckersData.BLACK;
-            legalMoves = board.getLegalMoves(currentPlayer);
-            if (legalMoves == null) {
-                gameOver("RED"); //!@#$%^&*()
-            }
-//            // AI's turn
-//            else if (computerDifficulty > 0) {
-//                repaint();
-//                computerPlayer.updateGameBoard(board.gamePieces);
-//                doMakeMove(computerPlayer.getBestMove());
-//            }
-            // These only appear in Human V. Human
-            else if (legalMoves[0].isJump()) {
-                message.setText("RED:  You must jump.");
-            } else {
-                message.setText("RED:  Make your move.");
-            }
-        } else {
-            currentPlayer = CheckersData.RED;
-            legalMoves = board.getLegalMoves(currentPlayer);
-            if (legalMoves == null) {
-                gameOver("BLACK");//!@#$%^&*()
-            } else if (legalMoves[0].isJump()) {
-                message.setText("BLACK:   You must jump.");
-            } else {
-                message.setText("BLACK:  Make your move.");
-            }
-        }
-
-        // Player has not selected piece: selectedRow = -1
-        selectedRow = -1;
-
-        // Auto select piece if it is the only legal piece to move
-        if (legalMoves != null) {
-            boolean isOnlyOneLegalPieceToMove = true;
-            //!@#$%^&*() Foreach?
-            for (Move legalMove : legalMoves) {
-                if (legalMove.fromRow != legalMoves[0].fromRow
-                        || legalMove.fromCol != legalMoves[0].fromCol) {
-                    isOnlyOneLegalPieceToMove = false;
-                    break;
-                }
-            }
-//            for (int i = 1; i < legalMoves.length; i++)
-//                if (legalMoves[i].fromRow != legalMoves[0].fromRow
-//                        || legalMoves[i].fromCol != legalMoves[0].fromCol) {
-//                    sameStartSquare = false;
-//                    break;
-//                }
-            if (isOnlyOneLegalPieceToMove) {
-                selectedRow = legalMoves[0].fromRow;
-                selectedCol = legalMoves[0].fromCol;
-            }
             /* Make sure the board is redrawn in its new state. */
             repaint();
-
-            // Delay move to allow user to see computer 'think'
-            new java.util.Timer().schedule(
-                    new java.util.TimerTask() {
-                        @Override
-                        public void run() {
-                            if (isComputerPlayingAndIsItComputersTurn()) {
-                                if (singleAI || currentPlayer == computerPlayer.getComputerPlayerID()) {
-                                    computerPlayer.updateGameBoard(board.gamePieces);
-                                    doMakeMove(computerPlayer.getBestMove());
-                                } else if (currentPlayer == computerPlayer2.getComputerPlayerID()) {
-                                    computerPlayer2.updateGameBoard(board.gamePieces);
-                                    doMakeMove(computerPlayer2.getBestMove());
-                                }
-                            }
-                        }
-                    },
-                    COMPUTER_MOVE_DELAY_IN_MILLISECONDS
-            );
         }
-
-        /* Make sure the board is redrawn in its new state. */
-        repaint();
-
-//        // Delay move to allow user to see computer 'think'
-//        new java.util.Timer().schedule(
-//                new java.util.TimerTask() {
-//                    @Override
-//                    public void run() {
-//                        if (isComputerPlayingAndIsItComputersTurn()) {
-//                            if (singleAI || currentPlayer == computerPlayer.getComputerPlayerID()) {
-//                                computerPlayer.updateGameBoard(board.gamePieces);
-//                                doMakeMove(computerPlayer.getBestMove());
-//                            } else if (currentPlayer == computerPlayer2.getComputerPlayerID()) {
-//                                computerPlayer2.updateGameBoard(board.gamePieces);
-//                                doMakeMove(computerPlayer2.getBestMove());
-//                            }
-//                        }
-//                    }
-//                },
-//                COMPUTER_MOVE_DELAY_IN_MILLISECONDS
-//        );
     }
 
     /**
@@ -522,9 +507,6 @@ class Board extends JPanel implements ActionListener, MouseListener {
                 }
             }
         }
-
-        // Add Message  Board
-
     }
 
     /**
@@ -595,9 +577,9 @@ class Board extends JPanel implements ActionListener, MouseListener {
      * Displays a game over screen and asks player if they'd like to play again
      * Resets game configuration if player does want another game
      *
-     * @param playerColor The Player's Color for the dialogue box
+     * @param message Message to User(s)
      */
-    private void gameOverPopUp(String playerColor, String EndGameNotice) {
+    private void gameOverPopUp(String message) {
         JOptionPane gameOverScreen = new JOptionPane();
         int confirm = gameOverScreen.showConfirmDialog(null,
                 "<html>" +
@@ -611,12 +593,10 @@ class Board extends JPanel implements ActionListener, MouseListener {
 //                        "}" +
 //                        "</style>" +
                         "</head>" +
-                        "<h1>" + playerColor + " " + EndGameNotice + "!!</h1>" +
-//                        "<h2>Play Again?</h2>" +
+                        "<h1>" + message + "</h1>" +
                         "</html>",
                 "GAME OVER",
-                JOptionPane.NO_OPTION);
-        gameInProgress = false;
+                JOptionPane.PLAIN_MESSAGE);
 //        if (confirm == JOptionPane.YES_OPTION) {
 //            doNewGame();
 //        }

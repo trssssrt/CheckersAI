@@ -1,4 +1,5 @@
 import java.awt.*;
+import java.util.HashMap;
 
 public final class Constants {
 
@@ -7,7 +8,7 @@ public final class Constants {
     }
 
     public static final int defaultWindowHeight = 750,
-            defaultWindowWidth = 1000,
+            defaultWindowWidth = 850,//1000,
             defaultNumRowsAndColumns = 8;
     public static final int defaultinitialX = 100,
             defaultinitialY = 50,
@@ -17,8 +18,10 @@ public final class Constants {
     public static final boolean default_SingleAI = true;
     public static final Color backgroundColor = Color.decode("#492A1B");
 
-
-
+    public static final HashMap<String, String> colorStringMap = new HashMap<>() {{
+        put("RED", "RED");
+        put("BLACK", "BLACK");
+    }};
     public static final Color gameBlack = Color.BLACK.brighter(),
             gameRed = Color.RED.darker();
 //    public static final Color gameRed = Color.BLACK.brighter(),
@@ -42,6 +45,9 @@ public final class Constants {
             BLACK = 3,
             BLACK_KING = 4;
 
+    public static final String computerDifficulty_Text = "Computer Difficulty: ";
+    public static final String[] difficultyLevels = {"Human Vs Human", "Easy", "Medium", "Intermediate", "Hard"};
+
     // 0 - Human, 1 - Easy, 2 - Medium, 3 - Intermediate, 4 - Hard
     public static final int defaultGameDifficulty = 3,
             difficulty_ZERO = 0,
@@ -50,7 +56,7 @@ public final class Constants {
             difficulty_Intermediate = 3,
             difficulty_Hard = 4;
 
-    public static final int default_COMPUTER_MOVE_DELAY_IN_MILLISECONDS = 500,
-            default_COMPUTER_JUMP_DELAY_IN_MILLISECONDS = 100;
+    public static final int default_COMPUTER_MOVE_DELAY_IN_MILLISECONDS = 1000,
+            default_COMPUTER_JUMP_DELAY_IN_MILLISECONDS = 1000;
 
 }
