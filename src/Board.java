@@ -561,8 +561,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
      * @param message Message to User(s)
      */
     private void gameOverPopUp(String message) {
-        JOptionPane gameOverScreen = new JOptionPane();
-        int confirm = gameOverScreen.showConfirmDialog(null,
+        JOptionPane.showMessageDialog(null,
                 "<html>" +
                         "<head>" +
                         "</head>" +
