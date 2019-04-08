@@ -42,7 +42,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
 
     // THIS SHOULD UPDATE the buttons on Main Screen
     //!@#$%^&*()
-    private JButton resignButton, newGameButton;
+//    private JButton resignButton, newGameButton;
     private JLabel message;
     public JLabel userMessage;
 
@@ -55,16 +55,9 @@ class Board extends JPanel implements ActionListener, MouseListener {
 
     //!@#$%^&*()
     Board(Color backgroundColor) {
-//        this.numRowsAndColumns = numRowsAndColumns;
         setBackground(backgroundColor);
-//        this.backgroundColor = backgroundColor;
         addMouseListener(this);
-        resignButton = new JButton("Resign");
-        resignButton.addActionListener(this);
-        newGameButton = new JButton("New Game");
-        newGameButton.addActionListener(this);
-//        add(newGameButton);
-//        add(resignButton);
+
         message = new JLabel("", JLabel.CENTER);
         message.setFont(new Font("Serif", Font.BOLD, 14));
         message.setForeground(Color.green);
@@ -80,16 +73,10 @@ class Board extends JPanel implements ActionListener, MouseListener {
     }
 
     //!@#$%^&*() WILL remove if buttons don't exist
-
     /**
      * Respond to user's click on one of the two buttons.
      */
     public void actionPerformed(ActionEvent evt) {
-        Object src = evt.getSource();
-        if (src == newGameButton)
-            doNewGame();
-        else if (src == resignButton)
-            doResign();
     }
 
     //!@#$%^&*()
@@ -115,8 +102,8 @@ class Board extends JPanel implements ActionListener, MouseListener {
         selectedRow = -1;   // No pieces are selected at start of game
         message.setText("Black:  Make your move.");
         gameInProgress = true;
-        newGameButton.setEnabled(false);
-        resignButton.setEnabled(true);
+//        newGameButton.setEnabled(false);
+//        resignButton.setEnabled(true);
 
 
         // We can later add implementation for Computer VS Computer HERE too
@@ -162,7 +149,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
             gameRed = Constants.gameRed;
         } else {
             gameBlack = Constants.gameRed;
-            gameRed  = Constants.gameBlack;
+            gameRed = Constants.gameBlack;
         }
     }
 
@@ -198,8 +185,8 @@ class Board extends JPanel implements ActionListener, MouseListener {
     private void gameOver(String str) {
 //        gameOverPopUp(str);
         message.setText(str);
-        newGameButton.setEnabled(true);
-        resignButton.setEnabled(false);
+//        newGameButton.setEnabled(true);
+//        resignButton.setEnabled(false);
         gameInProgress = !gameInProgress;
     }
 
@@ -537,6 +524,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
         }
 
         // Add Message  Board
+
     }
 
     /**
@@ -609,7 +597,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
      *
      * @param playerColor The Player's Color for the dialogue box
      */
-    private void gameOverPopUp(String playerColor) {
+    private void gameOverPopUp(String playerColor, String EndGameNotice) {
         JOptionPane gameOverScreen = new JOptionPane();
         int confirm = gameOverScreen.showConfirmDialog(null,
                 "<html>" +
@@ -623,14 +611,14 @@ class Board extends JPanel implements ActionListener, MouseListener {
 //                        "}" +
 //                        "</style>" +
                         "</head>" +
-                        "<h1>" + playerColor + " Wins!!</h1>" +
-                        "<h2>Play Again?</h2>" +
+                        "<h1>" + playerColor + " " + EndGameNotice + "!!</h1>" +
+//                        "<h2>Play Again?</h2>" +
                         "</html>",
                 "GAME OVER",
-                JOptionPane.YES_NO_OPTION);
+                JOptionPane.NO_OPTION);
         gameInProgress = false;
-        if (confirm == JOptionPane.YES_OPTION) {
-            doNewGame();
-        }
+//        if (confirm == JOptionPane.YES_OPTION) {
+//            doNewGame();
+//        }
     }
 }
