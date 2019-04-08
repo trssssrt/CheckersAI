@@ -27,7 +27,7 @@ public class AI_Heuristic {
 
     private int RMIN = -10, RMAX = 10;// Variables determining Random changes in Heuristic
 
-    private int PAWN_PIECE = 500,//!@#$%^&*()
+    private int PAWN_PIECE = 500,
             KING = PAWN_PIECE * 5 / 3,// Originally 175
             MOVABLE_PAWN = PAWN_PIECE * 5 / 6,
             MOVABLE_KING = KING * 5 / 6,
@@ -93,10 +93,8 @@ public class AI_Heuristic {
             }
         }
         Move[] legalMoveList = getLegalMoves(board, playerID);
-        // IF we reach the end //!@#$%^&*() Add game end logic?
         if (depth == 0) {
 //        || legalMoveList == null) {
-//            System.out.println(computerPlayerID + " -- " + playerID);
             if (playerID != computerPlayerID) {
                 System.out.println("HELP");
             }
@@ -118,7 +116,7 @@ public class AI_Heuristic {
 
                 // Delete created board to stop excess storage
                 // (indicates to garbage collector that this can be removed)
-                newBoard = null;//!@#$%^&*() Keep? Does speed up the system
+                newBoard = null;
 
                 bestValue = Math.max(bestValue, val);
                 if (val >= alpha && depth == DEPTH) {
@@ -253,7 +251,7 @@ public class AI_Heuristic {
                 C10 = KING;// King Value
             }
 
-            //!@#$%^&*() ADD OTHER STAGES
+            // STAGES
             if (currentStage == stage[0]) {
 //            System.out.println("NOW IN PHASE 1");
 
@@ -1163,7 +1161,7 @@ public class AI_Heuristic {
             // The move is a jump.  Remove the jumped piece from the board.
             int jumpRow = (fromRow + toRow) / 2;  // Row of the jumped piece.
             int jumpCol = (fromCol + toCol) / 2;  // Column of the jumped piece.
-            gameBoard[jumpRow][jumpCol].resetPiece(EMPTY);//!@#$%^&*()
+            gameBoard[jumpRow][jumpCol].resetPiece(EMPTY);
         }
 
         // If piece gets to other side of board make it into a king

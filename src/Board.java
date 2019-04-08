@@ -17,7 +17,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
 
     private static Move[] legalMoves;  // Current Player's legal moves
     private static int numRowsAndColumns = Constants.defaultNumRowsAndColumns;
-    private int COMPUTER_MOVE_DELAY_IN_MILLISECONDS = Constants.default_COMPUTER_MOVE_DELAY_IN_MILLISECONDS,//!@#$%^&*()
+    private int COMPUTER_MOVE_DELAY_IN_MILLISECONDS = Constants.default_COMPUTER_MOVE_DELAY_IN_MILLISECONDS,
             COMPUTER_JUMP_DELAY_IN_MILLISECONDS = Constants.default_COMPUTER_JUMP_DELAY_IN_MILLISECONDS;
 
 
@@ -49,7 +49,6 @@ class Board extends JPanel implements ActionListener, MouseListener {
     private AI_Heuristic computerPlayer, computerPlayer2;
 
 
-    //!@#$%^&*()
     Board(Color backgroundColor) {
         setBackground(backgroundColor);
         addMouseListener(this);
@@ -300,7 +299,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
             currentPlayer = CheckersData.BLACK;
             legalMoves = board.getLegalMoves(currentPlayer);
             if (legalMoves == null) {
-                gameOver("RED"); //!@#$%^&*()
+                gameOver("RED WINS!!!");
             }
             else if (legalMoves[0].isJump()) {
                 message.setText(getPlayerColor() + ":  You must jump.");
@@ -311,7 +310,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
             currentPlayer = CheckersData.RED;
             legalMoves = board.getLegalMoves(currentPlayer);
             if (legalMoves == null) {
-                gameOver("BLACK");//!@#$%^&*()
+                gameOver("BLACK WWINS!!!");
             } else if (legalMoves[0].isJump()) {
                 message.setText(getPlayerColor() + ":   You must jump.");
             } else {
@@ -325,7 +324,6 @@ class Board extends JPanel implements ActionListener, MouseListener {
         // Auto select piece if it is the only legal piece to move
         if (legalMoves != null) {
             boolean isOnlyOneLegalPieceToMove = true;
-            //!@#$%^&*() Foreach?
             for (Move legalMove : legalMoves) {
                 if (legalMove.fromRow != legalMoves[0].fromRow
                         || legalMove.fromCol != legalMoves[0].fromCol) {

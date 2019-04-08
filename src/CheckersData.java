@@ -247,7 +247,7 @@ class CheckersData {
         // If there are no jumps return null, otherwise return moves as an array
         if (moves.size() == 0) {
             return null;
-        } else {//!@#$%^&*() Why can't we just return moves? -- Because they are a different type
+        } else {
             return moves.toArray(new Move[moves.size()]);
         }
     }

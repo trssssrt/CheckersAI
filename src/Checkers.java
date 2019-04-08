@@ -187,8 +187,6 @@ class Checkers extends JPanel {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     if (!messageToUser.getText().contains(humanVsHuman)) {
                         messageToUser.setText(computerDifficulty_Text + difficultyLevel1);
-                        //!@#$%^&*() INCLUDE SIMILAR CODE IF I WANT TO UPDATE ON CLICK
-//                        board.userMessage.setText(messageToUser.getText());
                     }
                 }
             }
@@ -201,8 +199,6 @@ class Checkers extends JPanel {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     if (!messageToUser.getText().contains(humanVsHuman)) {
                         messageToUser.setText(computerDifficulty_Text + difficultyLevel2);
-                        //!@#$%^&*() INCLUDE SIMILAR CODE IF I WANT TO UPDATE ON CLICK
-//                        board.userMessage.setText(messageToUser.getText());
                     }
                 }
             }
@@ -215,8 +211,6 @@ class Checkers extends JPanel {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     if (!messageToUser.getText().contains(humanVsHuman)) {
                         messageToUser.setText(computerDifficulty_Text + difficultyLevel3);
-                        //!@#$%^&*() INCLUDE SIMILAR CODE IF I WANT TO UPDATE ON CLICK
-//                        board.userMessage.setText(messageToUser.getText());
                     }
                 }
             }
@@ -229,8 +223,6 @@ class Checkers extends JPanel {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     if (!messageToUser.getText().contains(humanVsHuman)) {
                         messageToUser.setText(computerDifficulty_Text + difficultyLevel4);
-                        //!@#$%^&*() INCLUDE SIMILAR CODE IF I WANT TO UPDATE ON CLICK
-//                        board.userMessage.setText(messageToUser.getText());
                     }
                 }
             }
