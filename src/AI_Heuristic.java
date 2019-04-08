@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Vector;
 
 /**
@@ -24,14 +23,22 @@ public class AI_Heuristic {
             DEPTH_DIFFICULTY_FACTOR = 4;
 
     private Move bestMove;
+    private int bestMoveCosts = 0;
 
-    private int NORMAL_PIECE = 100,
-            KING = 175,
-            CORNER_KING = 25,
-            NORMAL_PIECE_ROW_VALUE = 10,// Encourages Pieces to move forward
-            PROTECTED_PIECE_VALUE = 5,// Encourages Pieces to be protected
-            POSSIBLE_JUMP_VALUE = 2,// Encourages pieces to move to jump locations
-            ADVANCED_DISTANCE_VALUE = 1 / 1000;
+    private int RMIN = -10, RMAX = 10;// Variables determining Random changes in Heuristic
+
+    private int PAWN_PIECE = 500,//!@#$%^&*()
+            KING = PAWN_PIECE * 5 / 3,// Originally 175
+            MOVABLE_PAWN = PAWN_PIECE * 5 / 6,
+            MOVABLE_KING = KING * 5 / 6,
+            TRAPPED_CORNER_KING_VALUE = -KING * 2 / 3,// Originally 25 // Encourages Pieces to move forward
+            PROTECTED_PIECE_VALUE = 40,// Originally 10 // Encourages Pieces to be protected
+            POSSIBLE_JUMP_VALUE = 0,// Originally 5 // Encourages pieces to move to jump locations
+            SIMPLE_DISTANCE_VALUE = 0,
+            ADVANCED_DISTANCE_VALUE = 30;// Originally 4
+    private int PAWN_PIECE_ROW_VALUE = PAWN_PIECE / 2;
+
+    private final int[] stage = {0, 1, 3}; // 3 Stages: 0 - Beginning, 1 - Middle, 2 - End
 
 
     AI_Heuristic(int computerPlayerID, int difficulty, Piece[][] board, int numRowsAndColumns) {
@@ -53,9 +60,12 @@ public class AI_Heuristic {
 //            System.out.println("--Player ID: " + computerPlayerID);
             int a = this.negamaxAB(gameBoard, DEPTH, Integer.MIN_VALUE, Integer.MAX_VALUE, computerPlayerID);
 //            System.out.println("BEST MOVE: " + bestMove);
-            System.out.println("Best Move SCORE: " + a
+            bestMoveCosts += a;
+            System.out.println("Best Move SCORE For " + computerPlayerID + ": " + a
                     + " (" + bestMove.fromRow + ", " + bestMove.fromCol +
-                    ") -> (" + bestMove.toRow + ", " + bestMove.toCol + ")");
+                    ") -> (" + bestMove.toRow + ", " + bestMove.toCol + ")" +
+                    " Depth: " + DEPTH +
+                    " BMC: " + bestMoveCosts);
             return bestMove;
         }
 
@@ -82,7 +92,7 @@ public class AI_Heuristic {
             }
         }
         Move[] legalMoveList = getLegalMoves(board, playerID);
-        // IF we reach the end
+        // IF we reach the end //!@#$%^&*() Add game end logic?
         if (depth == 0) {
 //        || legalMoveList == null) {
 //            System.out.println(computerPlayerID + " -- " + playerID);
@@ -92,7 +102,7 @@ public class AI_Heuristic {
 
             // If there are equal scores, then the game is completely deterministic
             // So, to prevent this, we add a pseudo-random number.
-            return evaluateHeuristic(board, playerID) + randomInt(-3, 3);
+            return evaluateHeuristic(board, playerID) + randomInt(RMIN, RMAX);
         }
 
         int bestValue = Integer.MIN_VALUE;
@@ -104,6 +114,11 @@ public class AI_Heuristic {
                 makeMove(newBoard, move.fromRow, move.fromCol, move.toRow, move.toCol);
 
                 int val = -negamaxAB(newBoard, depth - 1, -beta, -alpha, playerID);
+
+                // Delete created board to stop excess storage
+                // (indicates to garbage collector that this can be removed)
+                newBoard = null;//!@#$%^&*() Keep? Does speed up the system
+
                 bestValue = Math.max(bestValue, val);
                 if (val >= alpha && depth == DEPTH) {
                     bestMove = move;
@@ -121,27 +136,720 @@ public class AI_Heuristic {
     }
 
     private int evaluateHeuristic(Piece[][] board, int playerID) {
-        return simpleScore(board, playerID)
+
+
+//        //!@#$%^&*() change for production
+//        //!@#$%^&*() change for production
+//        int sS = simpleScore(board, playerID),
+//                sDS = SIMPLE_DISTANCE_VALUE != 0 ? simpleDistanceScore(board, playerID) * SIMPLE_DISTANCE_VALUE : 0,
+//                aDs = ADVANCED_DISTANCE_VALUE != 0 ? advancedDistanceScore(board, playerID, 2) * ADVANCED_DISTANCE_VALUE : 0, // Causes Issues, Most likely need SMALL scaling factor//!@#$%^&*()
+//                tKS = TRAPPED_CORNER_KING_VALUE != 0 ? trappedPieceScore(board, playerID) * TRAPPED_CORNER_KING_VALUE : 0,
+//                pPS = PROTECTED_PIECE_VALUE != 0 ? protectedPieceScore(board, playerID) * PROTECTED_PIECE_VALUE : 0,
+//                pJS = POSSIBLE_JUMP_VALUE != 0 ? possibleJumpsScore(board, playerID) * POSSIBLE_JUMP_VALUE : 0;
+////        if (aDs != 0) {
+//            System.out.println("HERE: " + aDs);
+//        }
+//        System.out.println(
+//                "sS-" +
+//                        "-sDs-" +
+//                        "-aDs-" +
+//                        "-tKS-" +
+//                        "-pPS-" +
+//                        "-pJS-"
+//        );
+//        int j = sS + sDS + aDs + tKS + pPS + pJS;
+//        System.out.println(
+//                sS + "-" +
+//                        sDS + "-" +
+//                        aDs + "-" +
+//                        tKS + "-" +
+//                        pPS + "-" +
+//                        pJS + "===" + j
+//        );
+//        return sS + sDS + aDs + tKS + pPS + pJS;
+//
+        /*return simpleScore(board, playerID)
                 + simpleDistanceScore(board, playerID)
                 + advancedDistanceScore(board, playerID, 2) * ADVANCED_DISTANCE_VALUE // Causes Issues, Most likely need SMALL scaling factor//!@#$%^&*()
-                + trappedKingScore(board, playerID) * NORMAL_PIECE_ROW_VALUE
+                + trappedPieceScore(board, playerID) * PAWN_PIECE_ROW_VALUE
                 + protectedPieceScore(board, playerID) * PROTECTED_PIECE_VALUE
-                + possibleJumpsScore(board, playerID) * POSSIBLE_JUMP_VALUE;
-//        if (difficulty == 1) {
-//            return simpleScore(board, playerID);
-//        } else if (difficulty == 2) {
-//            return simpleScore(board, playerID) + simpleDistanceScore(board, playerID);
-//        } else if (difficulty == 3) {
-//            return simpleScore(board, playerID)
-//            + simpleDistanceScore(board, playerID)
-//                    + trappedKingScore(board, playerID) * NORMAL_PIECE_ROW_VALUE;
-//        } else {
-//            return simpleScore(board, playerID)
-//            + simpleDistanceScore(board, playerID)
-//                    + trappedKingScore(board, playerID) * NORMAL_PIECE_ROW_VALUE
-//                + possibleJumpsScore(board, playerID) * POSSIBLE_JUMP_VALUE;
-//        }
+                + possibleJumpsScore(board, playerID) * POSSIBLE_JUMP_VALUE;*/
+        if (difficulty == 2) {
+            return simpleScore(board, playerID);
+        } else if (difficulty == 3) {
+            int[] tPS = trappedPieceScore(board);
+            int isRed = RED == playerID ? 1 : -1;
+            return simpleScore(board, playerID)
+                    + simpleDistanceScore(board, playerID)
+                    + advancedDistanceScore2(board, playerID, 2) * ADVANCED_DISTANCE_VALUE // Causes Issues, Most likely need SMALL scaling factor//!@#$%^&*()
+                    + isRed * (tPS[0] - tPS[2]) * PAWN_PIECE_ROW_VALUE
+                    + isRed * (tPS[1] - tPS[3]) * PAWN_PIECE_ROW_VALUE
+                    + protectedPieceScore(board, playerID) * PROTECTED_PIECE_VALUE
+                    + possibleJumpsScore(board, playerID) * POSSIBLE_JUMP_VALUE;
+        }
+        else  /*(difficulty > 3)*/ {
+            /**
+             * C1-C8 Focus on the difference between player pieces
+             * C9-C10 Focus on the current player's value
+             */
+            int C1 = 0,// Difference Value of Pawn Pieces
+                    C2 = 0, // Difference Value of KING Pieces
+                    C3 = 0, // Value of Protected Pawn Pieces
+                    C4 = 0, // Value of Protected Kings
+                    C5 = 0, // Value of movable Pawn Pieces
+                    C6 = 0, // Value of movable Kings
+                    C7 = 0, // Average Pawn Piece distance to promotion
+                    C8 = 0, // Value of opened Promotion Row
+                    C9 = 0,  // Piece Value
+                    C10 = 0,// King Value
+                    C11 = 0,// Mean Distance to Other Pieces
+                    C12 = 0,// Difference of pawns 'hiding' on the edge of the board
+                    C13 = 0,// Difference of Kings 'hiding' on the edge of the board
+                    C14 = -PAWN_PIECE,// Pawn 'hiding' on the edge of the board,
+                    C15 = -KING // King 'hiding' on the edge of the board
+                            ;
+
+
+            int[] pieceCount = pieceCount(board);
+            int currentStage;
+            int beginningPhaseKingCount = 0,
+                    beginningPhasePawnCount = 3,
+                    middlePhasePawnCount = 3;
+            int middlePhaseKingCount = 1;
+
+        /*
+          Stage 1: Beginning - Each player has more than 3 pawns & No kings
+          Stage 2: Kings - Each player has more than 3 pieces there is at least 1 king
+          Stage 3: Ending - One player has at least 3 pieces left
+         */
+            if (pieceCount[0] > beginningPhasePawnCount
+                    && pieceCount[2] > beginningPhasePawnCount
+                    && Math.abs(pieceCount[1] + pieceCount[3]) == beginningPhaseKingCount) {
+
+                // Stage 1
+                currentStage = stage[0];
+                RMIN = -PAWN_PIECE * 1 / 10;
+                RMAX = PAWN_PIECE * 1 / 10;
+                C1 = PAWN_PIECE * 2 / 7; // Value of difference of Pawn Pieces
+                C2 = KING * 2 / 7; // Value of difference of King Pieces
+                C3 = PAWN_PIECE * 3 / 4; // Value of difference of Protected Pawns
+                C4 = KING * 3 / 4; // Value of difference of Protected Kings
+                C5 = PAWN_PIECE * 10 / 13; // Value of difference of movable Pawn Pieces
+                C6 = KING * 10 / 13; // Value of difference of movable Kings
+                C7 = PAWN_PIECE * 3 / 11; // Value of difference of Average Pawn Piece distance to promotion
+                C8 = -PAWN_PIECE * 2 / 19; // Value of difference of opened Promotion Row
+                C9 = PAWN_PIECE;  // Piece Value
+                C10 = KING; // King Value
+
+            } else if ((pieceCount[0] + pieceCount[1]) > middlePhasePawnCount
+                    && (pieceCount[2] + pieceCount[3]) > middlePhasePawnCount
+                    && Math.abs(pieceCount[1] + pieceCount[3]) >= middlePhaseKingCount) {
+
+                // Stage 2
+                currentStage = stage[1];
+                RMIN = -PAWN_PIECE * 2 / 10;
+                RMAX = PAWN_PIECE * 2 / 10;
+                C1 = PAWN_PIECE * 2 / 5; // Value of difference of Pawn Pieces
+                C2 = KING * 2 / 5; // Value of difference of King Pieces
+                C3 = PAWN_PIECE * 5 / 8; // Value of difference of Protected Pawns
+                C4 = KING * 3 / 8; // Value of difference of Protected Kings
+                C5 = 0; // Value of difference of movable Pawn Pieces
+                C6 = KING * 2 / 5; // Value of difference of movable Kings
+                C7 = PAWN_PIECE * 5 / 7; // Value of difference of Average Pawn Piece distance to promotion
+                C8 = PAWN_PIECE * 3 / 7; // Value of difference of opened Promotion Row
+                C9 = PAWN_PIECE;  // Piece Value
+                C10 = KING; // King Value
+                C11 = -KING / 2; // Mean Distance to Other Pieces
+                C12 = PAWN_PIECE / 2; // Difference of pawns 'hiding' on the edge of the board
+                C13 = -KING / 2; // Difference of Kings 'hiding' on the edge of the board
+                C14 = -PAWN_PIECE; // Pawn 'hiding' on the edge of the board,
+                C15 = -KING; // King 'hiding' on the edge of the board
+
+            } else {
+                // Stage 3
+                currentStage = stage[2];
+                RMIN = -PAWN_PIECE * 3 / 10;
+                RMAX = PAWN_PIECE * 3 / 10;
+                C1 = PAWN_PIECE * 2 / 31; // Value of difference of Pawn Pieces
+                C2 = KING * 2 / 33; // Value of difference of King Pieces
+                C3 = PAWN_PIECE * 1 / 4; // Value of difference of Protected Pawns
+                C4 = KING * 1 / 4; // Value of difference of Protected Kings
+                C5 = PAWN_PIECE * 2 / 19; // Value of difference of movable Pawn Pieces
+                C6 = KING / 3; // Value of difference of movable Kings
+                C7 = PAWN_PIECE / 3; // Value of difference of Average Pawn Piece distance to promotion
+                C8 = 0; // Value of difference of opened Promotion Row
+                C9 = PAWN_PIECE;  // Piece Value
+                C10 = KING;// King Value
+            }
+
+            //!@#$%^&*() ADD OTHER STAGES
+            if (currentStage == stage[0]) {
+//            System.out.println("NOW IN PHASE 1");
+
+                int[] protectedPieceCount = protectedPiecesScore(board);
+                int[] movablePieceCount = movablePieceScore(board);
+                int[] promotionRowCount = promotionRowScore(board);
+                int[] meanDistanceToPromotionCount = meanDistanceToPromotionScore(board);
+                int isRed = playerID == RED ? 1 : -1;
+                return isRed * ( // If player is black, multiplying by -1 will reverse each subtraction
+                        C1 * (pieceCount[0] - pieceCount[2]) // Difference in Pawn Pieces
+                                + C2 * (pieceCount[1] - pieceCount[3])// Difference in King Pieces
+                                + C3 * (protectedPieceCount[0] - protectedPieceCount[2]) // Difference in Protected Pawn Pieces
+                                + C4 * (protectedPieceCount[1] - protectedPieceCount[3]) // Difference in Protected King Pieces
+                                + C5 * (movablePieceCount[0] - movablePieceCount[2]) // Difference in movable Pawn Pieces
+                                + C6 * (movablePieceCount[1] - movablePieceCount[3]) // Difference in movable Pawn Pieces
+                                + C7 * (meanDistanceToPromotionCount[0] - meanDistanceToPromotionCount[1]) // Difference in 'closeness' to promotional row
+                                + C8 * (promotionRowCount[0] - promotionRowCount[1]) // Difference in Respective Open Promotional Row Tiles
+                )
+                        // if player is Red count Red pieces, otherwise count Black
+                        + isRed == 1 ?
+                        (
+                                C9 * pieceCount[0]
+                                        + C10 * pieceCount[1]
+                        )
+                        :
+                        (
+                                C9 * pieceCount[2]
+                                        + C10 * pieceCount[3]
+                        );
+            } else if (currentStage == stage[1]) {
+//            System.out.println("NOW IN PHASE -2");
+
+                int[] protectedPieceCount = protectedPiecesScore(board);
+                int[] movablePieceCount = movablePieceScore(board);
+                int[] promotionRowCount = promotionRowScore(board);
+                int[] meanDistanceToPromotionCount = meanDistanceToPromotionScore(board);
+                int[] meanDistanceCount = meanDistanceScore(board, 2);
+                int[] trappedPieceCount = trappedPieceScore(board);
+                int isRed = playerID == RED ? 1 : -1;
+                return isRed * ( // If player is black, multiplying by -1 will reverse each subtraction
+                        C1 * (pieceCount[0] - pieceCount[2]) // Difference in Pawn Pieces
+                                + C2 * (pieceCount[1] - pieceCount[3])// Difference in King Pieces
+                                + C3 * (protectedPieceCount[0] - protectedPieceCount[2]) // Difference in Protected Pawn Pieces
+                                + C4 * (protectedPieceCount[1] - protectedPieceCount[3]) // Difference in Protected King Pieces
+                                + C5 * (movablePieceCount[0] - movablePieceCount[2]) // Difference in movable Pawn Pieces
+                                + C6 * (movablePieceCount[1] - movablePieceCount[3]) // Difference in movable Pawn Pieces
+                                + C7 * (meanDistanceToPromotionCount[0] - meanDistanceToPromotionCount[1]) // Difference in 'closeness' to promotional row
+                                + C8 * (promotionRowCount[0] - promotionRowCount[1]) // Difference in Respective Open Promotional Row Tiles
+//                            + C11 * (meanDistanceCount[0] - meanDistanceCount[1])
+                                + C12 * (trappedPieceCount[0] - trappedPieceCount[2])// Difference in Edge Pawns
+                                + C13 * (trappedPieceCount[1] - trappedPieceCount[3]) // Difference in Edge Kings
+                )
+                        // if player is Red count Red pieces, otherwise count Black
+                        + isRed == 1 ?
+                        (
+                                C9 * pieceCount[0]
+                                        + C10 * pieceCount[1]
+                                        + C11 * meanDistanceCount[0]
+                                        + C14 * trappedPieceCount[0]
+                                        + C15 * trappedPieceCount[1]
+                        )
+                        :
+                        (
+                                C9 * pieceCount[2]
+                                        + C10 * pieceCount[3]
+                                        + C11 * meanDistanceCount[1]
+                                        + C14 * trappedPieceCount[2]
+                                        + C15 * trappedPieceCount[3]
+                        );
+
+            } else {
+//            System.out.println("NOW IN PHASE --3");
+                int[] protectedPieceCount = protectedPiecesScore(board);
+                int[] movablePieceCount = movablePieceScore(board);
+                int[] promotionRowCount = promotionRowScore(board);
+                int[] meanDistanceToPromotionCount = meanDistanceToPromotionScore(board);
+                int[] meanDistanceCount = meanDistanceScore(board, 2);
+                int[] trappedPieceCount = trappedPieceScore(board);
+                int isRed = playerID == RED ? 1 : -1;
+                return isRed * ( // If player is black, multiplying by -1 will reverse each subtraction
+                        C1 * (pieceCount[0] - pieceCount[2]) // Difference in Pawn Pieces
+                                + C2 * (pieceCount[1] - pieceCount[3])// Difference in King Pieces
+                                + C3 * (protectedPieceCount[0] - protectedPieceCount[2]) // Difference in Protected Pawn Pieces
+                                + C4 * (protectedPieceCount[1] - protectedPieceCount[3]) // Difference in Protected King Pieces
+                                + C5 * (movablePieceCount[0] - movablePieceCount[2]) // Difference in movable Pawn Pieces
+                                + C6 * (movablePieceCount[1] - movablePieceCount[3]) // Difference in movable Pawn Pieces
+                                + C7 * (meanDistanceToPromotionCount[0] - meanDistanceToPromotionCount[1]) // Difference in 'closeness' to promotional row
+                                + C8 * (promotionRowCount[0] - promotionRowCount[1]) // Difference in Respective Open Promotional Row Tiles
+//                            + C11 * (meanDistanceCount[0] - meanDistanceCount[1])
+                                + C12 * (trappedPieceCount[0] - trappedPieceCount[2])// Difference in Edge Pawns
+                                + C13 * (trappedPieceCount[1] - trappedPieceCount[3]) // Difference in Edge Kings
+                )
+                        // if player is Red count Red pieces, otherwise count Black
+                        + isRed == 1 ?
+                        (
+                                C9 * pieceCount[0]
+                                        + C10 * pieceCount[1]
+                                        + C11 * meanDistanceCount[0]
+                                        + C14 * trappedPieceCount[0]
+                                        + C15 * trappedPieceCount[1]
+                        )
+                        :
+                        (
+                                C9 * pieceCount[2]
+                                        + C10 * pieceCount[3]
+                                        + C11 * meanDistanceCount[1]
+                                        + C14 * trappedPieceCount[2]
+                                        + C15 * trappedPieceCount[3]
+                        );
+            }
+        }
     }
+
+    /**
+     * @param board Current Board State
+     * @return Number of each piece type
+     */
+    private int[] pieceCount(Piece[][] board) {
+        int[] pC = {0, 0, 0, 0}; // Red, RED_KING, BLACK, BLACK_KING
+
+        for (int row = 0; row < numRowsAndColumns; row++) {
+            for (int col = 0; col < numRowsAndColumns; col++) {
+                if (board[row][col].getPieceType() == RED) {
+                    pC[0]++;
+                } else if (board[row][col].getPieceType() == RED_KING && board[row][col].isKing()) {
+                    pC[1]++;
+                } else if (board[row][col].getPieceType() == BLACK) {
+                    pC[2]++;
+                } else if (board[row][col].getPieceType() == BLACK_KING && board[row][col].isKing()) {
+                    pC[3]++;
+                }
+            }
+        }
+        return pC;
+    }
+
+    /**
+     * @param board Current Board State
+     * @return Number of each protected piece type
+     */
+    private int[] protectedPiecesScore(Piece[][] board) {
+        int[] pieces = {0, 0, 0, 0};// Red, RED_KING, BLACK, BLACK_KING
+
+        for (int row = 0; row < numRowsAndColumns; row++) {
+            for (int col = 0; col < numRowsAndColumns; col++) {
+                if (board[row][col].getPieceType() == RED && !board[row][col].isKing()) {
+                    if (isOnBoard(row + 1, col + 1)) {
+                        if (board[row + 1][col + 1].getPieceType() == RED && !board[row + 1][col + 1].isKing()) {
+                            pieces[0]++;
+                        }
+                    }
+
+//                    if (isOnBoard(row - 1, col + 1)) {
+//                        if (board[row - 1][col + 1].getPieceType() == RED && !board[row - 1][col + 1].isKing()) {
+//                            red[0]++;
+//                        }
+//                    }
+
+                    if (isOnBoard(row + 1, col - 1)) {
+                        if (board[row + 1][col - 1].getPieceType() == RED && !board[row + 1][col - 1].isKing()) {
+                            pieces[0]++;
+                        }
+                    }
+
+//                    if (isOnBoard(row - 1, col - 1)) {
+//                        if (board[row - 1][col - 1].getPieceType() == RED && !board[row - 1][col - 1].isKing()) {
+//                            red[0]++;
+//                        }
+//                    }
+                } else if (board[row][col].getPieceType() == BLACK && !board[row][col].isKing()) {
+//                    if (isOnBoard(row + 1, col + 1)) {
+//                        if (board[row + 1][col + 1].getPieceType() == BLACK && !board[row + 1][col + 1].isKing()) {
+//                            black[0]++;
+//                        }
+//                    }
+
+                    if (isOnBoard(row - 1, col + 1)) {
+                        if (board[row - 1][col + 1].getPieceType() == BLACK && !board[row - 1][col + 1].isKing()) {
+                            pieces[2]++;
+                        }
+                    }
+
+//                    if (isOnBoard(row + 1, col - 1)) {
+//                        if (board[row + 1][col - 1].getPieceType() == BLACK && !board[row + 1][col - 1].isKing()) {
+//                            black[0]++;
+//                        }
+//                    }
+
+                    if (isOnBoard(row - 1, col - 1)) {
+                        if (board[row - 1][col - 1].getPieceType() == BLACK && !board[row - 1][col - 1].isKing()) {
+                            pieces[2]++;
+                        }
+                    }
+                } else if (board[row][col].getPieceType() == RED_KING && board[row][col].isKing()) {
+                    if (isOnBoard(row + 1, col + 1)) {
+                        if (board[row + 1][col + 1].getPieceType() == RED || board[row + 1][col + 1].getPieceType() == RED_KING) {
+                            pieces[1]++;
+                        }
+                    }
+
+//                    if (isOnBoard(row - 1, col + 1)) {
+//                        if (board[row - 1][col + 1].getPieceType() == RED && !board[row - 1][col + 1].isKing()) {
+//                            red[0]++;
+//                        }
+//                    }
+
+                    if (isOnBoard(row + 1, col - 1)) {
+                        if (board[row + 1][col - 1].getPieceType() == RED || board[row + 1][col - 1].getPieceType() == RED_KING) {
+                            pieces[1]++;
+                        }
+                    }
+
+//                    if (isOnBoard(row - 1, col - 1)) {
+//                        if (board[row - 1][col - 1].getPieceType() == RED && !board[row - 1][col - 1].isKing()) {
+//                            red[0]++;
+//                        }
+//                    }
+                } else if (board[row][col].getPieceType() == BLACK_KING && board[row][col].isKing()) {
+//                    if (isOnBoard(row + 1, col + 1)) {
+//                        if (board[row + 1][col + 1].getPieceType() == BLACK && !board[row + 1][col + 1].isKing()) {
+//                            black[0]++;
+//                        }
+//                    }
+
+                    if (isOnBoard(row - 1, col + 1)) {
+                        if (board[row - 1][col + 1].getPieceType() == BLACK || board[row - 1][col + 1].getPieceType() == BLACK_KING) {
+                            pieces[2]++;
+                        }
+                    }
+
+//                    if (isOnBoard(row + 1, col - 1)) {
+//                        if (board[row + 1][col - 1].getPieceType() == BLACK && !board[row + 1][col - 1].isKing()) {
+//                            black[0]++;
+//                        }
+//                    }
+
+                    if (isOnBoard(row - 1, col - 1)) {
+                        if (board[row - 1][col - 1].getPieceType() == BLACK || board[row - 1][col - 1].getPieceType() == BLACK_KING) {
+                            pieces[2]++;
+                        }
+                    }
+                }
+            }
+        }
+        return pieces;
+    }
+
+
+    /**
+     * @param board Current Board State
+     * @return Number of pieces that can move
+     */
+    private int[] movablePieceScore(Piece[][] board) {
+        int[] pieces = {0, 0, 0, 0};// Red, RED_KING, BLACK, BLACK_KING
+
+        for (int row = 0; row < numRowsAndColumns; row++) {
+            for (int col = 0; col < numRowsAndColumns; col++) {
+                if (board[row][col].getPieceType() == RED && !board[row][col].isKing()) {
+//                    if (isOnBoard(row + 1, col + 1)) {
+//                        if (board[row + 1][col + 1].getPieceType() == RED && !board[row + 1][col + 1].isKing()) {
+//                            pieces[0]++;
+//                        }
+//                    }
+
+                    if (isOnBoard(row - 1, col + 1)) {
+                        if (board[row - 1][col + 1].getPieceType() == EMPTY) {
+                            pieces[0]++;
+                        }
+                    }
+
+//                    if (isOnBoard(row + 1, col - 1)) {
+//                        if (board[row + 1][col - 1].getPieceType() == RED && !board[row + 1][col - 1].isKing()) {
+//                            pieces[0]++;
+//                        }
+//                    }
+
+                    if (isOnBoard(row - 1, col - 1)) {
+                        if (board[row - 1][col - 1].getPieceType() == EMPTY) {
+                            pieces[0]++;
+                        }
+                    }
+                } else if (board[row][col].getPieceType() == BLACK && !board[row][col].isKing()) {
+                    if (isOnBoard(row + 1, col + 1)) {
+                        if (board[row + 1][col + 1].getPieceType() == EMPTY) {
+                            pieces[2]++;
+                        }
+                    }
+
+//                    if (isOnBoard(row - 1, col + 1)) {
+//                        if (board[row - 1][col + 1].getPieceType() == BLACK && !board[row - 1][col + 1].isKing()) {
+//                            pieces[2]++;
+//                        }
+//                    }
+
+                    if (isOnBoard(row + 1, col - 1)) {
+                        if (board[row + 1][col - 1].getPieceType() == EMPTY) {
+                            pieces[2]++;
+                        }
+                    }
+
+//                    if (isOnBoard(row - 1, col - 1)) {
+//                        if (board[row - 1][col - 1].getPieceType() == BLACK && !board[row - 1][col - 1].isKing()) {
+//                            pieces[2]++;
+//                        }
+//                    }
+                } else if (board[row][col].getPieceType() == RED_KING && board[row][col].isKing()) {
+                    if (isOnBoard(row + 1, col + 1)) {
+                        if (board[row + 1][col + 1].getPieceType() == EMPTY) {
+                            pieces[1]++;
+                        }
+                    }
+
+                    if (isOnBoard(row - 1, col + 1)) {
+                        if (board[row - 1][col + 1].getPieceType() == EMPTY) {
+                            pieces[1]++;
+                        }
+                    }
+
+                    if (isOnBoard(row + 1, col - 1)) {
+                        if (board[row + 1][col - 1].getPieceType() == EMPTY) {
+                            pieces[1]++;
+                        }
+                    }
+
+                    if (isOnBoard(row - 1, col - 1)) {
+                        if (board[row - 1][col - 1].getPieceType() == EMPTY) {
+                            pieces[1]++;
+                        }
+                    }
+                } else if (board[row][col].getPieceType() == BLACK_KING && board[row][col].isKing()) {
+                    if (isOnBoard(row + 1, col + 1)) {
+                        if (board[row + 1][col + 1].getPieceType() == EMPTY) {
+                            pieces[2]++;
+                        }
+                    }
+
+                    if (isOnBoard(row - 1, col + 1)) {
+                        if (board[row - 1][col + 1].getPieceType() == EMPTY) {
+                            pieces[2]++;
+                        }
+                    }
+
+                    if (isOnBoard(row + 1, col - 1)) {
+                        if (board[row + 1][col - 1].getPieceType() == EMPTY) {
+                            pieces[2]++;
+                        }
+                    }
+
+                    if (isOnBoard(row - 1, col - 1)) {
+                        if (board[row - 1][col - 1].getPieceType() == EMPTY) {
+                            pieces[2]++;
+                        }
+                    }
+                }
+            }
+        }
+        return pieces;
+    }
+
+    /**
+     * @param board Current Board State
+     * @return Total Open Promotional Row Tiles
+     */
+    private int[] promotionRowScore(Piece[][] board) {
+        int[] pieces = {0, 0};// Red, BLACK
+        for (Piece p : board[numRowsAndColumns - 1]) {
+            if (p.getPieceType() == EMPTY) {
+                pieces[0]++;
+            }
+        }
+        for (Piece p : board[0]) {
+            if (p.getPieceType() == EMPTY) {
+                pieces[1]++;
+            }
+        }
+
+        return pieces;
+    }
+
+
+    /**
+     * meanDistanceToPromotionScore
+     * calculates the mean distance
+     * for Pawn Pieces to
+     * promotion line
+     *
+     * @param board Current Board State
+     * @return Mean Piece distance to player's respective promotional row
+     */
+    private int[] meanDistanceToPromotionScore(Piece[][] board) {
+        int[] pieces = {0, 0}; // RED, BLACK
+        int black = 0, red = 0;
+
+        // Find Piece locations
+        for (int row = 0; row < numRowsAndColumns; row++) {
+            for (int col = 0; col < numRowsAndColumns; col++) {
+                if (board[row][col].getPieceType() == RED && !board[row][col].isKing()) {
+                    red++;
+                    pieces[0] += (numRowsAndColumns - 1) - row;
+//                    pieces[0] += row;
+                } else if (board[row][col].getPieceType() == BLACK && !board[row][col].isKing()) {
+                    black++;
+                    pieces[1] += row + 1;
+//                    pieces[1] += (numRowsAndColumns - 1) - row;//row;
+                }
+            }
+        }
+
+        if (red != 0) {
+            pieces[0] /= red;
+        }
+        if (black != 0) {
+            pieces[1] /= black;
+        }
+        return pieces;
+    }
+
+    /**
+     * @param board Current Board State
+     * @return The measured and averaged distance between kings and other pieces
+     */
+    private int[] meanDistanceScore(Piece[][] board, int norm) {
+        int[] pieces = {0, 0}; // RED_KING, BLACK_KING
+
+        Vector<String> redKingsCoord = new Vector<>(),
+                blackKingsCoord = new Vector<>(),
+                redPawnCoord = new Vector<>(),
+                blackPawnCoord = new Vector<>();
+        Vector<Integer> redNorm = new Vector<>(),
+                blackNorm = new Vector<>();
+
+        // Find Piece locations
+        for (int row = 0; row < numRowsAndColumns; row++) {
+            for (int col = 0; col < numRowsAndColumns; col++) {
+                if (board[row][col].getPieceType() == RED_KING && board[row][col].isKing()) {
+                    redKingsCoord.add("" + row + "," + col);
+//                    red += (numRowsAndColumns - row);
+                }
+                if (board[row][col].getPieceType() == BLACK_KING && board[row][col].isKing()) {
+                    blackKingsCoord.add("" + row + "," + col);
+                }
+                if ((board[row][col].getPieceType() == RED && !board[row][col].isKing())
+                        ||
+                        (board[row][col].getPieceType() == RED_KING && board[row][col].isKing())
+                ) {
+                    redPawnCoord.add("" + row + "," + col);
+                }
+                if ((board[row][col].getPieceType() == BLACK && !board[row][col].isKing())
+                        ||
+                        board[row][col].getPieceType() == BLACK_KING && board[row][col].isKing()) {
+                    blackPawnCoord.add("" + row + "," + col);
+                }
+            }
+        }
+        for (String king : redKingsCoord) {
+            int sum = 0;
+
+            String s[] = king.split(",");
+            int row = 0, col = 0;
+            for (int i = 0; i < s.length; i += 2) {
+                row = Integer.parseInt(s[i + 1]);
+                col = Integer.parseInt((s[i]));
+            }
+            for (String pawn : blackPawnCoord) {
+                String sN[] = pawn.split(",");
+                for (int i = 0; i < sN.length; i += 2) {
+                    int rowN = Integer.parseInt(sN[i + 1]);
+                    int colN = Integer.parseInt((sN[i]));
+                    sum += Math.pow(row - rowN, norm);
+                    sum += Math.pow(col - colN, norm);
+                }
+                redNorm.add((int) ((double) Math.pow((double) sum, (double) 1 / norm)));
+            }
+        }
+
+
+        for (String king : blackKingsCoord) {
+            int sum = 0;
+
+            String s[] = king.split(",");
+            int row = 0, col = 0;
+            for (int i = 0; i < s.length; i += 2) {
+                row = Integer.parseInt(s[i + 1]);
+                col = Integer.parseInt((s[i]));
+            }
+            for (String pawn : redPawnCoord) {
+                String sN[] = pawn.split(",");
+                for (int i = 0; i < sN.length; i += 2) {
+                    int rowN = Integer.parseInt(sN[i + 1]);
+                    int colN = Integer.parseInt((sN[i]));
+                    sum += Math.pow(row - rowN, norm);
+                    sum += Math.pow(col - colN, norm);
+                }
+                blackNorm.add((int) ((double) Math.pow((double) sum, (double) 1 / norm)));
+            }
+        }
+
+        // Get average distance
+        if (redNorm.size() != 0) {
+            for (Integer integer : redNorm) {
+                pieces[0] += integer;
+            }
+            pieces[0] /= redNorm.size();
+        }
+        // Get average distance
+        if (blackNorm.size() != 0) {
+            for (Integer integer : blackNorm) {
+                pieces[1] += integer;
+            }
+            pieces[1] /= blackNorm.size();
+        }
+
+        return pieces;
+    }
+
+    /**
+     * @param board Current Board State
+     * @return Number of trapped Kings on the Sides
+     */
+    private int[] trappedPieceScore(Piece[][] board) {
+        int[] pieces = {0, 0, 0, 0};//RED, RED_KING, BLACK, BLACK_KING
+        for (int i = 0; i < numRowsAndColumns; i++) {
+            if (board[i][0].getPieceType() != EMPTY) {
+                if (board[i][0].getPieceType() == RED) {
+                    pieces[0]++;
+                } else if (board[i][0].getPieceType() == RED_KING) {
+                    pieces[1]++;
+                } else if (board[i][0].getPieceType() == BLACK) {
+                    pieces[2]++;
+                } else if (board[i][0].getPieceType() == BLACK_KING) {
+                    pieces[3]++;
+                }
+            } else if (board[i][numRowsAndColumns - 1].getPieceType() != EMPTY) {
+                if (board[i][numRowsAndColumns - 1].getPieceType() == RED) {
+                    pieces[0]++;
+                } else if (board[i][numRowsAndColumns - 1].getPieceType() == RED_KING) {
+                    pieces[1]++;
+                } else if (board[i][numRowsAndColumns - 1].getPieceType() == BLACK) {
+                    pieces[2]++;
+                } else if (board[i][numRowsAndColumns - 1].getPieceType() == BLACK_KING) {
+                    pieces[3]++;
+                }
+            } else if (board[0][i].getPieceType() != EMPTY) {
+                if (board[0][i].getPieceType() == RED) {
+                    pieces[0]++;
+                } else if (board[0][i].getPieceType() == RED_KING) {
+                    pieces[1]++;
+                } else if (board[0][i].getPieceType() == BLACK) {
+                    pieces[2]++;
+                } else if (board[0][i].getPieceType() == BLACK_KING) {
+                    pieces[3]++;
+                }
+            } else if (board[numRowsAndColumns - 1][i].getPieceType() != EMPTY) {
+                if (board[numRowsAndColumns - 1][i].getPieceType() == RED) {
+                    pieces[0]++;
+                } else if (board[numRowsAndColumns - 1][i].getPieceType() == RED_KING) {
+                    pieces[1]++;
+                } else if (board[numRowsAndColumns - 1][i].getPieceType() == BLACK) {
+                    pieces[2]++;
+                } else if (board[numRowsAndColumns - 1][i].getPieceType() == BLACK_KING) {
+                    pieces[3]++;
+                }
+            }
+        }
+        return pieces;
+    }
+
 
     /**
      * simpleScore does nothing more than count the
@@ -153,21 +861,9 @@ public class AI_Heuristic {
      * @return The difference is piece values
      */
     private int simpleScore(Piece[][] board, int player) {
-        int black = 0, red = 0;
-
-        for (int row = 0; row < numRowsAndColumns; row++) {
-            for (int col = 0; col < numRowsAndColumns; col++) {
-                if (board[row][col].getPieceType() == RED) {
-                    red += NORMAL_PIECE;
-                } else if (board[row][col].getPieceType() == RED_KING && board[row][col].isKing()) {
-                    red += KING;
-                } else if (board[row][col].getPieceType() == BLACK) {
-                    black += NORMAL_PIECE;
-                } else if (board[row][col].getPieceType() == BLACK_KING && board[row][col].isKing()) {
-                    black += KING;
-                }
-            }
-        }
+        int[] pC = pieceCount(board);
+        int black = pC[2] * PAWN_PIECE + pC[3] * KING,
+                red = pC[0] * PAWN_PIECE + pC[2] * KING;
         return player == RED ? red - black : black - red;
     }
 
@@ -195,131 +891,6 @@ public class AI_Heuristic {
         return player == RED ? red - black : black - red;
     }
 
-    /**
-     * advancedDistanceScore encourages
-     * pieces to 'attack' or 'flee'.
-     * Measures and averages the
-     * distance between EVERY
-     * king to EVERY opponent's piece
-     *
-     * @param board  Current Board State
-     * @param player Current player ID
-     * @return The difference between how close pieces are to the back of the board.
-     */
-    private int advancedDistanceScore(Piece[][] board, int player, int norm) {
-        int black = 0, red = 0;
-
-        Vector<String> redKingsCoord = new Vector<>(),
-                blackKingsCoord = new Vector<>(),
-                redNormalCoord = new Vector<>(),
-                blackNormalCoord = new Vector<>();
-        Vector<Integer> redNorm = new Vector<>(),
-                blackNorm = new Vector<>();
-
-        // Find Piece locations
-        for (int row = 0; row < numRowsAndColumns; row++) {
-            for (int col = 0; col < numRowsAndColumns; col++) {
-                if (board[row][col].getPieceType() == RED_KING && board[row][col].isKing()) {
-                    redKingsCoord.add("" + row + "," + col);
-//                    red += (numRowsAndColumns - row);
-                } else if (board[row][col].getPieceType() == BLACK_KING && board[row][col].isKing()) {
-                    blackKingsCoord.add("" + row + "," + col);
-                } else if (board[row][col].getPieceType() == RED && !board[row][col].isKing()) {
-                    redNormalCoord.add("" + row + "," + col);
-                } else if (board[row][col].getPieceType() == BLACK && !board[row][col].isKing()) {
-                    blackNormalCoord.add("" + row + "," + col);
-                }
-            }
-        }
-        for (String king : redKingsCoord) {
-            int sum = 0;
-
-            String s[] = king.split(",");
-            int row = 0, col = 0;
-            for (int i = 0; i < s.length; i += 2) {
-                row = Integer.parseInt(s[i + 1]);
-                col = Integer.parseInt((s[i]));
-            }
-            for (String normal : blackNormalCoord) {
-                String sN[] = normal.split(",");
-                for (int i = 0; i < sN.length; i += 2) {
-                    int rowN = Integer.parseInt(sN[i + 1]);
-                    int colN = Integer.parseInt((sN[i]));
-                    sum += Math.pow(row - rowN, norm);
-                    sum += Math.pow(col - colN, norm);
-                }
-                redNorm.add(sum ^ (1 / norm));
-            }
-        }
-
-
-        for (String king : blackKingsCoord) {
-            int sum = 0;
-
-            String s[] = king.split(",");
-            int row = 0, col = 0;
-            for (int i = 0; i < s.length; i += 2) {
-                row = Integer.parseInt(s[i + 1]);
-                col = Integer.parseInt((s[i]));
-            }
-            for (String normal : redNormalCoord) {
-                String sN[] = normal.split(",");
-                for (int i = 0; i < sN.length; i += 2) {
-                    int rowN = Integer.parseInt(sN[i + 1]);
-                    int colN = Integer.parseInt((sN[i]));
-                    sum += Math.pow(row - rowN, norm);
-                    sum += Math.pow(col - colN, norm);
-                }
-                blackNorm.add(sum ^ (1 / norm));
-            }
-        }
-
-        // Get average distance
-        if (redNorm.size() != 0) {
-            for (int i = 0; i < redNorm.size(); i++) {
-                red += redNorm.get(i);
-            }
-            red /= redNorm.size();
-        }
-        // Get average distance
-        if (blackNorm.size() != 0) {
-            for (int i = 0; i < blackNorm.size(); i++) {
-                black += blackNorm.get(i);
-            }
-            black /= blackNorm.size();
-        }
-
-        return player == RED ? red - black : black - red;
-    }
-
-    /**
-     * trappedKingScore punishes player if a
-     * king is in the corner (it could get
-     * trapped)
-     *
-     * @param board  Current Board State
-     * @param player Current player ID
-     * @return
-     */
-    private int trappedKingScore(Piece[][] board, int player) {
-        int black = 0, red = 0;
-        for (int row = 0; row < numRowsAndColumns; row++) {
-            if (board[row][0].getPieceType() != EMPTY && board[row][0].isKing()) {
-                if (board[row][0].getPieceType() == RED_KING) {
-                    red -= CORNER_KING;
-                } else if (board[row][0].getPieceType() == BLACK_KING) {
-                    black -= CORNER_KING;
-                }
-            } else if (board[row][numRowsAndColumns - 1].getPieceType() != EMPTY && board[row][numRowsAndColumns - 1].isKing()) {
-                if (board[row][numRowsAndColumns - 1].getPieceType() == RED_KING) {
-                    red -= CORNER_KING;
-                } else if (board[row][numRowsAndColumns - 1].getPieceType() == BLACK_KING) {
-                    black -= CORNER_KING;
-                }
-            }
-        }
-        return player == RED ? red - black : black - red;
-    }
 
     /**
      * protectedPieceScore encourages
@@ -497,10 +1068,107 @@ public class AI_Heuristic {
     }
 
     /**
+     * advancedDistanceScore encourages
+     * pieces to 'attack' or 'flee'.
+     * Measures and averages the
+     * distance between EVERY
+     * king to EVERY opponent's piece
      *
+     * @param board  Current Board State
+     * @param player Current player ID
+     * @return The difference between how close pieces are to the back of the board.
+     */
+    private int advancedDistanceScore2(Piece[][] board, int player, int norm) {
+        int black = 0, red = 0;
+
+        Vector<String> redKingsCoord = new Vector<>(),
+                blackKingsCoord = new Vector<>(),
+                redNormalCoord = new Vector<>(),
+                blackNormalCoord = new Vector<>();
+        Vector<Integer> redNorm = new Vector<>(),
+                blackNorm = new Vector<>();
+
+        // Find Piece locations
+        for (int row = 0; row < numRowsAndColumns; row++) {
+            for (int col = 0; col < numRowsAndColumns; col++) {
+                if (board[row][col].getPieceType() == RED_KING && board[row][col].isKing()) {
+                    redKingsCoord.add("" + row + "," + col);
+//                    red += (numRowsAndColumns - row);
+                } else if (board[row][col].getPieceType() == BLACK_KING && board[row][col].isKing()) {
+                    blackKingsCoord.add("" + row + "," + col);
+                } else if (board[row][col].getPieceType() == RED && !board[row][col].isKing()) {
+                    redNormalCoord.add("" + row + "," + col);
+                } else if (board[row][col].getPieceType() == BLACK && !board[row][col].isKing()) {
+                    blackNormalCoord.add("" + row + "," + col);
+                }
+            }
+        }
+        for (String king : redKingsCoord) {
+            int sum = 0;
+
+            String s[] = king.split(",");
+            int row = 0, col = 0;
+            for (int i = 0; i < s.length; i += 2) {
+                row = Integer.parseInt(s[i + 1]);
+                col = Integer.parseInt((s[i]));
+            }
+            for (String normal : blackNormalCoord) {
+                String sN[] = normal.split(",");
+                for (int i = 0; i < sN.length; i += 2) {
+                    int rowN = Integer.parseInt(sN[i + 1]);
+                    int colN = Integer.parseInt((sN[i]));
+                    sum += Math.pow(row - rowN, norm);
+                    sum += Math.pow(col - colN, norm);
+                }
+                redNorm.add(sum ^ (1 / norm));
+            }
+        }
+
+
+        for (String king : blackKingsCoord) {
+            int sum = 0;
+
+            String s[] = king.split(",");
+            int row = 0, col = 0;
+            for (int i = 0; i < s.length; i += 2) {
+                row = Integer.parseInt(s[i + 1]);
+                col = Integer.parseInt((s[i]));
+            }
+            for (String normal : redNormalCoord) {
+                String sN[] = normal.split(",");
+                for (int i = 0; i < sN.length; i += 2) {
+                    int rowN = Integer.parseInt(sN[i + 1]);
+                    int colN = Integer.parseInt((sN[i]));
+                    sum += Math.pow(row - rowN, norm);
+                    sum += Math.pow(col - colN, norm);
+                }
+                blackNorm.add(sum ^ (1 / norm));
+            }
+        }
+
+        // Get average distance
+        if (redNorm.size() != 0) {
+            for (int i = 0; i < redNorm.size(); i++) {
+                red += redNorm.get(i);
+            }
+            red /= redNorm.size();
+        }
+        // Get average distance
+        if (blackNorm.size() != 0) {
+            for (int i = 0; i < blackNorm.size(); i++) {
+                black += blackNorm.get(i);
+            }
+            black /= blackNorm.size();
+        }
+
+        return player == RED ? red - black : black - red;
+    }
+
+
+    /**
      * @param min Minimum Integer
      * @param max Maximum Integer
-     * @return Random Integer Between min and max
+     * @return Random Integer between min and max
      */
     private int randomInt(int min, int max) {
         return (int) (Math.random() * ((max - min) + 1)) + min;

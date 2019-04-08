@@ -18,8 +18,8 @@ class Board extends JPanel implements ActionListener, MouseListener {
 
     private static Move[] legalMoves;  // Current Player's legal moves
     private static int numRowsAndColumns = 8;
-    private int COMPUTER_MOVE_DELAY_IN_MILLISECONDS = 500,
-            COMPUTER_JUMP_DELAY_IN_MILLISECONDS = 100;
+    private int COMPUTER_MOVE_DELAY_IN_MILLISECONDS = 0,//500,//!@#$%^&*()
+            COMPUTER_JUMP_DELAY_IN_MILLISECONDS = 0;//100;
 
 
     // Variables dealing with game Paints & Graphics
@@ -45,10 +45,12 @@ class Board extends JPanel implements ActionListener, MouseListener {
     private JLabel message;
     public JLabel userMessage;
 
-    //    public int computerDifficulty = 2; // 0 - Human, 1 - Easy, 2 - Medium, 3 - Hard
+    //    public int computerDifficulty = 2; // 0 - Human, 1 - Easy, 2 - Medium, 3 - Intermediate, 4 - Hard
     public int computerDifficulty = 3; //!@#$%^&*() Remove after testing
     private boolean displayLegalMoveColors; // If True, highlight legal moves for player
-    private AI_Heuristic computerPlayer;
+        public boolean singleAI = true; //!@#$%^&*() Remove after testing
+//    public boolean singleAI = !true;
+    private AI_Heuristic computerPlayer, computerPlayer2;
 
 
     //!@#$%^&*()
@@ -122,6 +124,26 @@ class Board extends JPanel implements ActionListener, MouseListener {
                     computerDifficulty,
                     board.gamePieces,
                     numRowsAndColumns);
+
+            if (!singleAI) {
+                computerPlayer2 = new AI_Heuristic(
+                        CheckersData.RED,
+                        computerDifficulty,
+                        board.gamePieces,
+                        numRowsAndColumns);
+                // Delay move to allow user to see computer 'think'
+                repaint();
+                new java.util.Timer().schedule(
+                        new java.util.TimerTask() {
+                            @Override
+                            public void run() {
+                                computerPlayer2.updateGameBoard(board.gamePieces);
+                                doMakeMove(computerPlayer2.getBestMove());
+                            }
+                        },
+                        COMPUTER_JUMP_DELAY_IN_MILLISECONDS
+                );
+            }
         }
 
         // Update screen
@@ -243,8 +265,13 @@ class Board extends JPanel implements ActionListener, MouseListener {
                             @Override
                             public void run() {
                                 if (isComputerPlayingAndIsItComputersTurn()) {
-                                    computerPlayer.updateGameBoard(board.gamePieces);
-                                    doMakeMove(computerPlayer.getBestMove());
+                                    if (singleAI || currentPlayer == computerPlayer.getComputerPlayerID()) {
+                                        computerPlayer.updateGameBoard(board.gamePieces);
+                                        doMakeMove(computerPlayer.getBestMove());
+                                    } else if (currentPlayer == computerPlayer2.getComputerPlayerID()) {
+                                        computerPlayer2.updateGameBoard(board.gamePieces);
+                                        doMakeMove(computerPlayer2.getBestMove());
+                                    }
                                 }
                             }
                         },
@@ -318,24 +345,50 @@ class Board extends JPanel implements ActionListener, MouseListener {
                 selectedRow = legalMoves[0].fromRow;
                 selectedCol = legalMoves[0].fromCol;
             }
+            /* Make sure the board is redrawn in its new state. */
+            repaint();
+
+            // Delay move to allow user to see computer 'think'
+            new java.util.Timer().schedule(
+                    new java.util.TimerTask() {
+                        @Override
+                        public void run() {
+                            if (isComputerPlayingAndIsItComputersTurn()) {
+                                if (singleAI || currentPlayer == computerPlayer.getComputerPlayerID()) {
+                                    computerPlayer.updateGameBoard(board.gamePieces);
+                                    doMakeMove(computerPlayer.getBestMove());
+                                } else if (currentPlayer == computerPlayer2.getComputerPlayerID()) {
+                                    computerPlayer2.updateGameBoard(board.gamePieces);
+                                    doMakeMove(computerPlayer2.getBestMove());
+                                }
+                            }
+                        }
+                    },
+                    COMPUTER_MOVE_DELAY_IN_MILLISECONDS
+            );
         }
 
         /* Make sure the board is redrawn in its new state. */
         repaint();
 
-        // Delay move to allow user to see computer 'think'
-        new java.util.Timer().schedule(
-                new java.util.TimerTask() {
-                    @Override
-                    public void run() {
-                        if (isComputerPlayingAndIsItComputersTurn()) {
-                            computerPlayer.updateGameBoard(board.gamePieces);
-                            doMakeMove(computerPlayer.getBestMove());
-                        }
-                    }
-                },
-                COMPUTER_MOVE_DELAY_IN_MILLISECONDS
-        );
+//        // Delay move to allow user to see computer 'think'
+//        new java.util.Timer().schedule(
+//                new java.util.TimerTask() {
+//                    @Override
+//                    public void run() {
+//                        if (isComputerPlayingAndIsItComputersTurn()) {
+//                            if (singleAI || currentPlayer == computerPlayer.getComputerPlayerID()) {
+//                                computerPlayer.updateGameBoard(board.gamePieces);
+//                                doMakeMove(computerPlayer.getBestMove());
+//                            } else if (currentPlayer == computerPlayer2.getComputerPlayerID()) {
+//                                computerPlayer2.updateGameBoard(board.gamePieces);
+//                                doMakeMove(computerPlayer2.getBestMove());
+//                            }
+//                        }
+//                    }
+//                },
+//                COMPUTER_MOVE_DELAY_IN_MILLISECONDS
+//        );
     }
 
     /**
@@ -345,11 +398,15 @@ class Board extends JPanel implements ActionListener, MouseListener {
      */
     private boolean isComputerPlayingAndIsItComputersTurn() {
         if (computerDifficulty != 0) {
-            return currentPlayer == computerPlayer.getComputerPlayerID();
+            if (singleAI) {
+                return currentPlayer == computerPlayer.getComputerPlayerID();
+            } else
+                return currentPlayer == computerPlayer.getComputerPlayerID() || currentPlayer == computerPlayer2.getComputerPlayerID();
         } else {
             return false;
         }
     }
+
 
     /**
      * Draw checkerboard pattern, then the checkers pieces.
@@ -382,14 +439,15 @@ class Board extends JPanel implements ActionListener, MouseListener {
 
                 // Check piece type and color it appropriately
                 //!@#$%^&*() I SWITCHED THE COLORS. CHANGE BACK!!!
-                //!@#$%^&*() HOWEVER, IT DOESN'T EFFECT GAMEPLAY
+                //!@#$%^&*() HOWEVER, IT DOESN'T EFFECT GAME PLAY
                 if (board.gamePieces[row][col].getPieceType() == CheckersData.RED
                         || board.gamePieces[row][col].getPieceType() == CheckersData.RED_KING) {
-                    g2d.setColor(gameBlack);
-
+//                    g2d.setColor(gameBlack);//!@#$%^&*() Black First For production
+                    g2d.setColor(gameRed);
                 } else if (board.gamePieces[row][col].getPieceType() == CheckersData.BLACK
                         || board.gamePieces[row][col].getPieceType() == CheckersData.BLACK_KING) {
-                    g2d.setColor(gameRed);
+//                    g2d.setColor(gameRed);//!@#$%^&*() Black First For production
+                    g2d.setColor(gameBlack);
 
                 } else if (board.gamePieces[row][col].getPieceType() == CheckersData.EMPTY) {
                     g2d.setColor(emptyPieceColor);

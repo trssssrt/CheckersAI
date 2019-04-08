@@ -27,13 +27,15 @@ class Checkers extends JPanel {
     private static JMenu gameMenu, helpMenu, difficultyMenu;
     private static String humanVsHuman = "Human Vs Human",
             computerVsHuman = "Computer Vs Human",
+            computerVsComputer = "Computer Vs Computer",
             computerDifficulty_Text = "Computer Difficulty: ",
             difficultyLevel1 = "Easy",
             difficultyLevel2 = "Medium",
-            difficultyLevel3 = "Hard";
+            difficultyLevel3 = "Intermediate",
+            difficultyLevel4 = "Hard";
     private static JLabel messageToUser;
     private static ButtonGroup difGroup;
-    private static JRadioButtonMenuItem easyDifficultyMenuItem, mediumDifficultyMenuItem, hardDifficultyMenuItem;
+    private static JRadioButtonMenuItem easyDifficultyMenuItem, mediumDifficultyMenuItem, intermediateDifficultyMenuItem, hardDifficultyMenuItem;
 
     /**
      * Main JFrame window created here. Most of the work is passed into Board
@@ -97,8 +99,10 @@ class Checkers extends JPanel {
         JMenu newGameMenu = new JMenu("New");
         JMenuItem HumanVSHuman = new JMenuItem(humanVsHuman);
         JMenuItem ComputerVSHuman = new JMenuItem(computerVsHuman);
+        JMenuItem ComputerVsComputer = new JMenuItem(computerVsComputer);
         newGameMenu.add(HumanVSHuman);
         newGameMenu.add(ComputerVSHuman);
+        newGameMenu.add(ComputerVsComputer);
         gameMenu.add(newGameMenu);
 
         // Add New Game Actions
@@ -124,10 +128,38 @@ class Checkers extends JPanel {
                 } else if (mediumDifficultyMenuItem.isSelected()) {
                     difficulty = 2;
                     messageToUser.setText(computerDifficulty_Text + difficultyLevel2);
-                } else if (hardDifficultyMenuItem.isSelected()) {
+                } else if (intermediateDifficultyMenuItem.isSelected()) {
                     difficulty = 3;
                     messageToUser.setText(computerDifficulty_Text + difficultyLevel3);
+                } else if (hardDifficultyMenuItem.isSelected()) {
+                    difficulty = 4;
+                    messageToUser.setText(computerDifficulty_Text + difficultyLevel4);
                 }
+                board.singleAI = true;
+                board.computerDifficulty = difficulty;
+                board.performDoNewGame();
+                board.userMessage.setText(messageToUser.getText());
+            }
+        });
+        ComputerVsComputer.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("ADD AI & AI");
+                int difficulty = 0;
+                if (easyDifficultyMenuItem.isSelected()) {
+                    difficulty = 1;
+                    messageToUser.setText(computerDifficulty_Text + difficultyLevel1);
+                } else if (mediumDifficultyMenuItem.isSelected()) {
+                    difficulty = 2;
+                    messageToUser.setText(computerDifficulty_Text + difficultyLevel2);
+                } else if (intermediateDifficultyMenuItem.isSelected()) {
+                    difficulty = 3;
+                    messageToUser.setText(computerDifficulty_Text + difficultyLevel3);
+                } else if (hardDifficultyMenuItem.isSelected()) {
+                    difficulty = 4;
+                    messageToUser.setText(computerDifficulty_Text + difficultyLevel4);
+                }
+                board.singleAI = false;
                 board.computerDifficulty = difficulty;
                 board.performDoNewGame();
                 board.userMessage.setText(messageToUser.getText());
@@ -209,8 +241,8 @@ class Checkers extends JPanel {
         });
 //        mediumDifficultyMenuItem.setSelected(true); //!@#$%^&*() uncomment for production use
 
-        hardDifficultyMenuItem = new JRadioButtonMenuItem(difficultyLevel3);
-        hardDifficultyMenuItem.addItemListener(new ItemListener() {
+        intermediateDifficultyMenuItem = new JRadioButtonMenuItem(difficultyLevel3);
+        intermediateDifficultyMenuItem.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
@@ -223,15 +255,31 @@ class Checkers extends JPanel {
             }
         });
 
-        hardDifficultyMenuItem.setSelected(true);
+        hardDifficultyMenuItem = new JRadioButtonMenuItem(difficultyLevel4);
+        hardDifficultyMenuItem.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    if (!messageToUser.getText().contains(humanVsHuman)) {
+                        messageToUser.setText(computerDifficulty_Text + difficultyLevel4);
+                        //!@#$%^&*() INCLUDE SIMILAR CODE IF I WANT TO UPDATE ON CLICK
+//                        board.userMessage.setText(messageToUser.getText());
+                    }
+                }
+            }
+        });
+
+        hardDifficultyMenuItem.setSelected(true); // Remove for production //!@#$%^&*()
 
 
         difficultyMenu.add(easyDifficultyMenuItem);
         difficultyMenu.add(mediumDifficultyMenuItem);
+        difficultyMenu.add(intermediateDifficultyMenuItem);
         difficultyMenu.add(hardDifficultyMenuItem);
 
         difGroup.add(easyDifficultyMenuItem);
         difGroup.add(mediumDifficultyMenuItem);
+        difGroup.add(intermediateDifficultyMenuItem);
         difGroup.add(hardDifficultyMenuItem);
 
         menuBar.add(difficultyMenu);

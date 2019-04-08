@@ -29,6 +29,7 @@ class CheckersData {
     CheckersData() {
         gamePieces = new Piece[numRowsAndColumns][numRowsAndColumns];
         setUpCheckerBoard(numRowsAndColumns);
+//        printBoardPieces();
     }
 
     /**
