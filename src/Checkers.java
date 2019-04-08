@@ -8,13 +8,8 @@ import java.util.Map;
  * Create Swing Application of Checkers game
  */
 class Checkers extends JPanel {
-
     private JFrame window;
-    private JButton newGameButton;  // Button for starting a new game.
-    private JButton resignButton;   // Button that a player can use to end
-    //    the game by resigning.
 
-    private JLabel message;  // Label for displaying messages to the user.
     static private Map<String, Integer> windowDimensions = new HashMap<>() {{
         put("width", Constants.defaultWindowWidth);
         put("height", Constants.defaultWindowHeight);
@@ -40,7 +35,7 @@ class Checkers extends JPanel {
             difficulty_Medium = Constants.difficulty_Medium,
             difficulty_Intermediate = Constants.difficulty_Intermediate,
             difficulty_Hard = Constants.difficulty_Hard;
-    private String[] playerOneColor = {"<html>Colors: ",
+    private String[] playersColorString = {"<html>Colors: ",
             "<font color=\"", "red", "\"><strong>", "Player 1", "</strong></font>",
             ", ",
             "<font color=\"", "black", "\"><strong>", "Player 2", "</strong></font>",
@@ -195,21 +190,21 @@ class Checkers extends JPanel {
         });
         toggleLegalMoveColorsCommand.setSelected(false);
 
-        JRadioButtonMenuItem playerOneIsBlack = new JRadioButtonMenuItem(String.join("", playerOneColor)); // Create a menu item.
-        playerOneIsBlack.addActionListener(new ActionListener() {
+        JRadioButtonMenuItem playerColors = new JRadioButtonMenuItem(String.join("", playersColorString)); // Create a menu item.
+        playerColors.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                playerTwoIsBlack(playerOneIsBlack.isSelected());
-                playerOneIsBlack.setText(String.join("", playerOneColor));
+                playerColors(playerColors.isSelected());
+                playerColors.setText(String.join("", playersColorString));
             }
         });
-        playerOneIsBlack.setSelected(true);
+        playerColors.setSelected(true);
 
 
         // Add menu items to menu.
         helpMenu.add(helpCommand);
         helpMenu.add(toggleLegalMoveColorsCommand);
-        helpMenu.add(playerOneIsBlack);
+        helpMenu.add(playerColors);
 
         menuBar.add(helpMenu);
 
@@ -294,8 +289,6 @@ class Checkers extends JPanel {
         menuBar.add(difficultyMenu);
 
         menuBar.add(messageToUser, BorderLayout.LINE_END);
-        //!@#$%^&*() ADD EVEN MORE DIFFICULTY LEVELS HERE
-
 
         // Update Message in Board.java
         board.userMessage.setText(messageToUser.getText());
@@ -360,13 +353,15 @@ class Checkers extends JPanel {
         board.toggleLegalMoveColors();
     }
 
-    private void playerTwoIsBlack(boolean isBlack) {
+    /**
+     *
+     * @param isSelected playerColors JRadioButtonMenuItem is selected
+     */
+    private void playerColors(boolean isSelected) {
         // Player 1 Color
-        playerOneColor[2] = isBlack ? "red" : "black";
-//        playerOneColor[4] = isBlack ? "RED" : "BLACK";
+        playersColorString[2] = isSelected ? "red" : "black";
         // Player 2 Color
-        playerOneColor[8] = isBlack ? "black" : "red";
-//        playerOneColor[10] = isBlack ? "BLACK" : "RED";
-        board.setPlayerTwoIsBlack(isBlack);
+        playersColorString[8] = isSelected ? "black" : "red";
+        board.setPlayerTwoIsBlack(isSelected);
     }
 }
