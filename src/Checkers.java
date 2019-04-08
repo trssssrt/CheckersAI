@@ -172,42 +172,6 @@ class Checkers extends JPanel {
 
         menuBar.add(gameMenu);
 
-        // Help Menu
-        helpMenu = new JMenu("Help");
-        JMenuItem helpCommand = new JMenuItem("Game Instructions"); // Create a menu item.
-        helpCommand.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                showGameRulesScreen();
-            }
-        });
-
-        JRadioButtonMenuItem toggleLegalMoveColorsCommand = new JRadioButtonMenuItem("Color Legal Moves"); // Create a menu item.
-        toggleLegalMoveColorsCommand.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                toggleLegalMoveColors();
-            }
-        });
-        toggleLegalMoveColorsCommand.setSelected(false);
-
-        JRadioButtonMenuItem playerColors = new JRadioButtonMenuItem(String.join("", playersColorString)); // Create a menu item.
-        playerColors.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                playerColors(playerColors.isSelected());
-                playerColors.setText(String.join("", playersColorString));
-            }
-        });
-        playerColors.setSelected(true);
-
-
-        // Add menu items to menu.
-        helpMenu.add(helpCommand);
-        helpMenu.add(toggleLegalMoveColorsCommand);
-        helpMenu.add(playerColors);
-
-        menuBar.add(helpMenu);
 
 
         // Difficulty Menu
@@ -295,6 +259,57 @@ class Checkers extends JPanel {
 
 //        mainWindow.add(messageToUser, BorderLayout.LINE_END); //asf
 
+
+
+
+        // Help Menu
+        helpMenu = new JMenu("Help");
+        JMenuItem helpCommand = new JMenuItem("Game Instructions"); // Create a menu item.
+        helpCommand.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showGameRulesScreen();
+            }
+        });
+
+        JRadioButtonMenuItem toggleLegalMoveColorsCommand = new JRadioButtonMenuItem("Color Legal Moves"); // Create a menu item.
+        toggleLegalMoveColorsCommand.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                toggleLegalMoveColors();
+            }
+        });
+        toggleLegalMoveColorsCommand.setSelected(false);
+
+        JRadioButtonMenuItem playerColors = new JRadioButtonMenuItem(String.join("", playersColorString)); // Create a menu item.
+        playerColors.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                playerColors(playerColors.isSelected());
+                playerColors.setText(String.join("", playersColorString));
+            }
+        });
+        playerColors.setSelected(true);
+
+        JRadioButtonMenuItem gameEndWindowToggle = new JRadioButtonMenuItem("Show Game Over Window"); // Create a menu item.
+        gameEndWindowToggle.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                gameEndWindowToggle();
+            }
+        });
+
+
+        // Add menu items to menu.
+        helpMenu.add(helpCommand);
+        helpMenu.add(toggleLegalMoveColorsCommand);
+        helpMenu.add(playerColors);
+        helpMenu.add(gameEndWindowToggle);
+
+        menuBar.add(helpMenu);
+
+
+
         // Update Message in Board.java
         board.userMessage.setText(messageToUser.getText());
     }
@@ -368,4 +383,5 @@ class Checkers extends JPanel {
         playersColorString[8] = isSelected ? "black" : "red";
         board.setPlayerTwoIsBlack(isSelected);
     }
+    private void gameEndWindowToggle(){board.gameEndWindowToggle();}
 }
