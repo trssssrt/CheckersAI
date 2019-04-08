@@ -253,8 +253,6 @@ public class AI_Heuristic {
 
             // STAGES
             if (currentStage == stage[0]) {
-//            System.out.println("NOW IN PHASE 1");
-
                 int[] protectedPieceCount = protectedPiecesScore(board);
                 int[] movablePieceCount = movablePieceScore(board);
                 int[] promotionRowCount = promotionRowScore(board);
@@ -282,7 +280,6 @@ public class AI_Heuristic {
                                         + C10 * pieceCount[3]
                         );
             } else if (currentStage == stage[1]) {
-//            System.out.println("NOW IN PHASE -2");
 
                 int[] protectedPieceCount = protectedPiecesScore(board);
                 int[] movablePieceCount = movablePieceScore(board);
@@ -323,7 +320,7 @@ public class AI_Heuristic {
                         );
 
             } else {
-//            System.out.println("NOW IN PHASE --3");
+
                 int[] protectedPieceCount = protectedPiecesScore(board);
                 int[] movablePieceCount = movablePieceScore(board);
                 int[] promotionRowCount = promotionRowScore(board);
@@ -404,41 +401,17 @@ public class AI_Heuristic {
                         }
                     }
 
-//                    if (isOnBoard(row - 1, col + 1)) {
-//                        if (board[row - 1][col + 1].getPieceType() == RED && !board[row - 1][col + 1].isKing()) {
-//                            red[0]++;
-//                        }
-//                    }
-
                     if (isOnBoard(row + 1, col - 1)) {
                         if (board[row + 1][col - 1].getPieceType() == RED && !board[row + 1][col - 1].isKing()) {
                             pieces[0]++;
                         }
                     }
-
-//                    if (isOnBoard(row - 1, col - 1)) {
-//                        if (board[row - 1][col - 1].getPieceType() == RED && !board[row - 1][col - 1].isKing()) {
-//                            red[0]++;
-//                        }
-//                    }
                 } else if (board[row][col].getPieceType() == BLACK && !board[row][col].isKing()) {
-//                    if (isOnBoard(row + 1, col + 1)) {
-//                        if (board[row + 1][col + 1].getPieceType() == BLACK && !board[row + 1][col + 1].isKing()) {
-//                            black[0]++;
-//                        }
-//                    }
-
                     if (isOnBoard(row - 1, col + 1)) {
                         if (board[row - 1][col + 1].getPieceType() == BLACK && !board[row - 1][col + 1].isKing()) {
                             pieces[2]++;
                         }
                     }
-
-//                    if (isOnBoard(row + 1, col - 1)) {
-//                        if (board[row + 1][col - 1].getPieceType() == BLACK && !board[row + 1][col - 1].isKing()) {
-//                            black[0]++;
-//                        }
-//                    }
 
                     if (isOnBoard(row - 1, col - 1)) {
                         if (board[row - 1][col - 1].getPieceType() == BLACK && !board[row - 1][col - 1].isKing()) {
@@ -452,41 +425,19 @@ public class AI_Heuristic {
                         }
                     }
 
-//                    if (isOnBoard(row - 1, col + 1)) {
-//                        if (board[row - 1][col + 1].getPieceType() == RED && !board[row - 1][col + 1].isKing()) {
-//                            red[0]++;
-//                        }
-//                    }
-
                     if (isOnBoard(row + 1, col - 1)) {
                         if (board[row + 1][col - 1].getPieceType() == RED || board[row + 1][col - 1].getPieceType() == RED_KING) {
                             pieces[1]++;
                         }
                     }
 
-//                    if (isOnBoard(row - 1, col - 1)) {
-//                        if (board[row - 1][col - 1].getPieceType() == RED && !board[row - 1][col - 1].isKing()) {
-//                            red[0]++;
-//                        }
-//                    }
                 } else if (board[row][col].getPieceType() == BLACK_KING && board[row][col].isKing()) {
-//                    if (isOnBoard(row + 1, col + 1)) {
-//                        if (board[row + 1][col + 1].getPieceType() == BLACK && !board[row + 1][col + 1].isKing()) {
-//                            black[0]++;
-//                        }
-//                    }
 
                     if (isOnBoard(row - 1, col + 1)) {
                         if (board[row - 1][col + 1].getPieceType() == BLACK || board[row - 1][col + 1].getPieceType() == BLACK_KING) {
                             pieces[2]++;
                         }
                     }
-
-//                    if (isOnBoard(row + 1, col - 1)) {
-//                        if (board[row + 1][col - 1].getPieceType() == BLACK && !board[row + 1][col - 1].isKing()) {
-//                            black[0]++;
-//                        }
-//                    }
 
                     if (isOnBoard(row - 1, col - 1)) {
                         if (board[row - 1][col - 1].getPieceType() == BLACK || board[row - 1][col - 1].getPieceType() == BLACK_KING) {
@@ -510,23 +461,12 @@ public class AI_Heuristic {
         for (int row = 0; row < numRowsAndColumns; row++) {
             for (int col = 0; col < numRowsAndColumns; col++) {
                 if (board[row][col].getPieceType() == RED && !board[row][col].isKing()) {
-//                    if (isOnBoard(row + 1, col + 1)) {
-//                        if (board[row + 1][col + 1].getPieceType() == RED && !board[row + 1][col + 1].isKing()) {
-//                            pieces[0]++;
-//                        }
-//                    }
 
                     if (isOnBoard(row - 1, col + 1)) {
                         if (board[row - 1][col + 1].getPieceType() == EMPTY) {
                             pieces[0]++;
                         }
                     }
-
-//                    if (isOnBoard(row + 1, col - 1)) {
-//                        if (board[row + 1][col - 1].getPieceType() == RED && !board[row + 1][col - 1].isKing()) {
-//                            pieces[0]++;
-//                        }
-//                    }
 
                     if (isOnBoard(row - 1, col - 1)) {
                         if (board[row - 1][col - 1].getPieceType() == EMPTY) {
@@ -540,23 +480,12 @@ public class AI_Heuristic {
                         }
                     }
 
-//                    if (isOnBoard(row - 1, col + 1)) {
-//                        if (board[row - 1][col + 1].getPieceType() == BLACK && !board[row - 1][col + 1].isKing()) {
-//                            pieces[2]++;
-//                        }
-//                    }
-
                     if (isOnBoard(row + 1, col - 1)) {
                         if (board[row + 1][col - 1].getPieceType() == EMPTY) {
                             pieces[2]++;
                         }
                     }
 
-//                    if (isOnBoard(row - 1, col - 1)) {
-//                        if (board[row - 1][col - 1].getPieceType() == BLACK && !board[row - 1][col - 1].isKing()) {
-//                            pieces[2]++;
-//                        }
-//                    }
                 } else if (board[row][col].getPieceType() == RED_KING && board[row][col].isKing()) {
                     if (isOnBoard(row + 1, col + 1)) {
                         if (board[row + 1][col + 1].getPieceType() == EMPTY) {
@@ -651,11 +580,9 @@ public class AI_Heuristic {
                 if (board[row][col].getPieceType() == RED && !board[row][col].isKing()) {
                     red++;
                     pieces[0] += (numRowsAndColumns - 1) - row;
-//                    pieces[0] += row;
                 } else if (board[row][col].getPieceType() == BLACK && !board[row][col].isKing()) {
                     black++;
                     pieces[1] += row + 1;
-//                    pieces[1] += (numRowsAndColumns - 1) - row;//row;
                 }
             }
         }
@@ -688,7 +615,6 @@ public class AI_Heuristic {
             for (int col = 0; col < numRowsAndColumns; col++) {
                 if (board[row][col].getPieceType() == RED_KING && board[row][col].isKing()) {
                     redKingsCoord.add("" + row + "," + col);
-//                    red += (numRowsAndColumns - row);
                 }
                 if (board[row][col].getPieceType() == BLACK_KING && board[row][col].isKing()) {
                     blackKingsCoord.add("" + row + "," + col);
@@ -850,10 +776,8 @@ public class AI_Heuristic {
             for (int col = 0; col < numRowsAndColumns; col++) {
                 if (board[row][col].getPieceType() == RED && !board[row][col].isKing()) {
                     red += row;
-//                    red += (numRowsAndColumns - row);
                 } else if (board[row][col].getPieceType() == BLACK && !board[row][col].isKing()) {
                     black += ((numRowsAndColumns - 1) - row); // Subtract 1 because there are numRowsAndColumns - 1 Rows
-//                    black += row;
                 }
             }
         }
