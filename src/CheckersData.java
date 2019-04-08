@@ -29,7 +29,6 @@ class CheckersData {
     CheckersData() {
         gamePieces = new Piece[numRowsAndColumns][numRowsAndColumns];
         setUpCheckerBoard(numRowsAndColumns);
-//        printBoardPieces();
     }
 
     /**
@@ -77,7 +76,7 @@ class CheckersData {
             // The move is a jump.  Remove the jumped piece from the board.
             int jumpRow = (fromRow + toRow) / 2;  // Row of the jumped piece.
             int jumpCol = (fromCol + toCol) / 2;  // Column of the jumped piece.
-            gamePieces[jumpRow][jumpCol].resetPiece(EMPTY);//!@#$%^&*()
+            gamePieces[jumpRow][jumpCol].resetPiece(EMPTY);
         }
 
         // If piece gets to other side of board make it into a king

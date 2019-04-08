@@ -33,7 +33,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
             selectedPiece = Constants.selectedPiece,
             selectedPieceLegalMove = Constants.selectedPieceLegalMove;
     private static final float legalMoveBorder = Constants.legalMoveBorder,
-            selectedLegalMoveBorder = Constants.legalMoveBorder,
+            selectedLegalMoveBorder = Constants.selectedLegalMoveBorder,
             selectedPieceBorder = Constants.selectedPieceBorder;
     private static Graphics[][] gameBoardGraphics = new Graphics[numRowsAndColumns][numRowsAndColumns];
     private static final int initialX = Constants.defaultinitialX, initialY = Constants.defaultinitialY;
@@ -269,6 +269,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
                         new java.util.TimerTask() {
                             @Override
                             public void run() {
+                                // AI turn (If there is one)
                                 if (isComputerPlayingAndIsItComputersTurn()) {
                                     if (singleAI || currentPlayer == computerPlayer.getComputerPlayerID()) {
                                         computerPlayer.updateGameBoard(board.gamePieces);
@@ -301,13 +302,6 @@ class Board extends JPanel implements ActionListener, MouseListener {
             if (legalMoves == null) {
                 gameOver("RED"); //!@#$%^&*()
             }
-//            // AI's turn
-//            else if (computerDifficulty > 0) {
-//                repaint();
-//                computerPlayer.updateGameBoard(board.gamePieces);
-//                doMakeMove(computerPlayer.getBestMove());
-//            }
-            // These only appear in Human V. Human
             else if (legalMoves[0].isJump()) {
                 message.setText(getPlayerColor() + ":  You must jump.");
             } else {
@@ -351,6 +345,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
                     new java.util.TimerTask() {
                         @Override
                         public void run() {
+                            // AI turn (If there is one)
                             if (isComputerPlayingAndIsItComputersTurn()) {
                                 if (singleAI || currentPlayer == computerPlayer.getComputerPlayerID()) {
                                     computerPlayer.updateGameBoard(board.gamePieces);
@@ -417,15 +412,11 @@ class Board extends JPanel implements ActionListener, MouseListener {
                 gameBoardGraphics[row][col] = g;
 
                 // Check piece type and color it appropriately
-                //!@#$%^&*() I SWITCHED THE COLORS. CHANGE BACK!!!
-                //!@#$%^&*() HOWEVER, IT DOESN'T EFFECT GAME PLAY
                 if (board.gamePieces[row][col].getPieceType() == CheckersData.RED
                         || board.gamePieces[row][col].getPieceType() == CheckersData.RED_KING) {
-//                    g2d.setColor(gameBlack);//!@#$%^&*() Black First For production
                     g2d.setColor(gameRed);
                 } else if (board.gamePieces[row][col].getPieceType() == CheckersData.BLACK
                         || board.gamePieces[row][col].getPieceType() == CheckersData.BLACK_KING) {
-//                    g2d.setColor(gameRed);//!@#$%^&*() Black First For production
                     g2d.setColor(gameBlack);
 
                 } else if (board.gamePieces[row][col].getPieceType() == CheckersData.EMPTY) {
@@ -576,22 +567,11 @@ class Board extends JPanel implements ActionListener, MouseListener {
         int confirm = gameOverScreen.showConfirmDialog(null,
                 "<html>" +
                         "<head>" +
-//                        "<style>" +
-//                        "p {" +
-//                        "  width: " + windowDimensions.get("width") / 3 + "px;" +
-//                        "}" +
-//                        "ul {" +
-//                        "  width: " + windowDimensions.get("width") / 3 + "px;" +
-//                        "}" +
-//                        "</style>" +
                         "</head>" +
                         "<h1>" + message + "</h1>" +
                         "</html>",
                 "GAME OVER",
                 JOptionPane.PLAIN_MESSAGE);
-//        if (confirm == JOptionPane.YES_OPTION) {
-//            doNewGame();
-//        }
     }
 
     public void gameEndWindowToggle(){

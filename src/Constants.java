@@ -1,6 +1,9 @@
 import java.awt.*;
 import java.util.HashMap;
 
+/**
+ * All Program (Multi-Used) Constants are Stored HERE
+ */
 public final class Constants {
 
     private Constants() {

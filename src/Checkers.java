@@ -52,7 +52,6 @@ class Checkers extends JPanel {
         window.setSize(windowDimensions.get("width"), windowDimensions.get("height"));
         // Game Menu
         menuBar = new JMenuBar();
-//        createMenuBar();
         window.setJMenuBar(menuBar);
 
         Checkers content = new Checkers(window);
@@ -208,7 +207,6 @@ class Checkers extends JPanel {
                 }
             }
         });
-//        mediumDifficultyMenuItem.setSelected(true); //!@#$%^&*() uncomment for production use
 
         intermediateDifficultyMenuItem = new JRadioButtonMenuItem(difficultyLevel3);
         intermediateDifficultyMenuItem.addItemListener(new ItemListener() {
@@ -239,10 +237,7 @@ class Checkers extends JPanel {
         });
 
 
-//        easyDifficultyMenuItem.setSelected(true); // Remove for production //!@#$%^&*()
-//        mediumDifficultyMenuItem.setSelected(true); // Remove for production //!@#$%^&*()
-        intermediateDifficultyMenuItem.setSelected(true); // Remove for production //!@#$%^&*()
-//        hardDifficultyMenuItem.setSelected(true); // Remove for production //!@#$%^&*()
+        mediumDifficultyMenuItem.setSelected(true);
 
 
         difficultyMenu.add(easyDifficultyMenuItem);
@@ -256,9 +251,6 @@ class Checkers extends JPanel {
         difGroup.add(hardDifficultyMenuItem);
 
         menuBar.add(difficultyMenu);
-
-//        mainWindow.add(messageToUser, BorderLayout.LINE_END); //asf
-
 
 
 
