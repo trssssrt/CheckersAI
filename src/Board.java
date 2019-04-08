@@ -23,19 +23,19 @@ class Board extends JPanel implements ActionListener, MouseListener {
 
 
     // Variables dealing with game Paints & Graphics
-    private static final Color darkColor = Color.decode("#9D7D5C");
-    private static final Color lightColor = Color.decode("#F1EBDE");
+    private static final Color darkColor = Constants.darkColor;
+    private static final Color lightColor = Constants.lightColor;
     private static Color gameBlack = Constants.gameBlack,
             gameRed = Constants.gameRed;
     private boolean playerOneIsBlack = true;
-    private static final Color emptyPieceColor = new Color(0, 0, 0, 0),
-            legalMovePieceColor = Color.ORANGE,
-            legalMoveColor = Color.MAGENTA,
-            selectedPiece = Color.WHITE,
-            selectedPieceLegalMove = Color.GREEN;
-    private static final float legalMoveBorder = 1.9f,
-            selectedLegalMoveBorder = 1.9f,
-            selectedPieceBorder = 2f;
+    private static final Color emptyPieceColor = Constants.emptyPieceColor,
+            legalMovePieceColor = Constants.legalMovePieceColor,
+            legalMoveColor = Constants.legalMoveColor,
+            selectedPiece = Constants.selectedPiece,
+            selectedPieceLegalMove = Constants.selectedPieceLegalMove;
+    private static final float legalMoveBorder = Constants.legalMoveBorder,
+            selectedLegalMoveBorder = Constants.legalMoveBorder,
+            selectedPieceBorder = Constants.selectedPieceBorder;
     private static Graphics[][] gameBoardGraphics = new Graphics[numRowsAndColumns][numRowsAndColumns];
     private static final int initialX = Constants.defaultinitialX, initialY = Constants.defaultinitialY;
     private static final int squareSize = Constants.default_squareSize, pieceSize = Constants.default_pieceSize;
@@ -535,6 +535,8 @@ class Board extends JPanel implements ActionListener, MouseListener {
                 }
             }
         }
+
+        // Add Message  Board
     }
 
     /**

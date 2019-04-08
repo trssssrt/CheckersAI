@@ -15,7 +15,7 @@ class Checkers extends JPanel {
         put("height", Constants.defaultWindowHeight);
     }};
     private static int numRowsAndColumns = Constants.defaultNumRowsAndColumns;
-    private static Color backgroundColor = Color.decode("#492A1B");
+    private static Color backgroundColor = Constants.backgroundColor;
     private final Board board = new Board(backgroundColor);
 
 
@@ -273,7 +273,11 @@ class Checkers extends JPanel {
             }
         });
 
-        hardDifficultyMenuItem.setSelected(true); // Remove for production //!@#$%^&*()
+
+//        easyDifficultyMenuItem.setSelected(true); // Remove for production //!@#$%^&*()
+//        mediumDifficultyMenuItem.setSelected(true); // Remove for production //!@#$%^&*()
+        intermediateDifficultyMenuItem.setSelected(true); // Remove for production //!@#$%^&*()
+//        hardDifficultyMenuItem.setSelected(true); // Remove for production //!@#$%^&*()
 
 
         difficultyMenu.add(easyDifficultyMenuItem);
@@ -354,7 +358,6 @@ class Checkers extends JPanel {
     }
 
     /**
-     *
      * @param isSelected playerColors JRadioButtonMenuItem is selected
      */
     private void playerColors(boolean isSelected) {
