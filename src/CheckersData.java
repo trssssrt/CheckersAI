@@ -265,7 +265,7 @@ class CheckersData {
      * @param toCol   The colum the player arrives at after jump
      * @return True if jump is legal
      */
-    //!@#$%^&*() Superior Logic, but not for Submission //!@#$%^&*()
+
     private boolean isLegalJump(int player, int fromRow, int fromCol, int jumpRow, int jumpCol, int toRow, int toCol) { // WORKS
         // Check if jump is on the board
         if (toRow < 0 || toRow >= numRowsAndColumns || toCol < 0 || toCol >= numRowsAndColumns) {
@@ -295,55 +295,6 @@ class CheckersData {
         return true;  // The jump is legal.
 
     }
-
-//!@#$%^&*() ENABLE THIS LOGIC CHECK IN ACTUAL GAME
-//    /**
-    // * Check if jump is legal
-//     * @param player  Player's ID (Assumed to be RED or BLACK)
-//     * @param fromRow Row from which the Player moves
-//     * @param fromCol Column from which the Player moves
-//     * @param jumpRow The row the player jumps over
-//     * @param jumpCol The column the player jumps over
-//     * @param toRow   The row the player arrives at after jump
-//     * @param toCol   The column the player arrives at after jump
-//     * @return True if jump is legal
-//     */
-//    private boolean isLegalJump(int player, int fromRow, int fromCol, int jumpRow, int jumpCol, int toRow, int toCol) { // WORKS
-//        // Check if jump is on the board
-//        if (toRow < 0 || toRow >= numRowsAndColumns || toCol < 0 || toCol >= numRowsAndColumns) {
-//            return false;
-//        }
-//
-//        // Check if tile is occupied
-//        if (gamePieces[toRow][toCol].getPieceType() != EMPTY) {
-//            return false;
-//        }
-//
-//        // Cannot jump over empty spaces
-//        if (gamePieces[jumpRow][jumpCol].getPieceType() == EMPTY) {
-//            return false;
-//        }
-//
-//        // Check if uncrowned pieces are going in the right direction
-//        if (player == RED
-//                && gamePieces[fromRow][fromCol].getPieceType() == RED
-//                && toRow > fromRow) { // Red only moves North
-//            return false;
-//        } else if (player == BLACK
-//                && gamePieces[fromRow][fromCol].getPieceType() == BLACK
-//                && toRow < fromRow) { // Black only moves South
-//            return false;
-//        }
-//
-//        // Cannot jump over player's own pieces
-//        // Recall that "Color"_KING = "Color" + 1
-//        if (gamePieces[jumpRow][jumpCol].getPieceType() == player || gamePieces[jumpRow][jumpCol].getPieceType() == player + 1) {
-//            return false;
-//        }
-//
-//        return true;  // The jump is legal.
-//
-//    }
 
 
     /**
