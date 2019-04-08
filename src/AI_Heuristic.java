@@ -35,7 +35,7 @@ public class AI_Heuristic {
             PROTECTED_PIECE_VALUE = 40,// Originally 10 // Encourages Pieces to be protected
             POSSIBLE_JUMP_VALUE = 0,// Originally 5 // Encourages pieces to move to jump locations
             SIMPLE_DISTANCE_VALUE = 0,
-            ADVANCED_DISTANCE_VALUE = 30;// Originally 4
+            ADVANCED_DISTANCE_VALUE = 5;// Originally 4
     private int PAWN_PIECE_ROW_VALUE = PAWN_PIECE / 100,
             KING_PIECE_ROW_VALUE = KING / 100;
 
@@ -149,7 +149,7 @@ public class AI_Heuristic {
             RMAX = 10;
             int[] tPS = trappedPieceScore(board);
             int isRed = RED == playerID ? 1 : -1;
-            return simpleScore(board, playerID)
+            return simpleScore(board, playerID) * PAWN_PIECE / 50
                     + simpleDistanceScore(board, playerID)
                     + advancedDistanceScore2(board, playerID, 2) * ADVANCED_DISTANCE_VALUE // Causes Issues, Most likely need SMALL scaling factor//!@#$%^&*()
                     + isRed * (tPS[0] - tPS[2]) * PAWN_PIECE_ROW_VALUE

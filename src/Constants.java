@@ -52,7 +52,7 @@ public final class Constants {
     public static final String[] difficultyLevels = {"Human Vs Human", "Easy", "Medium", "Intermediate", "Hard"};
 
     // 0 - Human, 1 - Easy, 2 - Medium, 3 - Intermediate, 4 - Hard
-    public static final int defaultGameDifficulty = 3,
+    public static final int defaultGameDifficulty = 2,
             difficulty_ZERO = 0,
             difficulty_Easy = 1,
             difficulty_Medium = 2,
