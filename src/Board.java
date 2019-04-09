@@ -6,6 +6,7 @@ import java.awt.geom.Rectangle2D;
 
 /**
  * Create and Paint checker board
+ * Controls game play
  */
 class Board extends JPanel implements ActionListener, MouseListener {
 

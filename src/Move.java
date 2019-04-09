@@ -1,3 +1,7 @@
+/**
+ * Move object representing possible moves.
+ * (Evaluation of legality happens elsewhere)
+ */
 class Move {
     int fromRow, fromCol;  // Current piece's position
     int toRow, toCol;      // Tile to which the piece moves
