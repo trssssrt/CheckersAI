@@ -150,7 +150,6 @@ class Checkers extends JPanel {
         menuBar.add(gameMenu);
 
 
-
         // Difficulty Menu
         messageToUser = new JLabel(computerDifficulty_Text + difficultyLevel2); // Medium is Default Game Difficulty
         difficultyMenu = new JMenu("Difficulty");
@@ -209,7 +208,6 @@ class Checkers extends JPanel {
         difGroup.add(hardDifficultyMenuItem);
 
         menuBar.add(difficultyMenu);
-
 
 
         // Help Menu
@@ -310,5 +308,8 @@ class Checkers extends JPanel {
         playersColorString[8] = isSelected ? "black" : "red";
         board.setPlayerTwoIsBlack(isSelected);
     }
-    private void gameEndWindowToggle(){board.gameEndWindowToggle();}
+
+    private void gameEndWindowToggle() {
+        board.gameEndWindowToggle();
+    }
 }

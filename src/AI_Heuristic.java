@@ -1015,7 +1015,7 @@ public class AI_Heuristic {
                     sum += Math.pow(row - rowN, norm);
                     sum += Math.pow(col - colN, norm);
                 }
-                redNorm.add(Math.pow(sum , (double) (1 / norm)));
+                redNorm.add(Math.pow(sum, (double) (1 / norm)));
             }
         }
 
@@ -1037,7 +1037,7 @@ public class AI_Heuristic {
                     sum += Math.pow(row - rowN, norm);
                     sum += Math.pow(col - colN, norm);
                 }
-                blackNorm.add(Math.pow(sum , (double) (1 / norm)));
+                blackNorm.add(Math.pow(sum, (double) (1 / norm)));
             }
         }
 

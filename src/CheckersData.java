@@ -34,7 +34,7 @@ class CheckersData {
     /**
      * Set up board with checkers in every other position.
      * That is, pieces reside at row % 2 == col % 2.
-     *
+     * <p>
      * Starting positions are first 3 and last 3 rows
      * which hold Black and Red pieces respectively.
      *
@@ -100,13 +100,13 @@ class CheckersData {
      * <p>
      * <p>
      * Piece Organization:
-     *         Northwest           North (illegal Move)            Northeast
-     *                  \                  |                      /
-     *                   \                 |                     /
+     * Northwest           North (illegal Move)            Northeast
+     * \                  |                      /
+     * \                 |                     /
      * West (illegal Move) -------   Player's Game Piece     ------- East (illegal Move)
-     *                   /                 |                     \
-     *                  /                  |                      \
-     *         Southwest           South (illegal Move)            Southeast
+     * /                 |                     \
+     * /                  |                      \
+     * Southwest           South (illegal Move)            Southeast
      */
     Move[] getLegalMoves(int playerID) {
         // Reject if player isn't Red or Black (Should never happen)
