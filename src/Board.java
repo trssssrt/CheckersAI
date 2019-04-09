@@ -96,6 +96,12 @@ class Board extends JPanel implements ActionListener, MouseListener {
 
 
         if (computerDifficulty != Constants.difficulty_ZERO) {
+            if (computerDifficulty == Constants.difficulty_Easy) {
+                setDELAYS_TO_DEFAULTS();
+            } else {
+                setCOMPUTER_MOVE_DELAY_IN_MILLISECONDS(COMPUTER_MOVE_DELAY_IN_MILLISECONDS * computerDifficulty * 4 / 5);
+                setCOMPUTER_JUMP_DELAY_IN_MILLISECONDS(COMPUTER_JUMP_DELAY_IN_MILLISECONDS * computerDifficulty * 4 / 5);
+            }
             computerPlayer = new AI_Heuristic(
                     CheckersData.BLACK,
                     computerDifficulty,
@@ -118,7 +124,8 @@ class Board extends JPanel implements ActionListener, MouseListener {
                                 doMakeMove(computerPlayer2.getBestMove());
                             }
                         },
-                        COMPUTER_JUMP_DELAY_IN_MILLISECONDS
+                        // The First Move Should start being calculated quickly
+                        Constants.default_COMPUTER_JUMP_DELAY_IN_MILLISECONDS / 100
                 );
             }
         }
@@ -243,7 +250,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
         }
 
 //        if (computerDifficulty != Constants.difficulty_ZERO && currentPlayer == CheckersData.BLACK) {
-            if (computerDifficulty != Constants.difficulty_ZERO && isComputerPlayingAndIsItComputersTurn()) {
+        if (computerDifficulty != Constants.difficulty_ZERO && isComputerPlayingAndIsItComputersTurn()) {
             repaint();
         }
         board.makeMove(move.fromRow, move.fromCol, move.toRow, move.toCol);
@@ -257,13 +264,15 @@ class Board extends JPanel implements ActionListener, MouseListener {
             // Check for double jump (this will continue to get called until there are no more successive jumps)
             legalMoves = board.getLegalJumpsFromPosition(currentPlayer, move.toRow, move.toCol);
             if (legalMoves != null) {
-                // Delay move to allow user to see computer 'think' by delaying time to computation
-                new java.util.Timer().schedule(
-                        new java.util.TimerTask() {
-                            @Override
-                            public void run() {
-                                // AI turn (If there is one)
-                                if (isComputerPlayingAndIsItComputersTurn()) {
+
+                // AI turn (If there is one)
+                if (isComputerPlayingAndIsItComputersTurn()) {
+                    // Delay move to allow user to see computer 'think' by delaying time to computation
+                    new java.util.Timer().schedule(
+                            new java.util.TimerTask() {
+                                @Override
+                                public void run() {
+                                    // AI turn (If there is one)
                                     if (singleAI || currentPlayer == computerPlayer.getComputerPlayerID()) {
                                         computerPlayer.updateGameBoard(board.gamePieces);
                                         doMakeMove(computerPlayer.getBestMove());
@@ -271,12 +280,13 @@ class Board extends JPanel implements ActionListener, MouseListener {
                                         computerPlayer2.updateGameBoard(board.gamePieces);
                                         doMakeMove(computerPlayer2.getBestMove());
                                     }
+                                    return;
                                 }
-                                return;
-                            }
-                        },
-                        COMPUTER_JUMP_DELAY_IN_MILLISECONDS
-                );
+                            },
+                            COMPUTER_JUMP_DELAY_IN_MILLISECONDS
+                    );
+                }
+
                 // Enforce Jump Rule
                 selectedRow = move.toRow;
                 selectedCol = move.toCol;
@@ -296,7 +306,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
             if (legalMoves == null) {
                 // Player Wins Text (With adjustment for player changing color)
                 String lastPlayer = !getCurrentPlayerColor().equals(Constants.colorStringMap.get("RED")) ? Constants.colorStringMap.get("RED") : Constants.colorStringMap.get("BLACK");
-                gameOver( lastPlayer + " WINS!!!");
+                gameOver(lastPlayer + " WINS!!!");
 
             } else if (legalMoves[0].isJump()) {
                 message.setText(getCurrentPlayerColor() + ":  You must jump.");
@@ -309,7 +319,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
             if (legalMoves == null) {
                 // Player Wins Text (With adjustment for player changing color)
                 String lastPlayer = !getCurrentPlayerColor().equals(Constants.colorStringMap.get("RED")) ? Constants.colorStringMap.get("RED") : Constants.colorStringMap.get("BLACK");
-                gameOver( lastPlayer + " WINS!!!");
+                gameOver(lastPlayer + " WINS!!!");
 
             } else if (legalMoves[0].isJump()) {
                 message.setText(getCurrentPlayerColor() + ":   You must jump.");
@@ -323,6 +333,29 @@ class Board extends JPanel implements ActionListener, MouseListener {
 
         // Auto select piece if it is the only legal piece to move
         if (legalMoves != null) {
+            /* Make sure the board is redrawn in its new state. */
+            repaint();
+
+            // AI turn (If there is one)
+            if (isComputerPlayingAndIsItComputersTurn()) {
+                // Delay move to allow user to see computer 'think' by delaying time to computation
+                new java.util.Timer().schedule(
+                        new java.util.TimerTask() {
+                            @Override
+                            public void run() {
+                                if (singleAI || currentPlayer == computerPlayer.getComputerPlayerID()) {
+                                    computerPlayer.updateGameBoard(board.gamePieces);
+                                    doMakeMove(computerPlayer.getBestMove());
+                                } else if (currentPlayer == computerPlayer2.getComputerPlayerID()) {
+                                    computerPlayer2.updateGameBoard(board.gamePieces);
+                                    doMakeMove(computerPlayer2.getBestMove());
+                                }
+                                return;
+                            }
+                        },
+                        COMPUTER_MOVE_DELAY_IN_MILLISECONDS
+                );
+            }
             boolean isOnlyOneLegalPieceToMove = true;
             for (Move legalMove : legalMoves) {
                 if (legalMove.fromRow != legalMoves[0].fromRow
@@ -335,29 +368,6 @@ class Board extends JPanel implements ActionListener, MouseListener {
                 selectedRow = legalMoves[0].fromRow;
                 selectedCol = legalMoves[0].fromCol;
             }
-            /* Make sure the board is redrawn in its new state. */
-            repaint();
-
-            // Delay move to allow user to see computer 'think' by delaying time to computation
-            new java.util.Timer().schedule(
-                    new java.util.TimerTask() {
-                        @Override
-                        public void run() {
-                            // AI turn (If there is one)
-                            if (isComputerPlayingAndIsItComputersTurn()) {
-                                if (singleAI || currentPlayer == computerPlayer.getComputerPlayerID()) {
-                                    computerPlayer.updateGameBoard(board.gamePieces);
-                                    doMakeMove(computerPlayer.getBestMove());
-                                } else if (currentPlayer == computerPlayer2.getComputerPlayerID()) {
-                                    computerPlayer2.updateGameBoard(board.gamePieces);
-                                    doMakeMove(computerPlayer2.getBestMove());
-                                }
-                            }
-                            return;
-                        }
-                    },
-                    COMPUTER_MOVE_DELAY_IN_MILLISECONDS
-            );
         }
 
         /* Make sure the board is redrawn in its new state. */
@@ -571,13 +581,29 @@ class Board extends JPanel implements ActionListener, MouseListener {
         displayLegalMoveColors = !displayLegalMoveColors;
         repaint();
     }
+
     public void gameEndWindowToggle() {
         this.showGameOverPopUp = !this.showGameOverPopUp;
     }
+
     public void setSingleAI(boolean single_AI) {
         this.singleAI = single_AI;
     }
-    public void setComputerDifficulty(int computer_Difficulty){
+
+    public void setComputerDifficulty(int computer_Difficulty) {
         this.computerDifficulty = computer_Difficulty;
+    }
+
+    private void setCOMPUTER_MOVE_DELAY_IN_MILLISECONDS(int newTime) {
+        this.COMPUTER_MOVE_DELAY_IN_MILLISECONDS = newTime;
+    }
+
+    private void setCOMPUTER_JUMP_DELAY_IN_MILLISECONDS(int newTime) {
+        this.COMPUTER_JUMP_DELAY_IN_MILLISECONDS = newTime;
+    }
+
+    private void setDELAYS_TO_DEFAULTS() {
+        this.COMPUTER_MOVE_DELAY_IN_MILLISECONDS = Constants.default_COMPUTER_MOVE_DELAY_IN_MILLISECONDS;
+        this.COMPUTER_JUMP_DELAY_IN_MILLISECONDS = Constants.default_COMPUTER_JUMP_DELAY_IN_MILLISECONDS;
     }
 }
