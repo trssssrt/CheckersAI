@@ -8,8 +8,6 @@ import java.util.Map;
  * Create Swing Application of Checkers game
  */
 class Checkers extends JPanel {
-    private JFrame mainWindow, window;
-
     static private Map<String, Integer> windowDimensions = new HashMap<>() {{
         put("width", Constants.defaultWindowWidth);
         put("height", Constants.defaultWindowHeight);
@@ -54,7 +52,7 @@ class Checkers extends JPanel {
         menuBar = new JMenuBar();
         window.setJMenuBar(menuBar);
 
-        Checkers content = new Checkers(window);
+        Checkers content = new Checkers();
         window.setContentPane(content);
 
 
@@ -69,8 +67,7 @@ class Checkers extends JPanel {
         window.setVisible(true);
     }
 
-    private Checkers(JFrame window) {
-        this.mainWindow = window;
+    private Checkers() {
         setPreferredSize(new Dimension(windowDimensions.get("width"), windowDimensions.get("height")));
 
         setBackground(backgroundColor);
@@ -302,7 +299,7 @@ class Checkers extends JPanel {
      * This displays the game rules
      */
     private void showGameRulesScreen() {
-        JOptionPane.showMessageDialog(window,
+        JOptionPane.showMessageDialog(null,
                 "<html>" +
                         "<head>" +
                         "<style>" +
