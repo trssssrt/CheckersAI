@@ -242,7 +242,8 @@ class Board extends JPanel implements ActionListener, MouseListener {
             return;
         }
 
-        if (computerDifficulty != Constants.difficulty_ZERO && currentPlayer == CheckersData.BLACK) {
+//        if (computerDifficulty != Constants.difficulty_ZERO && currentPlayer == CheckersData.BLACK) {
+            if (computerDifficulty != Constants.difficulty_ZERO && isComputerPlayingAndIsItComputersTurn()) {
             repaint();
         }
         board.makeMove(move.fromRow, move.fromCol, move.toRow, move.toCol);
@@ -271,6 +272,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
                                         doMakeMove(computerPlayer2.getBestMove());
                                     }
                                 }
+                                return;
                             }
                         },
                         COMPUTER_JUMP_DELAY_IN_MILLISECONDS
@@ -351,6 +353,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
                                     doMakeMove(computerPlayer2.getBestMove());
                                 }
                             }
+                            return;
                         }
                     },
                     COMPUTER_MOVE_DELAY_IN_MILLISECONDS

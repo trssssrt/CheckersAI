@@ -953,7 +953,8 @@ public class AI_Heuristic {
 
         for (int row = 0; row < numRowsAndColumns; row++) {
             for (int col = 0; col < numRowsAndColumns; col++) {
-                newBoard[row][col] = new Piece(localBoard[row][col].getPieceType(),
+                newBoard[row][col] = new Piece(
+                        localBoard[row][col].getPieceType(),
                         null,
                         localBoard[row][col].isKing());
             }
