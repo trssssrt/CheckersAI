@@ -293,7 +293,8 @@ class Board extends JPanel implements ActionListener, MouseListener {
             legalMoves = board.getLegalMoves(currentPlayer);
             if (legalMoves == null) {
                 // Player Wins Text (With adjustment for player changing color)
-                gameOver(getCurrentPlayerColor() + " WINS!!!");
+                String lastPlayer = !getCurrentPlayerColor().equals(Constants.colorStringMap.get("RED")) ? Constants.colorStringMap.get("RED") : Constants.colorStringMap.get("BLACK");
+                gameOver( lastPlayer + " WINS!!!");
 
             } else if (legalMoves[0].isJump()) {
                 message.setText(getCurrentPlayerColor() + ":  You must jump.");
@@ -305,7 +306,8 @@ class Board extends JPanel implements ActionListener, MouseListener {
             legalMoves = board.getLegalMoves(currentPlayer);
             if (legalMoves == null) {
                 // Player Wins Text (With adjustment for player changing color)
-                gameOver(getCurrentPlayerColor() + " WINS!!!");
+                String lastPlayer = !getCurrentPlayerColor().equals(Constants.colorStringMap.get("RED")) ? Constants.colorStringMap.get("RED") : Constants.colorStringMap.get("BLACK");
+                gameOver( lastPlayer + " WINS!!!");
 
             } else if (legalMoves[0].isJump()) {
                 message.setText(getCurrentPlayerColor() + ":   You must jump.");

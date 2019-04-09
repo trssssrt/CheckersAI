@@ -28,14 +28,14 @@ public class AI_Heuristic {
     private int RMIN = Constants.RMIN, RMAX = Constants.RMAX;// Variables determining Random changes in Heuristic
 
     private int PAWN_PIECE = 500,
-            KING = PAWN_PIECE * 5 / 3,// Originally 175
+            KING = PAWN_PIECE * 5 / 3,
             MOVABLE_PAWN = PAWN_PIECE * 5 / 6,
             MOVABLE_KING = KING * 5 / 6,
-            TRAPPED_CORNER_KING_VALUE = -KING * 2 / 3,// Originally 25 // Encourages Pieces to move forward
-            PROTECTED_PIECE_VALUE = 40,// Originally 10 // Encourages Pieces to be protected
-            POSSIBLE_JUMP_VALUE = 0,// Originally 5 // Encourages pieces to move to jump locations
+            TRAPPED_CORNER_KING_VALUE = -KING * 2 / 3,// Encourages Pieces to move forward
+            PROTECTED_PIECE_VALUE = 40,// Encourages Pieces to be protected
+            POSSIBLE_JUMP_VALUE = 0,// Encourages pieces to move to jump locations
             SIMPLE_DISTANCE_VALUE = 0,
-            ADVANCED_DISTANCE_VALUE = 5;// Originally 4
+            ADVANCED_DISTANCE_VALUE = 5;
     private int PAWN_PIECE_ROW_VALUE = PAWN_PIECE / 100,
             KING_PIECE_ROW_VALUE = KING / 100;
 
@@ -94,8 +94,6 @@ public class AI_Heuristic {
         }
         Move[] legalMoveList = getLegalMoves(board, playerID);
         if (depth == 0) {
-//        || legalMoveList == null) {
-
             // If there are equal scores, then the game is completely deterministic
             // So, to prevent this, we add a pseudo-random number.
             return evaluateHeuristic(board, playerID) + randomInt(RMIN, RMAX);
@@ -146,7 +144,7 @@ public class AI_Heuristic {
             RMAX = Constants.RMAX;
             int[] tPS = trappedPieceScore(board);
             int isRed = RED == playerID ? 1 : -1;
-            return simpleScore(board, playerID) * PAWN_PIECE / 50
+            return simpleScore(board, playerID)
                     + simpleDistanceScore(board, playerID)
                     + advancedDistanceScore2(board, playerID, 2) * ADVANCED_DISTANCE_VALUE // Causes Issues, Most likely need SMALL scaling factor//!@#$%^&*()
                     + isRed * (tPS[0] - tPS[2]) * PAWN_PIECE_ROW_VALUE
@@ -403,12 +401,14 @@ public class AI_Heuristic {
                             pieces[0]++;
                         }
                     }
+
                 } else if (board[row][col].getPieceType() == BLACK && !board[row][col].isKing()) {
                     if (isOnBoard(row - 1, col + 1)) {
                         if (board[row - 1][col + 1].getPieceType() == BLACK && !board[row - 1][col + 1].isKing()) {
                             pieces[2]++;
                         }
                     }
+
 
                     if (isOnBoard(row - 1, col - 1)) {
                         if (board[row - 1][col - 1].getPieceType() == BLACK && !board[row - 1][col - 1].isKing()) {
@@ -421,6 +421,7 @@ public class AI_Heuristic {
                             pieces[1]++;
                         }
                     }
+
 
                     if (isOnBoard(row + 1, col - 1)) {
                         if (board[row + 1][col - 1].getPieceType() == RED || board[row + 1][col - 1].getPieceType() == RED_KING) {
@@ -435,6 +436,7 @@ public class AI_Heuristic {
                             pieces[2]++;
                         }
                     }
+
 
                     if (isOnBoard(row - 1, col - 1)) {
                         if (board[row - 1][col - 1].getPieceType() == BLACK || board[row - 1][col - 1].getPieceType() == BLACK_KING) {
@@ -773,8 +775,10 @@ public class AI_Heuristic {
             for (int col = 0; col < numRowsAndColumns; col++) {
                 if (board[row][col].getPieceType() == RED && !board[row][col].isKing()) {
                     red += row;
+//                    red += (numRowsAndColumns - row);
                 } else if (board[row][col].getPieceType() == BLACK && !board[row][col].isKing()) {
                     black += ((numRowsAndColumns - 1) - row); // Subtract 1 because there are numRowsAndColumns - 1 Rows
+//                    black += row;
                 }
             }
         }
@@ -975,7 +979,7 @@ public class AI_Heuristic {
                 blackKingsCoord = new Vector<>(),
                 redNormalCoord = new Vector<>(),
                 blackNormalCoord = new Vector<>();
-        Vector<Integer> redNorm = new Vector<>(),
+        Vector<Double> redNorm = new Vector<>(),
                 blackNorm = new Vector<>();
 
         // Find Piece locations
@@ -1010,7 +1014,7 @@ public class AI_Heuristic {
                     sum += Math.pow(row - rowN, norm);
                     sum += Math.pow(col - colN, norm);
                 }
-                redNorm.add(sum ^ (1 / norm));
+                redNorm.add(Math.pow(sum , (double) (1 / norm)));
             }
         }
 
@@ -1032,7 +1036,7 @@ public class AI_Heuristic {
                     sum += Math.pow(row - rowN, norm);
                     sum += Math.pow(col - colN, norm);
                 }
-                blackNorm.add(sum ^ (1 / norm));
+                blackNorm.add(Math.pow(sum , (double) (1 / norm)));
             }
         }
 
@@ -1127,7 +1131,7 @@ public class AI_Heuristic {
             playerKingID = BLACK_KING;
         }
 
-        ArrayList<Move> moves = new ArrayList<>();  // Moves will be stored in this list.
+        ArrayList<Move> moves = new ArrayList<>();  // Moves will be stored in this list (since arrays are immutable).
 
         /*  If a jump is possible, find them first.
          *  Examine each location for a possible jump.
@@ -1244,6 +1248,7 @@ public class AI_Heuristic {
         return true;  // The jump is legal.
 
     }
+
 
     /**
      * Check if move is legal
