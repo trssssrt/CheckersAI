@@ -94,64 +94,55 @@ class Checkers extends JPanel {
         gameMenu.add(newGameMenu);
 
         // Add New Game Actions
-        HumanVSHuman.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                board.computerDifficulty = Constants.difficulty_ZERO;
-                board.performDoNewGame();
+        HumanVSHuman.addActionListener(e -> {
+            board.computerDifficulty = Constants.difficulty_ZERO;
+            board.performDoNewGame();
 
-                // update messageToUser & deselect difficulty level
-                messageToUser.setText(humanVsHuman);
-                board.userMessage.setText(humanVsHuman);
-            }
+            // update messageToUser & deselect difficulty level
+            messageToUser.setText(humanVsHuman);
+            board.userMessage.setText(humanVsHuman);
         });
-        ComputerVSHuman.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.out.println("ADD AI");
-                int difficulty = difficulty_ZERO;
-                if (easyDifficultyMenuItem.isSelected()) {
-                    difficulty = difficulty_Easy;
-                    messageToUser.setText(computerDifficulty_Text + difficultyLevel1);
-                } else if (mediumDifficultyMenuItem.isSelected()) {
-                    difficulty = difficulty_Medium;
-                    messageToUser.setText(computerDifficulty_Text + difficultyLevel2);
-                } else if (intermediateDifficultyMenuItem.isSelected()) {
-                    difficulty = difficulty_Medium;
-                    messageToUser.setText(computerDifficulty_Text + difficultyLevel3);
-                } else if (hardDifficultyMenuItem.isSelected()) {
-                    difficulty = difficulty_Hard;
-                    messageToUser.setText(computerDifficulty_Text + difficultyLevel4);
-                }
-                board.singleAI = true;
-                board.computerDifficulty = difficulty;
-                board.performDoNewGame();
-                board.userMessage.setText(messageToUser.getText());
+        ComputerVSHuman.addActionListener(e -> {
+            System.out.println("ADD AI");
+            int difficulty = difficulty_ZERO;
+            if (easyDifficultyMenuItem.isSelected()) {
+                difficulty = difficulty_Easy;
+                messageToUser.setText(computerDifficulty_Text + difficultyLevel1);
+            } else if (mediumDifficultyMenuItem.isSelected()) {
+                difficulty = difficulty_Medium;
+                messageToUser.setText(computerDifficulty_Text + difficultyLevel2);
+            } else if (intermediateDifficultyMenuItem.isSelected()) {
+                difficulty = difficulty_Intermediate;
+                messageToUser.setText(computerDifficulty_Text + difficultyLevel3);
+            } else if (hardDifficultyMenuItem.isSelected()) {
+                difficulty = difficulty_Hard;
+                messageToUser.setText(computerDifficulty_Text + difficultyLevel4);
             }
+            board.singleAI = true;
+            board.computerDifficulty = difficulty;
+            board.performDoNewGame();
+            board.userMessage.setText(messageToUser.getText());
         });
-        ComputerVsComputer.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.out.println("ADD AI & AI");
-                int difficulty = difficulty_ZERO;
-                if (easyDifficultyMenuItem.isSelected()) {
-                    difficulty = difficulty_Easy;
-                    messageToUser.setText(computerDifficulty_Text + difficultyLevel1);
-                } else if (mediumDifficultyMenuItem.isSelected()) {
-                    difficulty = difficulty_Medium;
-                    messageToUser.setText(computerDifficulty_Text + difficultyLevel2);
-                } else if (intermediateDifficultyMenuItem.isSelected()) {
-                    difficulty = difficulty_Intermediate;
-                    messageToUser.setText(computerDifficulty_Text + difficultyLevel3);
-                } else if (hardDifficultyMenuItem.isSelected()) {
-                    difficulty = difficulty_Hard;
-                    messageToUser.setText(computerDifficulty_Text + difficultyLevel4);
-                }
-                board.singleAI = false;
-                board.computerDifficulty = difficulty;
-                board.performDoNewGame();
-                board.userMessage.setText(messageToUser.getText());
+        ComputerVsComputer.addActionListener(e -> {
+            System.out.println("ADD AI & AI");
+            int difficulty = difficulty_ZERO;
+            if (easyDifficultyMenuItem.isSelected()) {
+                difficulty = difficulty_Easy;
+                messageToUser.setText(computerDifficulty_Text + difficultyLevel1);
+            } else if (mediumDifficultyMenuItem.isSelected()) {
+                difficulty = difficulty_Medium;
+                messageToUser.setText(computerDifficulty_Text + difficultyLevel2);
+            } else if (intermediateDifficultyMenuItem.isSelected()) {
+                difficulty = difficulty_Intermediate;
+                messageToUser.setText(computerDifficulty_Text + difficultyLevel3);
+            } else if (hardDifficultyMenuItem.isSelected()) {
+                difficulty = difficulty_Hard;
+                messageToUser.setText(computerDifficulty_Text + difficultyLevel4);
             }
+            board.singleAI = false;
+            board.computerDifficulty = difficulty;
+            board.performDoNewGame();
+            board.userMessage.setText(messageToUser.getText());
         });
 
 //        gameMenu.addSeparator();
@@ -178,37 +169,28 @@ class Checkers extends JPanel {
         difGroup = new ButtonGroup();
 
         easyDifficultyMenuItem = new JRadioButtonMenuItem(difficultyLevel1);
-        easyDifficultyMenuItem.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    if (!messageToUser.getText().contains(humanVsHuman)) {
-                        messageToUser.setText(computerDifficulty_Text + difficultyLevel1);
-                    }
+        easyDifficultyMenuItem.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                if (!messageToUser.getText().contains(humanVsHuman)) {
+                    messageToUser.setText(computerDifficulty_Text + difficultyLevel1);
                 }
             }
         });
 
         mediumDifficultyMenuItem = new JRadioButtonMenuItem(difficultyLevel2);
-        mediumDifficultyMenuItem.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    if (!messageToUser.getText().contains(humanVsHuman)) {
-                        messageToUser.setText(computerDifficulty_Text + difficultyLevel2);
-                    }
+        mediumDifficultyMenuItem.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                if (!messageToUser.getText().contains(humanVsHuman)) {
+                    messageToUser.setText(computerDifficulty_Text + difficultyLevel2);
                 }
             }
         });
 
         intermediateDifficultyMenuItem = new JRadioButtonMenuItem(difficultyLevel3);
-        intermediateDifficultyMenuItem.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    if (!messageToUser.getText().contains(humanVsHuman)) {
-                        messageToUser.setText(computerDifficulty_Text + difficultyLevel3);
-                    }
+        intermediateDifficultyMenuItem.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                if (!messageToUser.getText().contains(humanVsHuman)) {
+                    messageToUser.setText(computerDifficulty_Text + difficultyLevel3);
                 }
             }
         });
@@ -246,29 +228,16 @@ class Checkers extends JPanel {
         // Help Menu
         helpMenu = new JMenu("Help");
         JMenuItem helpCommand = new JMenuItem("Game Instructions"); // Create a menu item.
-        helpCommand.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                showGameRulesScreen();
-            }
-        });
+        helpCommand.addActionListener(e -> showGameRulesScreen());
 
         JRadioButtonMenuItem toggleLegalMoveColorsCommand = new JRadioButtonMenuItem("Color Legal Moves"); // Create a menu item.
-        toggleLegalMoveColorsCommand.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                toggleLegalMoveColors();
-            }
-        });
+        toggleLegalMoveColorsCommand.addActionListener(e -> toggleLegalMoveColors());
         toggleLegalMoveColorsCommand.setSelected(false);
 
         JRadioButtonMenuItem playerColors = new JRadioButtonMenuItem(String.join("", playersColorString)); // Create a menu item.
-        playerColors.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                playerColors(playerColors.isSelected());
-                playerColors.setText(String.join("", playersColorString));
-            }
+        playerColors.addActionListener(e -> {
+            playerColors(playerColors.isSelected());
+            playerColors.setText(String.join("", playersColorString));
         });
         playerColors.setSelected(true);
 
