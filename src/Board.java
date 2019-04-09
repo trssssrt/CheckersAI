@@ -43,8 +43,8 @@ class Board extends JPanel implements ActionListener, MouseListener {
 
     public int computerDifficulty = Constants.defaultGameDifficulty;
     private boolean displayLegalMoveColors; // If True, highlight legal moves for player
-    private boolean showgameOverPopUp = false;
-    public boolean singleAI = Constants.default_SingleAI;
+    private boolean showGameOverPopUp = false;
+    private boolean singleAI = Constants.default_SingleAI;
     private AI_Heuristic computerPlayer, computerPlayer2;
 
 
@@ -108,7 +108,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
                         computerDifficulty,
                         board.gamePieces,
                         numRowsAndColumns);
-                // Delay move to allow user to see computer 'think'
+                // Delay move to allow user to see computer 'think' by delaying time to computation
                 repaint();
                 new java.util.Timer().schedule(
                         new java.util.TimerTask() {
@@ -177,7 +177,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
      * @param str Message sent to players at the end of the game
      */
     private void gameOver(String str) {
-        if (showgameOverPopUp) {
+        if (showGameOverPopUp) {
             gameOverPopUp(str);
         }
 
@@ -256,7 +256,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
             // Check for double jump (this will continue to get called until there are no more successive jumps)
             legalMoves = board.getLegalJumpsFromPosition(currentPlayer, move.toRow, move.toCol);
             if (legalMoves != null) {
-                // Delay move to allow user to see computer 'think'
+                // Delay move to allow user to see computer 'think' by delaying time to computation
                 new java.util.Timer().schedule(
                         new java.util.TimerTask() {
                             @Override
@@ -334,7 +334,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
             /* Make sure the board is redrawn in its new state. */
             repaint();
 
-            // Delay move to allow user to see computer 'think'
+            // Delay move to allow user to see computer 'think' by delaying time to computation
             new java.util.Timer().schedule(
                     new java.util.TimerTask() {
                         @Override
@@ -545,11 +545,6 @@ class Board extends JPanel implements ActionListener, MouseListener {
     public void mouseExited(MouseEvent evt) {
     }
 
-    public void toggleLegalMoveColors() {
-        displayLegalMoveColors = !displayLegalMoveColors;
-        repaint();
-    }
-
     /**
      * Displays a game over screen and asks player if they'd like to play again
      * Resets game configuration if player does want another game
@@ -567,7 +562,17 @@ class Board extends JPanel implements ActionListener, MouseListener {
                 JOptionPane.PLAIN_MESSAGE);
     }
 
+    public void toggleLegalMoveColors() {
+        displayLegalMoveColors = !displayLegalMoveColors;
+        repaint();
+    }
     public void gameEndWindowToggle() {
-        this.showgameOverPopUp = !this.showgameOverPopUp;
+        this.showGameOverPopUp = !this.showGameOverPopUp;
+    }
+    public void setSingleAI(boolean single_AI) {
+        this.singleAI = single_AI;
+    }
+    public void setComputerDifficulty(int computer_Difficulty){
+        this.computerDifficulty = computer_Difficulty;
     }
 }

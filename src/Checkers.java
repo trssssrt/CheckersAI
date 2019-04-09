@@ -94,7 +94,7 @@ class Checkers extends JPanel {
 
         // Add New Game Actions
         HumanVSHuman.addActionListener(e -> {
-            board.computerDifficulty = Constants.difficulty_ZERO;
+            board.setComputerDifficulty(Constants.difficulty_ZERO);
             board.performDoNewGame();
 
             // update messageToUser & deselect difficulty level
@@ -116,8 +116,8 @@ class Checkers extends JPanel {
                 difficulty = difficulty_Hard;
                 messageToUser.setText(computerDifficulty_Text + difficultyLevel4);
             }
-            board.singleAI = true;
-            board.computerDifficulty = difficulty;
+            board.setSingleAI(true);
+            board.setComputerDifficulty(difficulty);
             board.performDoNewGame();
         });
         ComputerVsComputer.addActionListener(e -> {
@@ -136,8 +136,9 @@ class Checkers extends JPanel {
                 difficulty = difficulty_Hard;
                 messageToUser.setText(computerDifficulty_Text + difficultyLevel4);
             }
-            board.singleAI = false;
-            board.computerDifficulty = difficulty;
+            board.setSingleAI(false);
+
+            board.setComputerDifficulty(difficulty);
             board.performDoNewGame();
         });
 
