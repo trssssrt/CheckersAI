@@ -39,7 +39,7 @@ public class AI_Heuristic {
     private int PAWN_PIECE_ROW_VALUE = PAWN_PIECE / 100,
             KING_PIECE_ROW_VALUE = KING / 100;
 
-    private final int[] stage = {0, 1, 3}; // 3 Stages: 0 - Beginning, 1 - Middle, 2 - End
+    private final int[] stage = {0, 1, 2}; // 3 Stages: 0 - Beginning, 1 - Middle, 2 - End
 
 
     AI_Heuristic(int computerPlayerID, int difficulty, Piece[][] board, int numRowsAndColumns) {
@@ -168,9 +168,7 @@ public class AI_Heuristic {
                     C12 = 0,// Difference of pawns 'hiding' on the edge of the board
                     C13 = 0,// Difference of Kings 'hiding' on the edge of the board
                     C14 = -PAWN_PIECE,// Pawn 'hiding' on the edge of the board,
-                    C15 = -KING // King 'hiding' on the edge of the board
-                            ;
-
+                    C15 = -KING; // King 'hiding' on the edge of the board
 
             int[] pieceCount = pieceCount(board);
             int currentStage;

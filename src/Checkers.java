@@ -6,6 +6,9 @@ import java.util.Map;
 
 /**
  * Create Swing Application of Checkers game
+ *
+ * This class houses the main window and game options.
+ * It also calls the game functionality in Board.java
  */
 class Checkers extends JPanel {
     static private Map<String, Integer> windowDimensions = new HashMap<>() {{
