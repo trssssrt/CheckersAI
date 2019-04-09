@@ -141,13 +141,18 @@ public class AI_Heuristic {
             RMAX = Constants.RMAX;
             int[] tPS = trappedPieceScore(board);
             int isRed = RED == playerID ? 1 : -1;
+            int _NORMAL_PIECE_ROW_VALUE = 10,// Encourages Pieces to move forward
+                    _KING_PIECE_ROW_VALUE = 10 * 5 / 2, // Encourage Kings to move
+                    _PROTECTED_PIECE_VALUE = 5,// Encourages Pieces to be protected
+                    _POSSIBLE_JUMP_VALUE = 2,// Encourages pieces to move to jump locations
+                    _ADVANCED_DISTANCE_VALUE = 1 / 1000;
             return simpleScore(board, playerID)
                     + simpleDistanceScore(board, playerID)
-                    + advancedDistanceScore2(board, playerID, 2) * ADVANCED_DISTANCE_VALUE // Causes Issues, Most likely need SMALL scaling factor//!@#$%^&*()
-                    + isRed * (tPS[0] - tPS[2]) * PAWN_PIECE_ROW_VALUE
-                    + isRed * (tPS[1] - tPS[3]) * KING_PIECE_ROW_VALUE
-                    + protectedPieceScore(board, playerID) * PROTECTED_PIECE_VALUE
-                    + possibleJumpsScore(board, playerID) * POSSIBLE_JUMP_VALUE;
+                    + advancedDistanceScore2(board, playerID, 2) * _ADVANCED_DISTANCE_VALUE
+                    + isRed * (tPS[0] - tPS[2]) * _NORMAL_PIECE_ROW_VALUE
+                    + isRed * (tPS[1] - tPS[3]) * _KING_PIECE_ROW_VALUE
+                    + protectedPieceScore(board, playerID) * _PROTECTED_PIECE_VALUE
+                    + possibleJumpsScore(board, playerID) * _POSSIBLE_JUMP_VALUE;
         } else  /*(difficulty > Constants.difficulty_Intermediate)*/ {
             /**
              * C1-C8 Focus on the difference between player pieces
