@@ -77,7 +77,6 @@ class Checkers extends JPanel {
         createMenuBar();
 
         board.setPreferredSize(new Dimension(windowDimensions.get("width"), windowDimensions.get("height")));
-        board.userMessage.setText(messageToUser.getText());
     }
 
     private void createMenuBar() {
@@ -100,7 +99,6 @@ class Checkers extends JPanel {
 
             // update messageToUser & deselect difficulty level
             messageToUser.setText(humanVsHuman);
-            board.userMessage.setText(humanVsHuman);
         });
         ComputerVSHuman.addActionListener(e -> {
             System.out.println("ADD AI");
@@ -121,7 +119,6 @@ class Checkers extends JPanel {
             board.singleAI = true;
             board.computerDifficulty = difficulty;
             board.performDoNewGame();
-            board.userMessage.setText(messageToUser.getText());
         });
         ComputerVsComputer.addActionListener(e -> {
             System.out.println("ADD AI & AI");
@@ -142,10 +139,7 @@ class Checkers extends JPanel {
             board.singleAI = false;
             board.computerDifficulty = difficulty;
             board.performDoNewGame();
-            board.userMessage.setText(messageToUser.getText());
         });
-
-//        gameMenu.addSeparator();
 
         JMenuItem resignCommand = new JMenuItem("Resign"); // Create a menu item.
         // Add listener to menu item.
@@ -244,11 +238,6 @@ class Checkers extends JPanel {
         helpMenu.add(gameEndWindowToggle);
 
         menuBar.add(helpMenu);
-
-
-
-        // Update Message in Board.java
-        board.userMessage.setText(messageToUser.getText());
     }
 
     /**

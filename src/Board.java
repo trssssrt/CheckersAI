@@ -40,7 +40,6 @@ class Board extends JPanel implements ActionListener, MouseListener {
     private static final int squareSize = Constants.default_squareSize, pieceSize = Constants.default_pieceSize;
 
     private JLabel message;
-    public JLabel userMessage;
 
     public int computerDifficulty = Constants.defaultGameDifficulty;
     private boolean displayLegalMoveColors; // If True, highlight legal moves for player
@@ -57,11 +56,6 @@ class Board extends JPanel implements ActionListener, MouseListener {
         message.setFont(new Font("Serif", Font.BOLD, 14));
         message.setForeground(Color.decode("#C8D2C6"));
         add(message, BorderLayout.LINE_START);
-
-        userMessage = new JLabel("", JLabel.RIGHT);
-        userMessage.setFont(new Font("Serif", Font.BOLD, 14));
-//        userMessage.setForeground(Color.YELLOW);
-//        add(userMessage, BorderLayout.LINE_END);
 
         displayLegalMoveColors = false;
         doNewGame();
