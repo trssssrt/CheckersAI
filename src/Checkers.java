@@ -19,14 +19,14 @@ class Checkers extends JPanel {
 
     private static JMenuBar menuBar;
     private static JMenu gameMenu, helpMenu, difficultyMenu;
-    private static String humanVsHuman = "Human Vs Human",
-            computerVsHuman = "Computer Vs Human",
-            computerVsComputer = "Computer Vs Computer",
-            computerDifficulty_Text = "Computer Difficulty: ",
-            difficultyLevel1 = "Easy",
-            difficultyLevel2 = "Medium",
-            difficultyLevel3 = "Intermediate",
-            difficultyLevel4 = "Hard";
+    private static String humanVsHuman = Constants.difficultyLevels[0],
+            computerVsHuman = Constants.computerVsHuman,
+            computerVsComputer = Constants.computerVsComputer,
+            computerDifficulty_Text = Constants.computerDifficulty_Text,
+            difficultyLevel1 = Constants.difficultyLevels[1],
+            difficultyLevel2 = Constants.difficultyLevels[2],
+            difficultyLevel3 = Constants.difficultyLevels[3],
+            difficultyLevel4 = Constants.difficultyLevels[4];
     // Integer difficulty levels
     private static int difficulty_ZERO = Constants.difficulty_ZERO,
             difficulty_Easy = Constants.difficulty_Easy,
@@ -149,12 +149,7 @@ class Checkers extends JPanel {
 
         JMenuItem resignCommand = new JMenuItem("Resign"); // Create a menu item.
         // Add listener to menu item.
-        resignCommand.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                board.performDoResign();
-            }
-        });
+        resignCommand.addActionListener(e -> board.performDoResign());
         gameMenu.add(resignCommand); // Add menu item to menu.
 
         menuBar.add(gameMenu);
@@ -196,13 +191,10 @@ class Checkers extends JPanel {
         });
 
         hardDifficultyMenuItem = new JRadioButtonMenuItem(difficultyLevel4);
-        hardDifficultyMenuItem.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    if (!messageToUser.getText().contains(humanVsHuman)) {
-                        messageToUser.setText(computerDifficulty_Text + difficultyLevel4);
-                    }
+        hardDifficultyMenuItem.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED) {
+                if (!messageToUser.getText().contains(humanVsHuman)) {
+                    messageToUser.setText(computerDifficulty_Text + difficultyLevel4);
                 }
             }
         });
@@ -242,12 +234,7 @@ class Checkers extends JPanel {
         playerColors.setSelected(true);
 
         JRadioButtonMenuItem gameEndWindowToggle = new JRadioButtonMenuItem("Show Game Over Window"); // Create a menu item.
-        gameEndWindowToggle.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                gameEndWindowToggle();
-            }
-        });
+        gameEndWindowToggle.addActionListener(e -> gameEndWindowToggle());
 
 
         // Add menu items to menu.

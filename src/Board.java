@@ -93,9 +93,10 @@ class Board extends JPanel implements ActionListener, MouseListener {
 
         selectedRow = -1;   // No pieces are selected at start of game
         if (computerDifficulty != Constants.difficulty_ZERO) {
-            message.setText("<html>" + Constants.computerDifficulty_Text + Constants.difficultyLevels[computerDifficulty] + "<br/>" + getPlayerColor() + ":  Make your move." + "</html>");
+            String playerText = singleAI ? Constants.computerVsHuman : Constants.computerVsComputer;
+            message.setText("<html>" + playerText + "<br/>" + Constants.computerDifficulty_Text + Constants.difficultyLevels[computerDifficulty] + "<br/>" + getCurrentPlayerColor() + ":  Make your move." + "</html>");
         } else {
-            message.setText(getPlayerColor() + ":  Make your move.");
+            message.setText("<html>" + Constants.difficultyLevels[computerDifficulty] + "<br/>" + getCurrentPlayerColor() + ":  Make your move." + "</html>");
         }
         gameInProgress = true;
 
@@ -146,7 +147,10 @@ class Board extends JPanel implements ActionListener, MouseListener {
         }
     }
 
-    private String getPlayerColor() {
+    /**
+     * @return Current Player Color
+     */
+    private String getCurrentPlayerColor() {
         if (this.playerTwoIsBlack && currentPlayer == CheckersData.RED) {
             return Constants.colorStringMap.get("RED");
         } else if (this.playerTwoIsBlack && currentPlayer == CheckersData.BLACK) {
@@ -170,8 +174,8 @@ class Board extends JPanel implements ActionListener, MouseListener {
             message.setText("There is no game in progress!");
             return;
         }
-        String currentOpponent = getPlayerColor().equals(Constants.colorStringMap.get("RED")) ? Constants.colorStringMap.get("BLACK") : Constants.colorStringMap.get("RED");
-        gameOver(getPlayerColor() + " resigns.  " + currentOpponent + " wins.");
+        String currentOpponent = getCurrentPlayerColor().equals(Constants.colorStringMap.get("RED")) ? Constants.colorStringMap.get("BLACK") : Constants.colorStringMap.get("RED");
+        gameOver(getCurrentPlayerColor() + " resigns.  " + currentOpponent + " wins.");
     }
 
 
@@ -184,7 +188,6 @@ class Board extends JPanel implements ActionListener, MouseListener {
         }
 
         message.setText(str);
-
         gameInProgress = !gameInProgress;
     }
 
@@ -211,8 +214,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
         // Inform player that they can only select their pieces
         if (selectedRow < 0) {
             message.setText(
-                    (currentPlayer == CheckersData.RED ? "BLACK: " : "RED: ")
-                            + "Please select piece to move."
+                    getCurrentPlayerColor() + ": " + "Please select piece to move."
             );
             return;
         }
@@ -227,12 +229,9 @@ class Board extends JPanel implements ActionListener, MouseListener {
         }
 
         // Inform player that they can only select the highlighted
-        if (currentPlayer == CheckersData.RED) {
-            message.setText("BLACK: Invalid move. Please select legal move.");
-        } else if (currentPlayer == CheckersData.BLACK) {
-            message.setText("RED: Invalid move. Please select legal move.");
-        }
-
+        message.setText(
+                getCurrentPlayerColor() + ": " + "Invalid move. Please select legal move.."
+        );
     }
 
 
@@ -299,22 +298,25 @@ class Board extends JPanel implements ActionListener, MouseListener {
             currentPlayer = CheckersData.BLACK;
             legalMoves = board.getLegalMoves(currentPlayer);
             if (legalMoves == null) {
-                gameOver("RED WINS!!!");
-            }
-            else if (legalMoves[0].isJump()) {
-                message.setText(getPlayerColor() + ":  You must jump.");
+                // Player Wins Text (With adjustment for player changing color)
+                gameOver(getCurrentPlayerColor() + " WINS!!!");
+
+            } else if (legalMoves[0].isJump()) {
+                message.setText(getCurrentPlayerColor() + ":  You must jump.");
             } else {
-                message.setText(getPlayerColor() + ":  Make your move.");
+                message.setText(getCurrentPlayerColor() + ":  Make your move.");
             }
         } else {
             currentPlayer = CheckersData.RED;
             legalMoves = board.getLegalMoves(currentPlayer);
             if (legalMoves == null) {
-                gameOver("BLACK WWINS!!!");
+                // Player Wins Text (With adjustment for player changing color)
+                gameOver(getCurrentPlayerColor() + " WINS!!!");
+
             } else if (legalMoves[0].isJump()) {
-                message.setText(getPlayerColor() + ":   You must jump.");
+                message.setText(getCurrentPlayerColor() + ":   You must jump.");
             } else {
-                message.setText(getPlayerColor() + ":  Make your move.");
+                message.setText(getCurrentPlayerColor() + ":  Make your move.");
             }
         }
 
@@ -500,8 +502,8 @@ class Board extends JPanel implements ActionListener, MouseListener {
     private void drawCrown(int row, int col, Graphics2D g, Color c) {
         g.setColor(c);
         Polygon crown = new Polygon(
-                new int[]{-pieceSize / 3, -pieceSize / 6, 0, pieceSize / 6, pieceSize / 3, pieceSize * 4 / 15, -pieceSize * 4 / 15}, //new int[]{-20, -10, 0, 10, 20, 16, -16},
-                new int[]{-pieceSize * 7 / 30, 0, -pieceSize * 7 / 30, 0, -pieceSize * 7 / 30, pieceSize / 5, pieceSize / 5}, //new int[]{-14, 0, -14, 0, -14, 12, 12}, 7);
+                new int[]{-pieceSize / 3, -pieceSize / 6, 0, pieceSize / 6, pieceSize / 3, pieceSize * 4 / 15, -pieceSize * 4 / 15},
+                new int[]{-pieceSize * 7 / 30, 0, -pieceSize * 7 / 30, 0, -pieceSize * 7 / 30, pieceSize / 5, pieceSize / 5},
                 7); // There are 7 corners in the polygon
         crown.translate(row, col);
         g.fill(crown);
@@ -571,7 +573,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
                 JOptionPane.PLAIN_MESSAGE);
     }
 
-    public void gameEndWindowToggle(){
+    public void gameEndWindowToggle() {
         this.showgameOverPopUp = !this.showgameOverPopUp;
     }
 }

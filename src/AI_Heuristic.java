@@ -25,7 +25,7 @@ public class AI_Heuristic {
     private Move bestMove;
     private int bestMoveCosts = 0;
 
-    private int RMIN = -10, RMAX = 10;// Variables determining Random changes in Heuristic
+    private int RMIN = Constants.RMIN, RMAX = Constants.RMAX;// Variables determining Random changes in Heuristic
 
     private int PAWN_PIECE = 500,
             KING = PAWN_PIECE * 5 / 3,// Originally 175
@@ -95,9 +95,6 @@ public class AI_Heuristic {
         Move[] legalMoveList = getLegalMoves(board, playerID);
         if (depth == 0) {
 //        || legalMoveList == null) {
-            if (playerID != computerPlayerID) {
-                System.out.println("HELP");
-            }
 
             // If there are equal scores, then the game is completely deterministic
             // So, to prevent this, we add a pseudo-random number.
@@ -141,12 +138,12 @@ public class AI_Heuristic {
      */
     private int evaluateHeuristic(Piece[][] board, int playerID) {
         if (difficulty == Constants.difficulty_Medium) {
-            RMIN = -10;
-            RMAX = 10;
+            RMIN = Constants.RMIN;
+            RMAX = Constants.RMAX;
             return simpleScore(board, playerID);
         } else if (difficulty == Constants.difficulty_Intermediate) {
-            RMIN = -10;
-            RMAX = 10;
+            RMIN = Constants.RMIN;
+            RMAX = Constants.RMAX;
             int[] tPS = trappedPieceScore(board);
             int isRed = RED == playerID ? 1 : -1;
             return simpleScore(board, playerID) * PAWN_PIECE / 50

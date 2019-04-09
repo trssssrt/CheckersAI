@@ -27,8 +27,6 @@ public final class Constants {
     }};
     public static final Color gameBlack = Color.BLACK.brighter(),
             gameRed = Color.RED.darker();
-//    public static final Color gameRed = Color.BLACK.brighter(),
-//            gameBlack= Color.RED.darker();
 
     public static final Color darkColor = Color.decode("#9D7D5C");
     public static final Color lightColor = Color.decode("#F1EBDE");
@@ -49,6 +47,8 @@ public final class Constants {
             BLACK_KING = 4;
 
     public static final String computerDifficulty_Text = "Computer Difficulty: ";
+    public static final String computerVsHuman = "Computer Vs Human",
+            computerVsComputer = "Computer Vs Computer";
     public static final String[] difficultyLevels = {"Human Vs Human", "Easy", "Medium", "Intermediate", "Hard"};
 
     // 0 - Human, 1 - Easy, 2 - Medium, 3 - Intermediate, 4 - Hard
@@ -61,5 +61,9 @@ public final class Constants {
 
     public static final int default_COMPUTER_MOVE_DELAY_IN_MILLISECONDS = 1000,
             default_COMPUTER_JUMP_DELAY_IN_MILLISECONDS = 1000;
+
+
+    // Variables determining Random changes in Heuristic
+    public static final int RMIN = -10, RMAX = 10;
 
 }
