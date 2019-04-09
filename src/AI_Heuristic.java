@@ -56,11 +56,8 @@ public class AI_Heuristic {
     }
 
     Move getBestMove() {
-//        System.out.println("DIFFICULTY: " + difficulty);
         if (difficulty > 1) {
-//            System.out.println("--Player ID: " + computerPlayerID);
             int a = this.negamaxAB(gameBoard, DEPTH, Integer.MIN_VALUE, Integer.MAX_VALUE, computerPlayerID);
-//            System.out.println("BEST MOVE: " + bestMove);
             bestMoveCosts += a;
             System.out.println("Best Move SCORE For " + computerPlayerID + ": " + a
                     + " (" + bestMove.fromRow + ", " + bestMove.fromCol +
@@ -755,9 +752,11 @@ public class AI_Heuristic {
      * @return The difference is piece values
      */
     private int simpleScore(Piece[][] board, int player) {
+        int NORMAL_PIECE = 100,
+                KING_PIECE = 175;
         int[] pC = pieceCount(board);
-        int black = pC[2] * PAWN_PIECE + pC[3] * KING,
-                red = pC[0] * PAWN_PIECE + pC[2] * KING;
+        int black = pC[2] * NORMAL_PIECE + pC[3] * KING_PIECE,
+                red = pC[0] * NORMAL_PIECE + pC[2] * KING_PIECE;
         return player == RED ? red - black : black - red;
     }
 
