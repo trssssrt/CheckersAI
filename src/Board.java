@@ -232,7 +232,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
 
         // Inform player that they can only select the highlighted
         message.setText(
-                getCurrentPlayerColor() + ": " + "Invalid move. Please select legal move.."
+                getCurrentPlayerColor() + ": " + "Invalid move. Please select legal move."
         );
     }
 
