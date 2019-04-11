@@ -3,7 +3,7 @@ import java.awt.geom.Ellipse2D;
 /**
  * Game Piece Object
  * Stores relevant piece information.
- * Each of the four game piece types have a specific value:
+ * Each game piece types has a specific value:
  * 0   -   Empty
  * 1   -   Red
  * 2   -   Black
