@@ -37,7 +37,7 @@ class Board extends JPanel implements ActionListener, MouseListener {
             selectedLegalMoveBorder = Constants.selectedLegalMoveBorder,
             selectedPieceBorder = Constants.selectedPieceBorder;
     private static Graphics[][] gameBoardGraphics = new Graphics[numRowsAndColumns][numRowsAndColumns];
-    private static final int initialX = Constants.defaultinitialX, initialY = Constants.defaultinitialY;
+    private static final int initialX = Constants.DEFAULT_INITIAL_X, initialY = Constants.DEFAULT_INITIAL_Y;
     private static final int squareSize = Constants.default_squareSize, pieceSize = Constants.default_pieceSize;
 
     private JLabel message;

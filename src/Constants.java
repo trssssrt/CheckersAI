@@ -11,10 +11,10 @@ public final class Constants {
     }
 
     public static final int defaultWindowHeight = 750,
-            defaultWindowWidth = 850,//1000,
+            defaultWindowWidth = 850,
             defaultNumRowsAndColumns = 8;
-    public static final int defaultinitialX = 100,
-            defaultinitialY = 50,
+    public static final int DEFAULT_INITIAL_X = 100,
+            DEFAULT_INITIAL_Y = 50,
             default_squareSize = 80,
             default_pieceSize = 60;
 
