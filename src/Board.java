@@ -422,11 +422,9 @@ class Board extends JPanel implements ActionListener, MouseListener {
                 gameBoardGraphics[row][col] = g;
 
                 // Check piece type and color it appropriately
-                if (board.gamePieces[row][col].getPieceType() == CheckersData.RED
-                        || board.gamePieces[row][col].getPieceType() == CheckersData.RED_KING) {
+                if (board.gamePieces[row][col].isPiece(CheckersData.RED)) {
                     g2d.setColor(gameRed);
-                } else if (board.gamePieces[row][col].getPieceType() == CheckersData.BLACK
-                        || board.gamePieces[row][col].getPieceType() == CheckersData.BLACK_KING) {
+                } else if (board.gamePieces[row][col].getPieceType() == CheckersData.BLACK) {
                     g2d.setColor(gameBlack);
 
                 } else if (board.gamePieces[row][col].getPieceType() == CheckersData.EMPTY) {
