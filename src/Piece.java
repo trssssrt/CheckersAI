@@ -6,9 +6,7 @@ import java.awt.geom.Ellipse2D;
  * Each of the four game piece types have a specific value:
  * 0   -   Empty
  * 1   -   Red
- * 2   -   Red King
- * 3   -   Black
- * 4   -   Black King
+ * 2   -   Black
  * <p>
  * Oval is the drawn piece on game board
  */
