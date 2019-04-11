@@ -42,7 +42,7 @@ public final class Constants {
     public static final int
             EMPTY = 0,
             RED = 1,
-            BLACK = 3;
+            BLACK = 2;
 
     public static final String computerDifficulty_Text = "Computer Difficulty: ";
     public static final String computerVsHuman = "Computer Vs Human",
