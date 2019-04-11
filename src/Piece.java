@@ -3,13 +3,11 @@ import java.awt.geom.Ellipse2D;
 /**
  * Game Piece Object
  * Stores relevant piece information.
- * Each of the four game piece types have a specific value:
+ * Each game piece types has a specific value:
  * 0   -   Empty
  * 1   -   Red
- * 2   -   Red King
- * 3   -   Black
- * 4   -   Black King
- *
+ * 2   -   Black
+ * <p>
  * Oval is the drawn piece on game board
  */
 class Piece {
@@ -25,6 +23,14 @@ class Piece {
 
     int getPieceType() {
         return pieceType;
+    }
+
+    boolean isPiece(int color) {
+        return getPieceType() == color;
+    }
+
+    boolean isPieceAndKing(int color) {
+        return getPieceType() == color && isKing();
     }
 
     void setOval(Ellipse2D oval) {
@@ -44,7 +50,6 @@ class Piece {
     }
 
     void resetPiece(int emptyPieceType) {
-//        this.pieceType = CheckersData.EMPTY; // This WOULD work, but feels like a bad practice
         this.pieceType = emptyPieceType;
         this.oval = null;
         this.king = false;
