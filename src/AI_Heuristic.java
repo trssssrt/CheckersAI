@@ -1101,13 +1101,13 @@ public class AI_Heuristic {
      * <p>
      * <p>
      * Piece Organization:
-     * Northwest           North (illegal Move)            Northeast
-     * \                  |                      /
-     * \                 |                     /
+     *           Northwest           North (illegal Move)            Northeast
+     *                    \                  |                      /
+     *                     \                 |                     /
      * West (illegal Move) -------   Player's Game Piece     ------- East (illegal Move)
-     * /                 |                     \
-     * /                  |                      \
-     * Southwest           South (illegal Move)            Southeast
+     *                     /                 |                     \
+     *                    /                  |                      \
+     *           Southwest           South (illegal Move)            Southeast
      */
     private Move[] getLegalMoves(Piece[][] gameBoard, int playerID) {
         // Reject if player isn't Red or Black (Should never happen)
