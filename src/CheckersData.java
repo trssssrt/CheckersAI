@@ -78,7 +78,7 @@ class CheckersData {
         }
 
         // If piece gets to other side of board make it into a king
-        if (toRow == 0 && gamePieces[toRow][toCol].getPieceType() == RED) { //  && !gamePieces[toRow][toCol].isKing() <- Can add but is superfluous since setKing() always makes king=true
+        if (toRow == 0 && gamePieces[toRow][toCol].getPieceType() == RED) {
             gamePieces[toRow][toCol].setKing();
         }
         if (toRow == numRowsAndColumns - 1 && gamePieces[toRow][toCol].getPieceType() == BLACK) {
@@ -96,13 +96,13 @@ class CheckersData {
      * <p>
      * <p>
      * Piece Organization:
-     * Northwest           North (illegal Move)            Northeast
-     * \                  |                      /
-     * \                 |                     /
+     *           Northwest           North (illegal Move)            Northeast
+     *                    \                  |                      /
+     *                     \                 |                     /
      * West (illegal Move) -------   Player's Game Piece     ------- East (illegal Move)
-     * /                 |                     \
-     * /                  |                      \
-     * Southwest           South (illegal Move)            Southeast
+     *                     /                 |                     \
+     *                    /                  |                      \
+     *           Southwest           South (illegal Move)            Southeast
      */
     Move[] getLegalMoves(int playerID) {
         // Reject if player isn't Red or Black (Should never happen)
@@ -177,6 +177,7 @@ class CheckersData {
 
         // If there are no moves return null, otherwise return moves as an array
         if (moves.size() == 0) {
+            // Returning null prevents empty arrays to be picked up by garbage collecter
             return null;
         } else {
             return moves.toArray(new Move[moves.size()]); // Convert Move List to Move Array
@@ -283,7 +284,7 @@ class CheckersData {
             return false;
         }
 
-        return true;  // The jump is legal.
+        return true;  // The jump is legal
 
     }
 
