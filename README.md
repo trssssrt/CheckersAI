@@ -1,5 +1,5 @@
 # CheckersAI
-Simple implementation of the Negamax algorithm in a Checkers board game
+Simple implementation of the Negamax algorithm, with alpha-beta pruning, in a Checkers board game
 
 ## Heuristic
 CheckersAI changes heuristic according to difficulty. 
